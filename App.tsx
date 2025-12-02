@@ -1,45 +1,105 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useEffect } from 'react';
+import { StatusBar, View, Platform, LogBox } from 'react-native';
+import { Provider } from 'react-redux';
+import store from './app/store/store';
+import AppStyles from './app/styles/AppStyles';
+import Toast from 'react-native-toast-message';
+import Geolocation from 'react-native-geolocation-service';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import AppNavigator from './app/navigation'; 
+import messaging from '@react-native-firebase/messaging';
+import { Alert } from 'react-native';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+const App = () => {
+  useEffect(() => {
+    LogBox.ignoreAllLogs(); // Optional: better to fix warnings instead
+  }, []);
+
+  // Move this inside useEffect if you want it to run once
+  Geolocation.setRNConfiguration({
+    skipPermissionRequests: false,
+    authorizationLevel: 'whenInUse',
+  });
+
+// 1. When a notification is received while the app is in the foreground
+useEffect(() => {
+  const unsubscribe = messaging().onMessage(async remoteMessage => {
+    console.log('New FCM message in foreground:', remoteMessage);
+
+    // Show a toast notification
+    Toast.show({
+      type: 'success',
+      text1: remoteMessage.notification?.title || 'Your turn has arrived!',
+      text2: remoteMessage.notification?.body || 'Please come now!',
+      position: 'top',
+      visibilityTime: 6000,
+    });
+
+    // Optional: Show an alert instead (uncomment if needed)
+    // Alert.alert(
+    //   remoteMessage.notification?.title,
+    //   remoteMessage.notification?.body
+    // );
+  });
+
+  return unsubscribe;
+}, []);
+
+// 2. When user taps on a notification and the app opens
+useEffect(() => {
+  // App was in background → user tapped notification
+  const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
+    console.log('Notification opened app from background:', remoteMessage);
+
+    const { body, title } = remoteMessage.notification;
+    const { tokenNumber } = remoteMessage.data;
+
+    Toast.show({
+      type:  'success',
+      text1: body || 'Your turn has arrived!',
+      text2:title || `Token ${tokenNumber} - Please come now!`,
+      visibilityTime: 8000,
+    });
+
+    // Navigate to queue screen if needed
+    // navigation.navigate('Servicing', { queueId });
+  });
+
+  // App was completely closed → user tapped notification to open it
+  messaging()
+    .getInitialNotification()
+    .then(remoteMessage => {
+      if (remoteMessage) {
+        console.log('Notification opened app from quit state:', remoteMessage);
+        const { tokenNumber } = remoteMessage.data;
+
+        setTimeout(() => {
+          Toast.show({
+            type: 'success',
+            text1: 'Welcome!',
+            text2: `Token ${tokenNumber} - Your turn has arrived!`,
+            visibilityTime: 10000,
+          });
+        }, 1000);
+      }
+    });
+
+  return unsubscribe;
+}, []);
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
-}
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
+    <View style={AppStyles.rootStyle}>
+      <StatusBar
+        translucent
+        // backgroundColor={colors.primary}
+        barStyle="light-content"
       />
+      <Provider store={store}>
+        <AppNavigator />
+      </Provider>
+      <Toast />
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+};
 
 export default App;

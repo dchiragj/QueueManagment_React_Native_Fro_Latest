@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1012510006840",
+    "project_id": "queue-e4fe9",
+    "storage_bucket": "queue-e4fe9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1012510006840:android:5e007b2bb55dfbcb0e90cd",
+        "android_client_info": {
+          "package_name": "com.queue_app_fro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_8JKfiPaughE-O873Zvzcf8KbeQKKocg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
