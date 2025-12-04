@@ -47,7 +47,6 @@ export const getCurrentToken = async (queueId, categoryId) => {
   try {
     const response = await apiService.get('/token/current/token', {params: { queueId, categoryId }
     });
-    console.log('Current Token Data:', response);
     return response.data.data.upcoming;
   } catch (error) {
     console.error('getCurrentToken error:', error.response?.data || error.message);
@@ -121,6 +120,7 @@ export const verificationcode = async ( code ) => {
 };
 
 export const profileUpdate = async ( obj ) => {
+  console.log( obj, "updateprofilepayload" );
   try {
     const response = await apiService.post( '/user/profile', obj );
     return response.data;

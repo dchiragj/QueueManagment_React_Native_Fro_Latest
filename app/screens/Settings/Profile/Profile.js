@@ -1,36 +1,35 @@
-import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard' ;
+import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
 import AppStyles from '../../../styles/AppStyles';
 import React, { useEffect } from 'react';
 import screens from '../../../constants/screens';
 import NavigationOptions from '../../../components/NavigationOptions';
 import { View, SafeAreaView, StyleSheet, Image } from 'react-native';
-import  colors  from '../../../styles/colors';
+import colors from '../../../styles/colors';
 import TextView from '../../../components/TextView/TextView';
 import { verticalScale, scale, moderateScale } from 'react-native-size-matters';
 import Icon from '../../../components/Icon';
 import { borderRadius } from '../../../styles/dimensions';
 import { connect } from 'react-redux';
-import  {getUserProfile}  from'../../../actions/profileActions';
-import { logout } from'../../../services/authService';
+import { getUserProfile } from '../../../actions/profileActions';
+import { logout } from '../../../services/authService';
 import Loading from '../../../components/Loading';
 import { Button } from '../../../components/Button';
 
 const Profile = (props) => {
-    const { user } = props.auth;
-  console.log('Profile',user);
-  useEffect(() => {
+  const { user } = props.auth;
+  // useEffect(() => {
 
-    loadData();
-    props.navigation.setParams({ onPressEdit });
-    const focusListener = props.navigation.addListener('didFocus', () => {
-    });
-    return () => {
-      focusListener.remove();
-    };
-  }, []);
+  //   loadData();
+  //   props.navigation.setParams({ onPressEdit });
+  //   const focusListener = props.navigation.addListener('didFocus', () => {
+  //   });
+  //   return () => {
+  //     focusListener.remove();
+  //   };
+  // }, []);
 
   const loadData = async () => {
-    await props.getUserProfile();
+    // await props.getUserProfile();
   };
   const onPressEdit = () => {
     props.navigation.navigate(screens.Onboarding, {
@@ -39,7 +38,7 @@ const Profile = (props) => {
   };
   const onSignOut = async () => {
     await props.logout();
-       props.navigation.navigate('Auth', { screen: screens.Login });
+    props.navigation.navigate('Auth', { screen: screens.Login });
   };
 
   const { profileInfo = {}, loading } = props.profile;
@@ -51,21 +50,41 @@ const Profile = (props) => {
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
         <View style={s.profileWrapper}>
           <Image source={require('../../../assets/images/profile.png')} />
-          <TextView color={colors.white} text={profileInfo?.name} type={'body-head'} style={[s.profileInfo]} />
+          <TextView color={colors.white} text={user?.name} type={'body-head'} style={[s.profileInfo]} />
           <TextView
             color={colors.lightWhite}
-            text={profileInfo.role?.toUpperCase()}
+            text={user.role?.toUpperCase()}
             type={'body-head'}
             style={[s.profileInfo]}
           />
         </View>
-        <View style={[s.profileGenderWrapper]}>
+        {/* <View style={[s.profileGenderWrapper]}>
           <Icon name='transgender' color={colors.primary} isFeather={false} style={s.genderLogo} />
-          <TextView style={s.locationText} color={colors.white} text={profileInfo?.gender} type={'body'} />
-        </View>
-        <View style={s.locationWrapper}>
+          <TextView style={s.locationText} color={colors.white} text={user?.gander} type={'body'} />
+        </View> */}
+        {/* <View style={s.locationWrapper}>
           <Icon style={s.genderLogo} name='md-location' color={colors.primary} isFeather={false} />
-          <TextView style={s.locationText} color={colors.white} text={profileInfo.address || 'Address'} type={'body'} />
+          <TextView style={s.locationText} color={colors.white} text={user?.address} type={'body'} />
+        </View> */}
+        <View style={s.mailWrapper}>
+          <Icon color={colors.primary} name='transgender' isFeather={false} />
+          <TextView
+            numberOfLines={1}
+            style={s.mailTextStyle}
+            color={colors.white}
+            text={user.gander}
+            type={'body'}
+          />
+        </View>
+        <View style={s.mailWrapper}>
+          <Icon color={colors.primary} name='location' isFeather={false} />
+          <TextView
+            numberOfLines={1}
+            style={s.mailTextStyle}
+            color={colors.white}
+            text={user.address}
+            type={'body'}
+          />
         </View>
         <View style={s.mailWrapper}>
           <Icon color={colors.primary} name='mail' isFeather={false} />
@@ -73,14 +92,14 @@ const Profile = (props) => {
             numberOfLines={1}
             style={s.mailTextStyle}
             color={colors.white}
-            text={profileInfo.email}
+            text={user.email}
             type={'body'}
           />
-          <Icon color={colors.green} name='md-shield-checkmark-sharp' isFeather={false} />
+          {/* <Icon color={colors.green} name='md-shield-checkmark-sharp' isFeather={false} /> */}
         </View>
         <View style={s.mailWrapper}>
           <Icon name='call' color={colors.primary} isFeather={false} />
-          <TextView style={s.mailTextStyle} color={colors.lightWhite} text={profileInfo.mobileNumber} type={'body'} />
+          <TextView style={s.mailTextStyle} color={colors.lightWhite} text={user.mobileNumber} type={'body'} />
           <TextView color={colors.green} text={'verify'} type={'body'} />
         </View>
         {/* <TextView
@@ -91,7 +110,20 @@ const Profile = (props) => {
           style={[s.signOut]}
           onPress={onSignOut}
         /> */}
-        <Button onPress={onSignOut} ButtonText='Sign Out' style={s.btn} animationStyle={s.btn} />
+        <View style={s.buttonRow}>
+          <Button
+            onPress={onPressEdit}
+            ButtonText='Edit Profile'
+            style={s.editBtn}
+            textStyle={s.editBtnText}
+          />
+          <Button
+            onPress={onSignOut}
+            ButtonText='Sign Out'
+            style={s.signOutBtn}
+            textStyle={s.signOutBtnText}
+          />
+        </View>
       </ScrollableAvoidKeyboard>
     </SafeAreaView>
   );
@@ -154,17 +186,41 @@ const s = StyleSheet.create({
     flex: 0.99,
     marginHorizontal: 8
   },
-  btn: {
-    backgroundColor: colors.primary,
+ buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginHorizontal: scale(30),
     marginTop: verticalScale(70),
-    marginBottom: verticalScale(10),
-    borderRadius: borderRadius
+    marginBottom: verticalScale(20),
+    gap: scale(5),
   },
-  signOut: {
-    textAlign: 'center',
-    marginVertical: verticalScale(80)
-  }
+
+  editBtn: {
+    flex: 1,
+    backgroundColor: colors.primary,      
+    borderRadius: borderRadius,
+    paddingVertical: verticalScale(14),
+    // width: 'auto',
+    paddingHorizontal: scale(20),
+  },
+  editBtnText: {
+    color: colors.white,
+    fontWeight: '600',
+  },
+
+  signOutBtn: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    borderRadius: borderRadius,
+    paddingVertical: verticalScale(14),
+    paddingHorizontal: scale(20),
+  },
+  signOutBtnText: {
+    color: colors.primary,
+    fontWeight: '600',
+  },
 });
 
 const mapStateToProps = (state) => ({

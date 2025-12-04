@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import {
   clearAuthData,
   clearAuthResponseMsg,
@@ -13,6 +13,7 @@ import { getBaseUrl } from '../global/Environment';
 import { isEmail, getAPIResponseError } from '../global/Helpers';
 import { saveToken, clearToken } from '../utils/authTokenHelpers';
 import { verificationcode, verifyEmailApi } from './apiService';
+import { Image } from 'react-native-svg';
 const baseUrl = getBaseUrl();
 
 /**F
@@ -21,7 +22,8 @@ const baseUrl = getBaseUrl();
  */
 export const login = (obj) => async (dispatch) => {
 
-  try {``
+  try {
+    ``
     dispatch(clearAuthResponseMsg());
     if (!obj) {
       dispatchAuthError('username', 'Email is Required', dispatch);
@@ -41,12 +43,12 @@ export const login = (obj) => async (dispatch) => {
     const response = await axios.post(`${baseUrl}/auth/login`, obj);
 
     const { data } = response.data;
-      // console.log("data------>",data);
+    // console.log("data------>",data);
     dispatch(setLoginToken(data));
     return true;
   } catch (e) {
-    console.log(e,"errorrrrr");
-    
+    console.log(e, "errorrrrr");
+
     dispatchAuthError('error', getAPIResponseError(e) || 'Unable to login please try again', dispatch);
     return false;
   } finally {
@@ -112,13 +114,25 @@ export const signup = (obj) => async (dispatch) => {
  * @desc set login token and set user
  */
 export const setLoginToken = (data) => async (dispatch) => {
-  console.log('setLoginToken', data);
+  console.log(data, "setlogin");
 
   await saveToken(data);
-  const decoded = jwtDecode(data.token);  
 
-  console.log(decoded, "decoded");
-  dispatch(setCurrentUser(decoded));
+  const userObj = {
+    email: data.email,
+    firstName: data.firstName,
+    role: data.role,
+    lastName: data.lastName,
+    mobileNumber: data.mobileNumber,
+    name: data.name,
+    gander: data.gender,
+    address: data.address,
+    id: data.id,
+    Image: data.profileImage
+  }
+
+  // const decoded = jwtDecode(data.token);
+  dispatch(setCurrentUser(userObj));
 };
 
 /**

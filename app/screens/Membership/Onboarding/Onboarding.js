@@ -6,13 +6,13 @@ import Input from '../../../components/Input';
 import Validation from '../../../components/Validation/Validation';
 import FormGroup from '../../../components/FormGroup';
 import TextView from '../../../components/TextView/TextView';
-import  colors  from '../../../styles/colors';
+import colors from '../../../styles/colors';
 import { verticalScale, scale } from 'react-native-size-matters';
 import NavigationOptions from '../../../components/NavigationOptions';
 import screens from '../../../constants/screens';
 import { Button, Touchable } from '../../../components/Button';
 import Icon from '../../../components/Icon';
-import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard' ;
+import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
 import { View, Image, StyleSheet, Alert, PermissionsAndroid, Platform, ActionSheetIOS, TouchableOpacity } from 'react-native';
 import AppStyles from '../../../styles/AppStyles';
 import { getAuthUser } from '../../../utils/localStorageHelpers';
@@ -26,6 +26,7 @@ import { genderArray } from './../../../data/raw';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CommonActions } from '@react-navigation/native';
+import { profileUpdate } from '../../../services/apiService';
 
 const Onboarding = (props) => {
   let { profileInfo, resError = {}, loading } = props.profile;
@@ -40,9 +41,9 @@ const Onboarding = (props) => {
     };
   }, []);
   useEffect(() => {
-  console.log("getUserProfile in props:", props.getUserProfile);
-  loadData();
-}, []);
+    console.log("getUserProfile in props:", props.getUserProfile);
+    loadData();
+  }, []);
 
 
   const loadData = async () => {
@@ -58,55 +59,69 @@ const Onboarding = (props) => {
     }
   };
 
- const onSubmit = async () => {
-  let profileInfo = props.profile.profileInfo;
+  const onSubmit = async () => {
+    try {
+    const formData = new FormData();
 
-  // Update profile picture if selected
-  if (selectedImage?.uri) {
-    profileInfo.ProfileUrl = selectedImage.uri;
-  }
+  formData.append("firstName", profileInfo.firstName);
+  formData.append("lastName", profileInfo.lastName);
+  formData.append("address", profileInfo.address);
+  formData.append("gender", profileInfo.gender);
+  console.log("selectedImage before image append:", selectedImage);
+  // If image selected
+ formData.append("ProfileUrl", {
+  uri: selectedImage.uri,
+  name: "profile.jpg",
+  type: "image/jpeg",
+});
 
-  const result = await props.updateUserProfile(profileInfo);
+  console.log("FormData before image append:", formData);
 
-  if (result) {
-    // Update local storage
-    const userDetails = await getAuthUser();
-    delete userDetails.onboardingRequired;
-    await saveUserDetails(userDetails);
 
-    // Check where we came from
-    const source = props.route.params?.source;
+  const result = await profileUpdate(formData);
 
-    if (source === screens.Profile) {
-      // If came from Profile → go back to Settings (inside Drawer/Tab)
-      props.navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: 'App' }], // or your main app stack name
-        })
-      );
-      props.navigation.navigate('App', {
-        screen: screens.SettingsRoot,
-        params: { screen: screens.Settings },
-      });
-    } else {
-      // Normal flow: Onboarding → Home
-      props.navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [
-            {
-              name: 'MainApp',
-              state: {
-                routes: [{ name: screens.HomeRoot }],
+    if (result) {
+      // Update local storage
+      const userDetails = await getAuthUser();
+      delete userDetails.onboardingRequired;
+      await saveUserDetails(userDetails);
+
+      // Check where we came from
+      const source = props.route.params?.source;
+
+      if (source === screens.Profile) {
+        // If came from Profile → go back to Settings (inside Drawer/Tab)
+        props.navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'MainApp' }], // or your main app stack name
+          })
+        );
+        props.navigation.navigate('MainApp', {
+          screen: screens.SettingsRoot,
+          params: { screen: screens.Settings },
+        });
+      } else {
+        // Normal flow: Onboarding → Home
+        props.navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'MainApp',
+                state: {
+                  routes: [{ name: screens.HomeRoot }],
+                },
               },
-            },
-          ],
-        })
-      );
+            ],
+          })
+        );
+      }
     }
+  } catch (error) {
+    console.log('Profile update error fro:', error);
   }
-};
+  };
 
   const saveUserDetails = async (userDetails) => {
     user = props.auth.user;
@@ -186,40 +201,47 @@ const Onboarding = (props) => {
 
     const pickImage = async (source) => {
       try {
-        let response;
+        const options = {
+          mediaType: 'photo',
+          maxWidth: 1024,
+          maxHeight: 1024,
+          quality: 0.8,
+          includeBase64: false,
+        };
+
+        let result;
         if (source === 'camera') {
-          const hasPermission = await requestCameraPermission();
-          if (!hasPermission) {
-            Alert.alert('Permission Denied', 'Camera access is required to take a photo.');
-            return;
-          }
-          response = await launchCamera(options);
+          if (!await requestCameraPermission()) return;
+          result = await launchCamera(options);
         } else {
-          const hasPermission = await requestGalleryPermission();
-          if (!hasPermission) {
-            Alert.alert('Permission Denied', 'Gallery access is required to select a photo.');
-            return;
-          }
-          response = await launchImageLibrary(options);
+          if (!await requestGalleryPermission()) return;
+          result = await launchImageLibrary(options);
         }
 
-        console.log('Image picker response:', response); // Debug
-
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-        } else if (response.errorCode || response.errorMessage) {
-          console.error('ImagePicker Error:', response.errorCode, response.errorMessage);
-          Alert.alert('Error', `Failed to ${source === 'camera' ? 'capture' : 'select'} photo: ${response.errorMessage || 'Unknown error'}`);
-        } else {
-          const imageAsset = response.assets ? response.assets[0] : response; // Handle v4/v5
-          console.log(imageAsset,"img");
-          
-          setSelectedImage(imageAsset );
-          handleFormChange('ProfileUrl', imageAsset.uri);
+        if (result.didCancel) return;
+        if (result.errorCode) {
+          Alert.alert('Error', result.errorMessage || 'Image pick failed');
+          return;
         }
+
+        if (result.assets && result.assets[0]) {
+          const { uri, type, fileName } = result.assets[0];
+
+          const imageData = {
+            uri,
+            type: type || 'image/jpeg',
+            name: fileName || `profile_${Date.now()}.jpg`,
+          };
+
+          console.log('Final Image Object:', imageData);
+
+          setSelectedImage(imageData);
+          handleFormChange('ProfileUrl', uri); // preview માટે
+        }
+
       } catch (error) {
-        console.error(`Image ${source} error:`, error);
-        Alert.alert('Error', `Failed to open ${source === 'camera' ? 'camera' : 'gallery'}. Please try again.`);
+        console.error('Image pick error:', error);
+        Alert.alert('Error', 'Failed to select image');
       }
     };
 
@@ -255,7 +277,7 @@ const Onboarding = (props) => {
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
         <Touchable onPress={handleImagePick}>
           <View style={s.profileImgMain}>
-            <Image source={ selectedImage ? { uri: selectedImage.uri } : profileInfo?.ProfileUrl ? { uri: profileInfo.ProfileUrl } : require('../../../assets/images/profile.png') } style={s.ProfileUrl} />
+            <Image source={selectedImage ? { uri: selectedImage.uri } : profileInfo?.ProfileUrl ? { uri: profileInfo.ProfileUrl } : require('../../../assets/images/profile.png')} style={s.ProfileUrl} />
             <TextView color={colors.primary} text={'Upload Photo'} type={'body-head'} style={[s.uploadPhotoText]} />
           </View>
         </Touchable>
@@ -296,7 +318,7 @@ const Onboarding = (props) => {
               placeholder='Enter Address'
               isIconLeft={true}
               isIconRight={true}
-              leftIconName={'md-location'}
+              leftIconName={'location'}
               rightIconName={'locate'}
               iconColor={colors.primary}
               color={colors.white}
@@ -339,17 +361,17 @@ const Onboarding = (props) => {
           onPress={onSubmit}
           isLoading={loading}
         />
-      {(!props.route?.params ||
-  props.route?.params?.source === screens.VerifyEmail) && (
-  <TextView
-    isClickableLink={true}
-    color={colors.primary}
-    text={'Sign Out'}
-    type={'body-one'}
-    style={[s.signOut]}
-    onPress={onSignOut}
-  />
-)}
+        {(!props.route?.params ||
+          props.route?.params?.source === screens.VerifyEmail) && (
+            <TextView
+              isClickableLink={true}
+              color={colors.primary}
+              text={'Sign Out'}
+              type={'body-one'}
+              style={[s.signOut]}
+              onPress={onSignOut}
+            />
+          )}
 
       </ScrollableAvoidKeyboard>
     </SafeAreaView>

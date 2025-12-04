@@ -16,8 +16,11 @@ import { logout } from '../../services/authService';
 import NavigationOptions from '../../components/NavigationOptions';
 
 const Settings = (props) => {
-
   const { user } = props.auth;
+  const ImageUrl = props.profile.profileInfo?.ProfileUrl;
+
+  console.log(props.profile.profileInfo.ProfileUrl,"props");
+  
 
   useEffect(() => {
     console.log('settings');
@@ -30,8 +33,9 @@ const Settings = (props) => {
   };
 
   const onPressProfile = async () => {
-    // props.navigation.navigate(screens.Profile);
+    props.navigation.navigate(screens.Profile);
   };
+  
 
   const _openDrawer = () => {
     props.navigation.openDrawer();
@@ -42,7 +46,7 @@ const Settings = (props) => {
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
         <Touchable onPress={onPressProfile} style={[s.profileMain, s.same]}>
           <View>
-            <Image source={require('../../assets/images/sProfile.png')}></Image>
+            <Image source={ require('../../assets/images/sProfile.png')}></Image>
           </View>
           <View style={s.profileTextMain}>
             <TextView color={colors.white} text={user.name} type={'body'} style={s.profileText} />

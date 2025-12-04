@@ -15,7 +15,6 @@ const Servicing = ({ navigation }) => {
   const route = useRoute();
   const { queueId, categoryid } = route.params;
 
-  console.log(queueId,categoryid ,"serving");
   
   const SERVICE_TIME = 10;
 
@@ -29,9 +28,6 @@ const Servicing = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [showMore, setShowMore] = useState(false);
 
-
-  console.log(completedHistory,"completedHistory");
-  
   const showToast = (type, title, message) => {
     Toast.show({
       type,
@@ -70,11 +66,9 @@ const Servicing = ({ navigation }) => {
 
 
     fetchCurrentAndUpcoming();
-
-    // દર 8 સેકન્ડે auto refresh
     // const interval = setInterval(fetchCurrentAndUpcoming, 8000);
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, [queueId, categoryid]);
 
   useEffect(() => {
@@ -496,6 +490,9 @@ const Servicing = ({ navigation }) => {
           </View>
         )}
       </ScrollView>
+      <View>
+        <Text style={styles.textcount}>Total Tokens in Queue:{customers.length}</Text>
+      </View>
       <View style={styles.queuingControls}>
         <TouchableOpacity style={styles.buttonGreen} onPress={callNext}>
           <Text style={styles.buttonText}>Next</Text>
@@ -611,7 +608,7 @@ const styles = StyleSheet.create({
   queuingControls: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    padding: 20,
+    padding: 10,
   },
   fixedBottomControls: {
     position: 'absolute',
@@ -773,6 +770,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
+  textcount:{
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
+    padding: 10,
+  }
 });
 
 export default Servicing;

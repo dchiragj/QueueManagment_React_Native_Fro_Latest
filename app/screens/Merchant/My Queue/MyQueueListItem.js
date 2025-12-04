@@ -217,7 +217,6 @@ const handleQueueDetails = () => {
   const handleSignInDesk = () => {
   if (navigation && item) {
     const queueId = item.id || item._id;
-    console.log('Navigating with queue:', queueId, categoryid);
     // navigation.navigate('Service', { queueId, categoryid });
      navigation.navigate(screens.MyQueueRoot, {
     screen: screens.Service,

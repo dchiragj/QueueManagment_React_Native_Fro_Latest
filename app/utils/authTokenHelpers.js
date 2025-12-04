@@ -27,6 +27,8 @@ export const validateRefreshToken = async () => {
 };
 
 export const saveToken = async (data) => {
+  console.log(data,"authtoken");
+  
   setAuthToken(data.token);
   await saveAuthUser(data);
 };

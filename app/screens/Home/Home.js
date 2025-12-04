@@ -54,7 +54,6 @@ const Home = (props) => {
         { key: 'qr', label: 'QR Code' },
       ]
     : [];
-    console.log(qrDetails,"qtdetails");
     
 
   useEffect(() => {
