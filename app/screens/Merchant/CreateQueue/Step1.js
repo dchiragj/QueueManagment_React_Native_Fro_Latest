@@ -203,7 +203,7 @@
 // screens/Step1.js
 // screens/Step1.js
 import TextView from '../../../components/TextView/TextView';
-import  colors  from '../../../styles/colors';
+import colors from '../../../styles/colors';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -216,7 +216,7 @@ import {
   Text,
 } from 'react-native';
 // import NavigationOptions from '../../../components/NavigationOptions';
-import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard' ;
+import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
 import AppStyles from '../../../styles/AppStyles';
 import FormGroup from '../../../components/FormGroup';
 import Input from '../../../components/Input';
@@ -230,8 +230,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Geolocation from 'react-native-geolocation-service';
 
 
-const Step1 = ( { navigation } ) => {
-  const [ formData, setFormData ] = useState( {
+const Step1 = ({ navigation }) => {
+  const [formData, setFormData] = useState({
     category: '',
     name: '',
     description: '',
@@ -244,14 +244,14 @@ const Step1 = ( { navigation } ) => {
     joinMethods: '',
     latitude: 0,
     longitude: 0,
-  } );
+  });
 
-  const [ errors, setErrors ] = useState( {} );
-  const [ loading, setLoading ] = useState( false );
-  const [ categories, setCategories ] = useState( [] );
-  const [ desks, setDesks ] = useState( [] );
-  const [ locationError, setLocationError ] = useState( '' );
-  const [ userLocation, setUserLocation ] = useState( { lat: 0, long: 0 } );
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [desks, setDesks] = useState([]);
+  const [locationError, setLocationError] = useState('');
+  const [userLocation, setUserLocation] = useState({ lat: 0, long: 0 });
 
   const JOIN_METHODS = [
     { key: 'private', label: 'Invite-only', icon: 'lock' },
@@ -260,40 +260,40 @@ const Step1 = ( { navigation } ) => {
     { key: 'qr', label: 'QR-Code Scan', icon: 'qrcode' },
   ];
 
-  const formatDateForSQL = ( date ) => {
-    if ( !date || !( date instanceof Date ) || isNaN( date ) ) return null;
-    return date.toISOString().slice( 0, 19 ).replace( 'T', ' ' );
+  const formatDateForSQL = (date) => {
+    if (!date || !(date instanceof Date) || isNaN(date)) return null;
+    return date.toISOString().slice(0, 19).replace('T', ' ');
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if ( !formData.name ) newErrors.name = 'Name is required';
-    if ( !formData.category ) newErrors.category = 'Category is required';
-    if ( !formData.description ) newErrors.description = 'Description is required';
-    if ( !formData.start_date || isNaN( formData.start_date ) ) {
+    if (!formData.name) newErrors.name = 'Name is required';
+    if (!formData.category) newErrors.category = 'Category is required';
+    if (!formData.description) newErrors.description = 'Description is required';
+    if (!formData.start_date || isNaN(formData.start_date)) {
       newErrors.start_date = 'Valid start date is required';
     }
-    if ( !formData.end_date || isNaN( formData.end_date ) ) {
+    if (!formData.end_date || isNaN(formData.end_date)) {
       newErrors.end_date = 'Valid end date is required';
     }
-    if ( formData.end_date && formData.start_date && formData.end_date <= formData.start_date ) {
+    if (formData.end_date && formData.start_date && formData.end_date <= formData.start_date) {
       newErrors.end_date = 'End date must be after start date';
     }
-    if ( !formData.start_number || formData.start_number < 1 ) {
+    if (!formData.start_number || formData.start_number < 1) {
       newErrors.start_number = 'Start number must be ≥ 1';
     }
-    if ( !formData.end_number || formData.end_number <= formData.start_number ) {
+    if (!formData.end_number || formData.end_number <= formData.start_number) {
       newErrors.end_number = 'End number must be > start number';
     }
-    if ( !formData.address ) newErrors.address = 'Address is required';
-    if ( !formData.joinMethods ) newErrors.joinMethods = 'Select a join method';
+    if (!formData.address) newErrors.address = 'Address is required';
+    if (!formData.joinMethods) newErrors.joinMethods = 'Select a join method';
 
-    setErrors( newErrors );
-    return Object.keys( newErrors ).length === 0;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const requestLocationPermission = async () => {
-    if ( Platform.OS !== 'android' ) return true;
+    if (Platform.OS !== 'android') return true;
 
     try {
       const granted = await PermissionsAndroid.request(
@@ -306,38 +306,38 @@ const Step1 = ( { navigation } ) => {
         }
       );
       return granted === PermissionsAndroid.RESULTS.GRANTED;
-    } catch ( err ) {
-      console.warn( err );
+    } catch (err) {
+      console.warn(err);
       return false;
     }
   };
 
   const captureLocation = async () => {
-    setLoading( true );
-    setLocationError( '' );
+    setLoading(true);
+    setLocationError('');
 
     try {
       const hasPermission = await requestLocationPermission();
-      if ( !hasPermission ) {
-        setLocationError( 'Permission denied' );
-        setLoading( false );
+      if (!hasPermission) {
+        setLocationError('Permission denied');
+        setLoading(false);
         return false;
       }
 
-      return new Promise( ( resolve ) => {
+      return new Promise((resolve) => {
         Geolocation.getCurrentPosition(
-          ( position ) => {
+          (position) => {
             const { latitude, longitude } = position.coords;
-            setFormData( prev => ( { ...prev, latitude, longitude } ) );
-            setUserLocation( { lat: latitude, long: longitude } );
-            setLoading( false );
-            resolve( true );
+            setFormData(prev => ({ ...prev, latitude, longitude }));
+            setUserLocation({ lat: latitude, long: longitude });
+            setLoading(false);
+            resolve(true);
           },
-          ( error ) => {
-            console.log( 'Location Error:', error );
-            setLocationError( 'Failed to get location' );
-            setLoading( false );
-            resolve( false );
+          (error) => {
+            console.log('Location Error:', error);
+            setLocationError('Failed to get location');
+            setLoading(false);
+            resolve(false);
           },
           {
             enableHighAccuracy: true,
@@ -345,227 +345,226 @@ const Step1 = ( { navigation } ) => {
             maximumAge: 10000,
           }
         );
-      } );
-    } catch ( err ) {
-      setLocationError( 'Permission error' );
-      setLoading( false );
+      });
+    } catch (err) {
+      setLocationError('Permission error');
+      setLoading(false);
       return false;
     }
   };
 
   const onSubmit = async () => {
-    if ( !validateForm() ) {
-      Alert.alert( 'Validation Error', 'Please fix the errors' );
+    if (!validateForm()) {
+      Alert.alert('Validation Error', 'Please fix the errors');
       return;
     }
 
-    setLoading( true );
+    setLoading(true);
     try {
       const payload = {
         ...formData,
         category: formData.category.toString(),
-        start_date: formatDateForSQL( formData.start_date ),
-        end_date: formatDateForSQL( formData.end_date ),
+        start_date: formatDateForSQL(formData.start_date),
+        end_date: formatDateForSQL(formData.end_date),
+        end_number: parseInt(formData.end_number || 0),
         deskDetails: formData.deskDetails,
         joinMethods: formData.joinMethods,
       };
-
-      await createQueue( payload );
-      Alert.alert( 'Success', 'Queue created! QR sent to email.' );
-
+      await createQueue(payload);
+      Alert.alert('Success', 'Queue created! QR sent to email.');
       const queue = await getQueueList();
-      navigation.navigate( 'MyQueue', { queues: queue.data ?? [] } );
-    } catch ( error ) {
-      console.error( error );
-      Alert.alert( 'Error', error.message || 'Failed to create queue' );
+      navigation.navigate('MyQueue', { queues: queue.data ?? [] });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', error.message || 'Failed to create queue');
     } finally {
-      setLoading( false );
+      setLoading(false);
     }
   };
 
-  const fetchDesksByCategory = async ( categoryId ) => {
+  const fetchDesksByCategory = async (categoryId) => {
     try {
-      const res = await getDesksByCategory( categoryId );
-      const deskList = ( res?.data || [] ).map( ( desk ) => ( {
+      const res = await getDesksByCategory(categoryId);
+      const deskList = (res?.data || []).map((desk) => ({
         key: desk.id,
         value: desk.name,
-      } ) );
-      setDesks( deskList );
-    } catch ( err ) {
-      console.error( err );
-      setDesks( [] );
+      }));
+      setDesks(deskList);
+    } catch (err) {
+      console.error(err);
+      setDesks([]);
     }
   };
 
-  useEffect( () => {
-    ( async () => {
+  useEffect(() => {
+    (async () => {
       try {
         const res = await getCategories();
-        const list = ( res?.data || [] ).map( ( c ) => ( {
+        const list = (res?.data || []).map((c) => ({
           key: c.id,
           value: c.name,
-        } ) );
-        setCategories( list );
-      } catch ( err ) {
-        console.error( err );
-        setCategories( [] );
+        }));
+        setCategories(list);
+      } catch (err) {
+        console.error(err);
+        setCategories([]);
       }
-    } )();
-  }, [] );
+    })();
+  }, []);
 
   return (
-    <SafeAreaView style={ AppStyles.root }>
-      <ScrollableAvoidKeyboard showsVerticalScrollIndicator={ false } keyboardShouldPersistTaps="handled">
+    <SafeAreaView style={AppStyles.root}>
+      <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         {/* <TextView text="Queue Details" type="body-one" isTextColorWhite style={ [ AppStyles.titleStyle ] } /> */}
 
-        <FormGroup style={ [ AppStyles.formContainer, s.firstFormWrapper ] }>
+        <FormGroup style={[AppStyles.formContainer, s.firstFormWrapper]}>
           <Input
             placeholder="Enter Queue Name"
             isIconLeft leftIconName="create"
-            value={ formData.name }
-            onChangeText={ ( text ) => setFormData( { ...formData, name: text } ) }
-            error={ errors.name }
-            editable={ !loading }
+            value={formData.name}
+            onChangeText={(text) => setFormData({ ...formData, name: text })}
+            error={errors.name}
+            editable={!loading}
           />
         </FormGroup>
 
         <FormGroup>
           <SelectList
-            setSelected={ ( value ) => {
-              setFormData( { ...formData, category: value } );
-              fetchDesksByCategory( value );
-            } }
-            data={ categories }
+            setSelected={(value) => {
+              setFormData({ ...formData, category: value });
+              fetchDesksByCategory(value);
+            }}
+            data={categories}
             save="key"
             placeholder="Select Category"
-            boxStyles={ [ s.fullborderBox, { borderColor: colors.lightWhite, backgroundColor: colors.background } ] }
-            inputStyles={ { color: colors.white } }
-            dropdownStyles={ { backgroundColor: colors.background, borderColor: colors.lightWhite } }
-            dropdownTextStyles={ { color: colors.white } }
-            disabled={ loading }
-            searchicon={ <Icon name="search" size={ 20 } color={ colors.white } style={ { marginRight: scale( 10 ) } } /> }
+            boxStyles={[s.fullborderBox, { borderColor: colors.lightWhite, backgroundColor: colors.background }]}
+            inputStyles={{ color: colors.white }}
+            dropdownStyles={{ backgroundColor: colors.background, borderColor: colors.lightWhite }}
+            dropdownTextStyles={{ color: colors.white }}
+            disabled={loading}
+            searchicon={<Icon name="search" size={20} color={colors.white} style={{ marginRight: scale(10) }} />}
           />
-          { errors.category && <Text style={ s.errorText }>{ errors.category }</Text> }
+          {errors.category && <Text style={s.errorText}>{errors.category}</Text>}
         </FormGroup>
 
-        <View style={ s.topBorder } />
+        <View style={s.topBorder} />
 
-        <View style={ s.dateWrapper }>
-          <TextView style={ s.dateTextHeader } text="Queue Time Period Start To End" type="body-one" isTextColorWhite />
-          <View style={ s.DatePickerWrapper }>
-            <View style={ s.containerStyle }>
+        <View style={s.dateWrapper}>
+          <TextView style={s.dateTextHeader} text="Queue Time Period Start To End" type="body-one" isTextColorWhite />
+          <View style={s.DatePickerWrapper}>
+            <View style={s.containerStyle}>
               <DatePicker
-                onDateChange={ ( date ) => {
-                  const d = typeof date === 'string' ? new Date( date ) : date;
-                  if ( d && !isNaN( d ) ) setFormData( { ...formData, start_date: d } );
-                } }
+                onDateChange={(date) => {
+                  const d = typeof date === 'string' ? new Date(date) : date;
+                  if (d && !isNaN(d)) setFormData({ ...formData, start_date: d });
+                }}
                 placeholder="Start Date"
-                selectedDate={ formData.start_date }
-                disabled={ loading }
+                selectedDate={formData.start_date}
+                disabled={loading}
               />
-              { errors.start_date && <Text style={ s.errorText }>{ errors.start_date }</Text> }
+              {errors.start_date && <Text style={s.errorText}>{errors.start_date}</Text>}
             </View>
-            <View style={ s.containerStyle }>
+            <View style={s.containerStyle}>
               <DatePicker
-                onDateChange={ ( date ) => {
-                  const d = typeof date === 'string' ? new Date( date ) : date;
-                  if ( d && !isNaN( d ) ) setFormData( { ...formData, end_date: d } );
-                } }
+                onDateChange={(date) => {
+                  const d = typeof date === 'string' ? new Date(date) : date;
+                  if (d && !isNaN(d)) setFormData({ ...formData, end_date: d });
+                }}
                 placeholder="End Date"
-                selectedDate={ formData.end_date }
-                disabled={ loading }
+                selectedDate={formData.end_date}
+                disabled={loading}
               />
-              { errors.end_date && <Text style={ s.errorText }>{ errors.end_date }</Text> }
+              {errors.end_date && <Text style={s.errorText}>{errors.end_date}</Text>}
             </View>
           </View>
         </View>
 
-        <View style={ s.topBorder } />
+        <View style={s.topBorder} />
 
-        <View style={ s.tokenWrapper }>
-          <View style={ s.tokenOption }>
-            <TextView style={ s.tokenNumberText } text="Token starts with 01" type="body-one" color={ colors.white } />
+        <View style={s.tokenWrapper}>
+          <View style={s.tokenOption}>
+            <TextView style={s.tokenNumberText} text="Token starts with 01" type="body-one" color={colors.white} />
             <Input
               placeholder="50"
-              wrapperStyle={ s.wrapperStyle }
-              style={ s.inputPlaceholder }
-              value={ formData.end_number.toString() }
-              onChangeText={ ( text ) => setFormData( { ...formData, end_number: parseInt( text ) || 50 } ) }
+              wrapperStyle={s.wrapperStyle}
+              style={s.inputPlaceholder}
+              value={formData.end_number}
+              onChangeText={(text) => setFormData({ ...formData, end_number: text })}
               keyboardType="numeric"
-              error={ errors.end_number }
-              editable={ !loading }
+              error={errors.end_number}
+              editable={!loading}
             />
           </View>
         </View>
 
-        <View style={ s.topBorder } />
+        <View style={s.topBorder} />
 
-        <TextView style={ s.locationHeader } text="Add Queue Location" type="body-one" isTextColorWhite />
+        <TextView style={s.locationHeader} text="Add Queue Location" type="body-one" isTextColorWhite />
         <Input
           placeholder="Enter Address"
           isIconLeft leftIconName="location"
           isIconRight rightIconName="locate"
-          style={ s.addressInput }
-          wrapperStyle={ s.addressInputWrapperStyle }
-          value={ formData.address }
-          onChangeText={ ( text ) => setFormData( { ...formData, address: text } ) }
-          error={ errors.address }
-          editable={ !loading }
+          style={s.addressInput}
+          wrapperStyle={s.addressInputWrapperStyle}
+          value={formData.address}
+          onChangeText={(text) => setFormData({ ...formData, address: text })}
+          error={errors.address}
+          editable={!loading}
         />
 
         <Input
           placeholder="Queue Description"
           isIconLeft leftIconName="create"
-          multiline numberOfLines={ 5 }
-          style={ s.queueInput }
-          iconStyle={ s.iconInput }
-          wrapperStyle={ s.addressInputWrapperStyle }
-          value={ formData.description }
-          onChangeText={ ( text ) => setFormData( { ...formData, description: text } ) }
-          error={ errors.description }
-          editable={ !loading }
+          multiline numberOfLines={5}
+          style={s.queueInput}
+          iconStyle={s.iconInput}
+          wrapperStyle={s.addressInputWrapperStyle}
+          value={formData.description}
+          onChangeText={(text) => setFormData({ ...formData, description: text })}
+          error={errors.description}
+          editable={!loading}
         />
 
         <FormGroup>
           <TextView text="How can people join this queue?" type="body-one" isTextColorWhite />
-          <View style={ s.radioRow }>
-            { JOIN_METHODS.map( ( { key, label, icon } ) => {
+          <View style={s.radioRow}>
+            {JOIN_METHODS.map(({ key, label, icon }) => {
               const isChecked = formData.joinMethods === key;
               return (
                 <TouchableOpacity
-                  key={ key }
-                  style={ s.radio }
-                  onPress={ async () => {
-                    setFormData( { ...formData, joinMethods: key } );
-                    if ( key === 'location' ) {
+                  key={key}
+                  style={s.radio}
+                  onPress={async () => {
+                    setFormData({ ...formData, joinMethods: key });
+                    if (key === 'location') {
                       const success = await captureLocation();
-                      if ( !success ) {
-                        setFormData( ( prev ) => ( { ...prev, joinMethods: '' } ) );
+                      if (!success) {
+                        setFormData((prev) => ({ ...prev, joinMethods: '' }));
                       }
                     } else {
-                      setFormData( ( prev ) => ( { ...prev, latitude: 0, longitude: 0 } ) );
+                      setFormData((prev) => ({ ...prev, latitude: 0, longitude: 0 }));
                     }
-                  } }
-                  disabled={ loading }
+                  }}
+                  disabled={loading}
                 >
-                  <Icon name={ isChecked ? 'dot-circle-o' : 'circle-o' } size={ 24 } color={ colors.primary } />
-                  <Icon name={ icon } size={ 20 } color={ colors.primary } style={ { marginLeft: scale( 8 ) } } />
-                  <Text style={ s.radioLabel }>{ label }</Text>
+                  <Icon name={isChecked ? 'dot-circle-o' : 'circle-o'} size={24} color={colors.primary} />
+                  <Icon name={icon} size={20} color={colors.primary} style={{ marginLeft: scale(8) }} />
+                  <Text style={s.radioLabel}>{label}</Text>
                 </TouchableOpacity>
               );
-            } ) }
+            })}
           </View>
-          { errors.joinMethods && <Text style={ s.errorText }>{ errors.joinMethods }</Text> }
-          { locationError ? <Text style={ s.errorText }>{ locationError }</Text> : null }
+          {errors.joinMethods && <Text style={s.errorText}>{errors.joinMethods}</Text>}
+          {locationError ? <Text style={s.errorText}>{locationError}</Text> : null}
         </FormGroup>
 
         <Button
           ButtonText="Submit"
-          style={ [ s.btn, AppStyles.btnStyle ] }
+          style={[s.btn, AppStyles.btnStyle]}
           isIconRight rightIconName="arrow-forward"
-          onPress={ onSubmit }
-          isLoading={ loading }
-          disabled={ loading }
+          onPress={onSubmit}
+          isLoading={loading}
+          disabled={loading}
         />
       </ScrollableAvoidKeyboard>
     </SafeAreaView>
@@ -574,29 +573,29 @@ const Step1 = ( { navigation } ) => {
 
 
 
-const s = StyleSheet.create( {
-  firstFormWrapper: { marginTop: verticalScale( 30 ) },
-  topBorder: { borderWidth: 0.5, borderColor: colors.lightWhite, marginTop: scale( 30 ), marginHorizontal: scale( 15 ) },
-  dateWrapper: { marginTop: verticalScale( 30 ) },
+const s = StyleSheet.create({
+  firstFormWrapper: { marginTop: verticalScale(30) },
+  topBorder: { borderWidth: 0.5, borderColor: colors.lightWhite, marginTop: scale(30), marginHorizontal: scale(15) },
+  dateWrapper: { marginTop: verticalScale(30) },
   dateTextHeader: { textAlign: 'center' },
-  DatePickerWrapper: { flexDirection: 'row', marginTop: verticalScale( 15 ), justifyContent: 'space-around' },
-  containerStyle: { flex: 1, marginHorizontal: scale( 5 ) },
-  tokenWrapper: { flexDirection: 'row', justifyContent: 'center', marginTop: verticalScale( 20 ) },
-  tokenOption: { width: '45%', paddingHorizontal: scale( 20 ), marginHorizontal: scale( 5 ), borderWidth: 1, borderColor: colors.white, borderRadius: borderRadius },
-  tokenNumberText: { marginTop: verticalScale( 7 ), textAlign: 'center' },
-  wrapperStyle: { marginTop: verticalScale( 10 ), marginHorizontal: scale( 25 ) },
+  DatePickerWrapper: { flexDirection: 'row', marginTop: verticalScale(15), justifyContent: 'space-around' },
+  containerStyle: { flex: 1, marginHorizontal: scale(5) },
+  tokenWrapper: { flexDirection: 'row', justifyContent: 'center', marginTop: verticalScale(20) },
+  tokenOption: { width: '45%', paddingHorizontal: scale(20), marginHorizontal: scale(5), borderWidth: 1, borderColor: colors.white, borderRadius: borderRadius },
+  tokenNumberText: { marginTop: verticalScale(7), textAlign: 'center' },
+  wrapperStyle: { marginTop: verticalScale(10), marginHorizontal: scale(25) },
   inputPlaceholder: { textAlign: 'center', color: colors.white },
-  locationHeader: { textAlign: 'center', marginTop: verticalScale( 30 ) },
+  locationHeader: { textAlign: 'center', marginTop: verticalScale(30) },
   addressInput: { color: colors.white },
-  addressInputWrapperStyle: { marginVertical: verticalScale( 20 ) },
+  addressInputWrapperStyle: { marginVertical: verticalScale(20) },
   queueInput: { color: colors.white, textAlignVertical: 'top' },
   iconInput: { alignSelf: 'flex-start', paddingTop: 10 },
-  btn: { marginTop: verticalScale( 20 ), marginBottom: verticalScale( 40 ) },
-  errorText: { color: colors.red, fontSize: scale( 12 ), marginTop: verticalScale( 5 ), marginLeft: scale( 15 ) },
-  fullborderBox: { borderWidth: 1, borderColor: colors.lightWhite, borderRadius: borderRadius, paddingVertical: scale( 22 ) },
-  radioRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: verticalScale( 12 ) },
-  radio: { flexDirection: 'row', alignItems: 'center', width: '48%', marginBottom: verticalScale( 10 ), paddingVertical: verticalScale( 6 ) },
-  radioLabel: { color: colors.white, marginLeft: scale( 8 ), fontSize: scale( 13 ) },
-} );
+  btn: { marginTop: verticalScale(20), marginBottom: verticalScale(40) },
+  errorText: { color: colors.red, fontSize: scale(12), marginTop: verticalScale(5), marginLeft: scale(15) },
+  fullborderBox: { borderWidth: 1, borderColor: colors.lightWhite, borderRadius: borderRadius, paddingVertical: scale(22) },
+  radioRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: verticalScale(12) },
+  radio: { flexDirection: 'row', alignItems: 'center', width: '48%', marginBottom: verticalScale(10), paddingVertical: verticalScale(6) },
+  radioLabel: { color: colors.white, marginLeft: scale(8), fontSize: scale(13) },
+});
 
 export default Step1;

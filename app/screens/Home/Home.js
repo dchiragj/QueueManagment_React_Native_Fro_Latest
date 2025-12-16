@@ -167,7 +167,6 @@ const processJoin = async (qrData) => {
     }
 
          const tokenCheckResponse = await checkToken( payload );
-      console.log( tokenCheckResponse, "token" );
 
       if ( tokenCheckResponse.status === 200 && tokenCheckResponse.data?.data && tokenCheckResponse.data.status === "ok" ) {
         setTokenDetails( tokenCheckResponse.data.data );

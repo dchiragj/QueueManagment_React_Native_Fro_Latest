@@ -131,6 +131,7 @@ function Signup(props) {
         businessPhone: businessPhone.trim(),
       }),
     };
+console.log(signupObj);
 
     const result = await props.signup(signupObj);
 

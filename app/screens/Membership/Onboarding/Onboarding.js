@@ -61,19 +61,27 @@ const Onboarding = (props) => {
 
   const onSubmit = async () => {
     try {
-    const formData = new FormData();
 
-  formData.append("firstName", profileInfo.firstName);
-  formData.append("lastName", profileInfo.lastName);
-  formData.append("address", profileInfo.address);
-  formData.append("gender", profileInfo.gender);
-  console.log("selectedImage before image append:", selectedImage);
+  //   const formData = new FormData();
+
+  // formData.append("firstName", profileInfo.firstName);
+  // formData.append("lastName", profileInfo.lastName);
+  // formData.append("address", profileInfo.address);
+  // formData.append("gender", profileInfo.gender);
+  // console.log("selectedImage before image append:", selectedImage);
   // If image selected
- formData.append("ProfileUrl", {
-  uri: selectedImage.uri,
-  name: "profile.jpg",
-  type: "image/jpeg",
-});
+//  formData.append("ProfileUrl", {
+//   uri: selectedImage.uri,
+//   name: "profile.jpg",
+//   type: "image/jpeg",
+// });
+
+const formData = {
+  firstName :profileInfo.firstName ,
+  lastName:profileInfo.lastName,
+  address:profileInfo.address,
+  gender:profileInfo.gender
+}
 
   console.log("FormData before image append:", formData);
 
@@ -132,7 +140,7 @@ const Onboarding = (props) => {
       firstName: profileInfo.firstName,
       lastName: profileInfo.lastName,
       name,
-      ProfileUrl: selectedImage ? selectedImage.uri : userDetails.ProfileUrl,
+      ProfileUrl: selectedImage ? selectedImage.uri : userDetails.ProfileUrl || '',
     };
     await props.setCurrentUser(userInfo);
     await saveAuthUser(localUser);
@@ -277,7 +285,8 @@ const Onboarding = (props) => {
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
         <Touchable onPress={handleImagePick}>
           <View style={s.profileImgMain}>
-            <Image source={selectedImage ? { uri: selectedImage.uri } : profileInfo?.ProfileUrl ? { uri: profileInfo.ProfileUrl } : require('../../../assets/images/profile.png')} style={s.ProfileUrl} />
+            {/* <Image source={selectedImage ? { uri: selectedImage.uri } : profileInfo?.ProfileUrl ? { uri: profileInfo.ProfileUrl } : require('../../../assets/images/profile.png')} style={s.ProfileUrl} /> */}
+            <Image source={ require('../../../assets/images/profile.png')} style={s.ProfileUrl} />
             <TextView color={colors.primary} text={'Upload Photo'} type={'body-head'} style={[s.uploadPhotoText]} />
           </View>
         </Touchable>

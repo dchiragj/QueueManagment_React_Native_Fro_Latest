@@ -123,6 +123,8 @@ export const profileUpdate = async ( obj ) => {
   console.log( obj, "updateprofilepayload" );
   try {
     const response = await apiService.post( '/user/profile', obj );
+    console.log(response);
+    
     return response.data;
   } catch ( error ) {
     console.error( 'Profile update error:', error.response?.data?.message || error.message );
@@ -232,7 +234,6 @@ export const getQueueDelete = async (queueId) => {
     return response.data;
   } catch ( error ) {
     console.log(error,"error");
-    
     throw new Error( error.response?.data?.message || 'Failed to get user profile' );
   }
 };

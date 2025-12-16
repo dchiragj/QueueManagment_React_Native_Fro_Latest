@@ -44,7 +44,7 @@ const Input = ({
       )}
       <TextInput
         underlineColorAndroid='transparent'
-        style={[s.formControl, !multiline && { height: verticalScale(60) }, style]}
+        style={[s.formControl, !multiline && { height: verticalScale(60) },  { color: colors.white },style]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
