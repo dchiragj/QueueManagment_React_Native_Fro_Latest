@@ -1,4 +1,4 @@
-package com.queue_app_fro
+package com.QueueFlow
 
 import android.app.Application
 import com.facebook.react.PackageList

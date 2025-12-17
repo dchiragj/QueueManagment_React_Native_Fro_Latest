@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "Queue_App_Fro.app"
-               BlueprintName = "Queue_App_Fro"
-               ReferencedContainer = "container:Queue_App_Fro.xcodeproj">
+               BuildableName = "QueueFlow.app"
+               BlueprintName = "QueueFlow"
+               ReferencedContainer = "container:QueueFlow.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "Queue_App_FroTests.xctest"
-               BlueprintName = "Queue_App_FroTests"
-               ReferencedContainer = "container:Queue_App_Fro.xcodeproj">
+               BuildableName = "QueueFlowTests.xctest"
+               BlueprintName = "QueueFlowTests"
+               ReferencedContainer = "container:QueueFlow.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Queue_App_Fro.app"
-            BlueprintName = "Queue_App_Fro"
-            ReferencedContainer = "container:Queue_App_Fro.xcodeproj">
+            BuildableName = "QueueFlow.app"
+            BlueprintName = "QueueFlow"
+            ReferencedContainer = "container:QueueFlow.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Queue_App_Fro.app"
-            BlueprintName = "Queue_App_Fro"
-            ReferencedContainer = "container:Queue_App_Fro.xcodeproj">
+            BuildableName = "QueueFlow.app"
+            BlueprintName = "QueueFlow"
+            ReferencedContainer = "container:QueueFlow.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

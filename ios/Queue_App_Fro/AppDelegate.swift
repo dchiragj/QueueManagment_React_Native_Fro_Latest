@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
 
     factory.startReactNative(
-      withModuleName: "Queue_App_Fro",
+      withModuleName: "QueueFlow",
       in: window,
       launchOptions: launchOptions
     )
