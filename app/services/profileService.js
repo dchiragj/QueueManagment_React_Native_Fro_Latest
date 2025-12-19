@@ -9,7 +9,7 @@ import {
 } from '../actions/profileActions';
 import { getUserProfileme, profileUpdate } from './apiService';
 // import formDataEntries from 'form-data-entries';
-const baseUrl = getBaseUrl();
+const baseUrl = `${getBaseUrl()}/api`
 
 export const updateUserProfile = (obj) => async (dispatch) => {
   try {

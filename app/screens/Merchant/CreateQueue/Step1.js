@@ -214,6 +214,7 @@ import {
   PermissionsAndroid,
   Platform,
   Text,
+  ActivityIndicator,
 } from 'react-native';
 // import NavigationOptions from '../../../components/NavigationOptions';
 import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
@@ -228,6 +229,7 @@ import { Button } from '../../../components/Button';
 import { createQueue, getCategories, getQueueList, getDesksByCategory } from '../../../services/apiService';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Geolocation from 'react-native-geolocation-service';
+import Toast from 'react-native-toast-message';
 
 
 const Step1 = ({ navigation }) => {
@@ -252,6 +254,7 @@ const Step1 = ({ navigation }) => {
   const [desks, setDesks] = useState([]);
   const [locationError, setLocationError] = useState('');
   const [userLocation, setUserLocation] = useState({ lat: 0, long: 0 });
+  const [errorMessages, setErrorMassages] = useState('')
 
   const JOIN_METHODS = [
     { key: 'private', label: 'Invite-only', icon: 'lock' },
@@ -266,31 +269,100 @@ const Step1 = ({ navigation }) => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name) newErrors.name = 'Name is required';
-    if (!formData.category) newErrors.category = 'Category is required';
-    if (!formData.description) newErrors.description = 'Description is required';
-    if (!formData.start_date || isNaN(formData.start_date)) {
-      newErrors.start_date = 'Valid start date is required';
-    }
-    if (!formData.end_date || isNaN(formData.end_date)) {
-      newErrors.end_date = 'Valid end date is required';
-    }
-    if (formData.end_date && formData.start_date && formData.end_date <= formData.start_date) {
-      newErrors.end_date = 'End date must be after start date';
-    }
-    if (!formData.start_number || formData.start_number < 1) {
-      newErrors.start_number = 'Start number must be ≥ 1';
-    }
-    if (!formData.end_number || formData.end_number <= formData.start_number) {
-      newErrors.end_number = 'End number must be > start number';
-    }
-    if (!formData.address) newErrors.address = 'Address is required';
-    if (!formData.joinMethods) newErrors.joinMethods = 'Select a join method';
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!formData.name.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Name is required',
+        position: 'top',
+      });
+      return false;
+    }
+
+    if (!formData.category) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Category is required',
+        position: 'top',
+      });
+      return false;
+    }
+
+    if (!formData.description.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Description is required',
+        position: 'top',
+      });
+      return false;
+    }
+
+    if (!formData.start_date || isNaN(formData.start_date.getTime())) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Valid start date is required',
+        position: 'top',
+      });
+      return false;
+    }
+
+    if (!formData.end_date || isNaN(formData.end_date.getTime())) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Valid end date is required',
+        position: 'top',
+      });
+      return false;
+    }
+
+    if (formData.end_date <= formData.start_date) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'End date must be after start date',
+        position: 'top',
+      });
+      return false;
+    }
+
+    if (!formData.end_number || parseInt(formData.end_number) <= formData.start_number) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'End number must be greater than start number',
+        position: 'top',
+      });
+      return false;
+    }
+
+    if (!formData.address.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Address is required',
+        position: 'top',
+      });
+      return false;
+    }
+
+    if (!formData.joinMethods) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Please select a join method',
+        position: 'top',
+      });
+      return false;
+    }
+
+    return true;
   };
+
 
   const requestLocationPermission = async () => {
     if (Platform.OS !== 'android') return true;
@@ -354,10 +426,7 @@ const Step1 = ({ navigation }) => {
   };
 
   const onSubmit = async () => {
-    if (!validateForm()) {
-      Alert.alert('Validation Error', 'Please fix the errors');
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
     try {
@@ -371,13 +440,23 @@ const Step1 = ({ navigation }) => {
         joinMethods: formData.joinMethods,
       };
       await createQueue(payload);
-      Alert.alert('Success', 'Queue created! QR sent to email.');
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Queue created successfully! QR sent to email.',
+      });
+       setLoading(false);
       const queue = await getQueueList();
       navigation.navigate('MyQueue', { queues: queue.data ?? [] });
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', error.message || 'Failed to create queue');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error.message || 'Failed to create queue',
+      });
     } finally {
+      setErrorMassages('')
       setLoading(false);
     }
   };
@@ -414,6 +493,11 @@ const Step1 = ({ navigation }) => {
 
   return (
     <SafeAreaView style={AppStyles.root}>
+      {loading && (
+        <View style={s.loaderOverlay}>
+          <ActivityIndicator size="large" color="#FF6A00" />
+        </View>
+      )}
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         {/* <TextView text="Queue Details" type="body-one" isTextColorWhite style={ [ AppStyles.titleStyle ] } /> */}
 
@@ -423,7 +507,7 @@ const Step1 = ({ navigation }) => {
             isIconLeft leftIconName="create"
             value={formData.name}
             onChangeText={(text) => setFormData({ ...formData, name: text })}
-            error={errors.name}
+            // error={errors.name}
             editable={!loading}
           />
         </FormGroup>
@@ -444,7 +528,7 @@ const Step1 = ({ navigation }) => {
             disabled={loading}
             searchicon={<Icon name="search" size={20} color={colors.white} style={{ marginRight: scale(10) }} />}
           />
-          {errors.category && <Text style={s.errorText}>{errors.category}</Text>}
+          {/* {errors.category && <Text style={s.errorText}>{errors.category}</Text>} */}
         </FormGroup>
 
         <View style={s.topBorder} />
@@ -462,7 +546,7 @@ const Step1 = ({ navigation }) => {
                 selectedDate={formData.start_date}
                 disabled={loading}
               />
-              {errors.start_date && <Text style={s.errorText}>{errors.start_date}</Text>}
+              {/* {errors.start_date && <Text style={s.errorText}>{errors.start_date}</Text>} */}
             </View>
             <View style={s.containerStyle}>
               <DatePicker
@@ -474,7 +558,7 @@ const Step1 = ({ navigation }) => {
                 selectedDate={formData.end_date}
                 disabled={loading}
               />
-              {errors.end_date && <Text style={s.errorText}>{errors.end_date}</Text>}
+              {/* {errors.end_date && <Text style={s.errorText}>{errors.end_date}</Text>} */}
             </View>
           </View>
         </View>
@@ -491,7 +575,7 @@ const Step1 = ({ navigation }) => {
               value={formData.end_number}
               onChangeText={(text) => setFormData({ ...formData, end_number: text })}
               keyboardType="numeric"
-              error={errors.end_number}
+              // error={errors.end_number}
               editable={!loading}
             />
           </View>
@@ -508,7 +592,7 @@ const Step1 = ({ navigation }) => {
           wrapperStyle={s.addressInputWrapperStyle}
           value={formData.address}
           onChangeText={(text) => setFormData({ ...formData, address: text })}
-          error={errors.address}
+          // error={errors.address}
           editable={!loading}
         />
 
@@ -521,7 +605,7 @@ const Step1 = ({ navigation }) => {
           wrapperStyle={s.addressInputWrapperStyle}
           value={formData.description}
           onChangeText={(text) => setFormData({ ...formData, description: text })}
-          error={errors.description}
+          // error={errors.description}
           editable={!loading}
         />
 
@@ -554,8 +638,8 @@ const Step1 = ({ navigation }) => {
               );
             })}
           </View>
-          {errors.joinMethods && <Text style={s.errorText}>{errors.joinMethods}</Text>}
-          {locationError ? <Text style={s.errorText}>{locationError}</Text> : null}
+          {/* {errors.joinMethods && <Text style={s.errorText}>{errors.joinMethods}</Text>}
+          {locationError ? <Text style={s.errorText}>{locationError}</Text> : null} */}
         </FormGroup>
 
         <Button
@@ -596,6 +680,18 @@ const s = StyleSheet.create({
   radioRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: verticalScale(12) },
   radio: { flexDirection: 'row', alignItems: 'center', width: '48%', marginBottom: verticalScale(10), paddingVertical: verticalScale(6) },
   radioLabel: { color: colors.white, marginLeft: scale(8), fontSize: scale(13) },
+  loaderOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+
 });
 
 export default Step1;

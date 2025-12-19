@@ -6,7 +6,7 @@ import { getAuthUser } from '../utils/localStorageHelpers';
 
 
 const apiService = axios.create( {
-  baseURL: getBaseUrl(),
+  baseURL: `${getBaseUrl()}/api`,
   headers: {
     'Content-Type': 'application/json',
   },

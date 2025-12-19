@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, StatusBar } from 'react-native';
-import  colors  from '../../../styles/colors';
+import { View, Text, StyleSheet, ActivityIndicator, StatusBar, Image } from 'react-native';
+import colors from '../../../styles/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppStyles from '../../../styles/AppStyles';
-import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard' ;
+import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
 import { getQueueDetails } from '../../../services/apiService';
 import NavigationOptions from '../../../components/NavigationOptions';
-import Card from'../../../components/Card';
+import Card from '../../../components/Card';
 import { useRoute } from '@react-navigation/native';
+import { getBaseUrl } from '../../../global/Environment';
 
 const MyQueueDetail = ({ navigation }) => {
-    const route = useRoute();
+  const route = useRoute();
   const { queueId, category } = route.params || {};
-  const [queue, setQueue] = useState(null);
+  const [queue, setQueue] = useState({});
+  const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
 
-  console.log(queue,"queue");
-  
+  console.log(queue, "queue");
+
   // Helper function to map status to label
   const getStatusLabel = (status) => {
     switch (status) {
@@ -30,13 +32,30 @@ const MyQueueDetail = ({ navigation }) => {
         return 'unknown';
     }
   };
+  const getTokenStatusColor = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return '#FF9800'; // Orange
+      case 'CALLED':
+        return '#2196F3'; // Blue
+      case 'COMPLETED':
+        return '#4CAF50'; // Green
+      case 'SKIPPED':
+        return '#F44336'; // Red
+      default:
+        return '#9E9E9E'; // Grey
+    }
+  };
 
   useEffect(() => {
     const fetchQueueDetails = async () => {
       try {
         setLoading(true);
         const response = await getQueueDetails(queueId);
-        setQueue(response.data);
+        console.log(response, "res");
+
+        setQueue(response?.data?.queue);
+        setTokens(response?.data?.tokens)
       } catch (err) {
         setError(err.message || 'Failed to fetch queue details');
         console.error('Queue details fetch error:', err);
@@ -105,17 +124,6 @@ const MyQueueDetail = ({ navigation }) => {
                 {queue.start_time && <DetailRow label="Start Time" value={queue.start_time} />}
                 {queue.end_time && <DetailRow label="End Time" value={queue.end_time} />}
               </View>
-
-              {/* Queue Statistics */}
-              {/* <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Queue Statistics</Text>
-                <View style={styles.statsContainer}>
-                  <StatCard title="Desks" value={queue.noOfDesk?.toString() || '0'} icon="🪑" />
-                  <StatCard title="People" value={(queue.end_number - queue.start_number + 1)?.toString() || '0'} icon="👥" />
-                  <StatCard title="Current No." value={queue.current_number?.toString() || '0'} icon="🎯" />
-                </View>
-              </View> */}
-
               {/* Additional Information */}
               {(queue.description || queue.location) && (
                 <View style={styles.section}>
@@ -123,8 +131,6 @@ const MyQueueDetail = ({ navigation }) => {
                   {queue.description && (
                     <View style={styles.infoRow}>
                       <DetailRow label="Description" value={queue.description || 'Unknown'} />
-                      {/* <Text style={styles.infoLabel}>Description: {queue.description}</Text>
-                      <Text style={styles.infoValue}>{queue.description}</Text> */}
                     </View>
                   )}
                   {queue.location && (
@@ -137,6 +143,57 @@ const MyQueueDetail = ({ navigation }) => {
               )}
             </Card>
           )}
+          <View style={styles.qrshow}>
+
+            {queue?.qrCode && (
+              <View style={styles.qrBox}>
+                <Text style={styles.qrTitle}>App QR Code</Text>
+                <Image
+                  style={styles.qrImage}
+                  source={{ uri: `${getBaseUrl()}/${queue.qrCode}` }}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
+
+            {queue?.webBaseqrCode && (
+              <View style={styles.qrBox}>
+                <Text style={styles.qrTitle}>Web QR Code</Text>
+                <Image
+                  style={styles.qrImage}
+                  source={{ uri: `${getBaseUrl()}/${queue.webBaseqrCode}` }}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
+
+          </View>
+
+          {/* Tokens List */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Tokens ({tokens?.length || 0})</Text>
+
+            {tokens && tokens?.length > 0 ? (
+              tokens?.map((token) => (
+                <View key={token.id} style={styles.tokenItem}>
+                  <View style={styles.tokenLeft}>
+                    <Text style={styles.tokenNumber}>#{token?.tokenNumber}</Text>
+                    <Text style={styles.tokenQueueName}>{token?.customer?.firstName || null} {token?.customer?.lastName || null}</Text>
+                  </View>
+                  <View style={styles.tokenStatusContainer}>
+                    <Text style={[
+                      styles.tokenStatus,
+                      { backgroundColor: getTokenStatusColor(token.status) }
+                    ]}>
+                      {token.status}
+                    </Text>
+                  </View>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.noTokensText}>No tokens generated yet</Text>
+            )}
+          </View>
         </View>
       </ScrollableAvoidKeyboard>
     </SafeAreaView>
@@ -332,7 +389,80 @@ const styles = StyleSheet.create({
   infoValue: {
     fontSize: 14,
     color: "#fff",
-    lineHeight: 20, 
+    lineHeight: 20,
+  },
+  qrshow: {
+    flexDirection: 'row',          
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+
+  qrBox: {
+    alignItems: 'center',
+    width: '48%',                
+  },
+
+  qrTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+    color:colors.primary
+  },
+
+  qrImage: {
+    width: 150,
+    height: 150,
+  },
+
+
+  tokenItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  tokenLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  tokenNumber: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.primary || '#e1511dff',
+    marginRight: 12,
+    minWidth: 50,
+  },
+  tokenQueueName: {
+    fontSize: 15,
+    color: '#fff',
+    fontWeight: '500',
+    overflow: 'hidden',
+  },
+  tokenStatusContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20
+  },
+  tokenStatus: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+    padding: 5,
+    borderRadius: 10,
+    textTransform: 'uppercase',
+  },
+  noTokensText: {
+    fontSize: 14,
+    color: '#aaa',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingVertical: 20,
   },
 });
 
@@ -341,7 +471,7 @@ MyQueueDetail.navigationOptions = ({ navigation }) => {
     title: 'Queue Detail',
     isBack: true,
     navigation: navigation,
-    headerStyle: { 
+    headerStyle: {
       elevation: 0,
       shadowOpacity: 0,
       backgroundColor: colors.background,

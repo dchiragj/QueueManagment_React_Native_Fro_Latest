@@ -14,7 +14,7 @@ import { isEmail, getAPIResponseError } from '../global/Helpers';
 import { saveToken, clearToken } from '../utils/authTokenHelpers';
 import { verificationcode, verifyEmailApi } from './apiService';
 import { Image } from 'react-native-svg';
-const baseUrl = getBaseUrl();
+const baseUrl = `${getBaseUrl()}/api`
 
 /**F
  * @desc Login - Get User Token
