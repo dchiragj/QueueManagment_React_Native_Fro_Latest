@@ -1,12 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import AppStyles from  '../../styles/AppStyles';
-import { View, Text, SafeAreaView, StyleSheet, ActivityIndicator } from 'react-native';
+import AppStyles from '../../styles/AppStyles';
+import { View, Text, SafeAreaView, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import NavigationOptions from '../../components/NavigationOptions';
 import { colors } from '../../styles';
 import screens from '../../constants/screens';
 import Input from '../../components/Input';
-import { Touchable } from '../../components/Button/Button';
 import TextView from '../../components/TextView/TextView';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { borderRadius } from '../../styles/dimensions';
@@ -28,6 +27,7 @@ const Categories = (props) => {
   const fetchCategories = async () => {
     try {
       const data = await getCategories();
+
       setCategories(data.data || []);
       setAllCategories(data.data || []); // Store all categories initially
     } catch (err) {
@@ -82,20 +82,27 @@ const Categories = (props) => {
           value={searchQuery}
           onChangeText={handleSearch} // Update search query on text change
         />
-        {categories.length === 0 && searchQuery ? (
+        {categories?.length === 0 && searchQuery ? (
           <View style={s.noDataContainer}>
             <TextView text={'Data not found'} type={'body-one'} color={colors.lightWhite} />
           </View>
         ) : (
           <View style={s.Categories}>
-            {categories.map((category, index) => (
-              <Touchable
-                key={index}
+            {categories?.map((category, index) => (
+              console.log(category, "category"),
+
+              <TouchableOpacity
+                key={category.id}
                 style={s.CategoriesOption}
-                onPress={() => onPressCategories(category)}
+                // onPress={() => onPressCategories(category)}
               >
-                <TextView text={category.name || category} type={'body-one'} color={colors.lightWhite} />
-              </Touchable>
+                <TextView
+                  text={category?.name || ''}
+                  type="body-one"
+                  color={colors.lightWhite}
+                />
+              </TouchableOpacity>
+
             ))}
           </View>
         )}

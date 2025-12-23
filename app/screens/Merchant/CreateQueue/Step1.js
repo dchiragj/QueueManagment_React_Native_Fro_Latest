@@ -255,6 +255,7 @@ const Step1 = ({ navigation }) => {
   const [locationError, setLocationError] = useState('');
   const [userLocation, setUserLocation] = useState({ lat: 0, long: 0 });
   const [errorMessages, setErrorMassages] = useState('')
+  const [isDayQueue, setIsDayQueue] = useState(0);
 
   const JOIN_METHODS = [
     { key: 'private', label: 'Invite-only', icon: 'lock' },
@@ -435,17 +436,19 @@ const Step1 = ({ navigation }) => {
         category: formData.category.toString(),
         start_date: formatDateForSQL(formData.start_date),
         end_date: formatDateForSQL(formData.end_date),
+        isDayQueue:isDayQueue,
         end_number: parseInt(formData.end_number || 0),
         deskDetails: formData.deskDetails,
         joinMethods: formData.joinMethods,
       };
+      
       await createQueue(payload);
       Toast.show({
         type: 'success',
         text1: 'Success',
         text2: 'Queue created successfully! QR sent to email.',
       });
-       setLoading(false);
+      setLoading(false);
       const queue = await getQueueList();
       navigation.navigate('MyQueue', { queues: queue.data ?? [] });
     } catch (error) {
@@ -500,7 +503,6 @@ const Step1 = ({ navigation }) => {
       )}
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         {/* <TextView text="Queue Details" type="body-one" isTextColorWhite style={ [ AppStyles.titleStyle ] } /> */}
-
         <FormGroup style={[AppStyles.formContainer, s.firstFormWrapper]}>
           <Input
             placeholder="Enter Queue Name"
@@ -532,7 +534,6 @@ const Step1 = ({ navigation }) => {
         </FormGroup>
 
         <View style={s.topBorder} />
-
         <View style={s.dateWrapper}>
           <TextView style={s.dateTextHeader} text="Queue Time Period Start To End" type="body-one" isTextColorWhite />
           <View style={s.DatePickerWrapper}>
@@ -560,6 +561,39 @@ const Step1 = ({ navigation }) => {
               />
               {/* {errors.end_date && <Text style={s.errorText}>{errors.end_date}</Text>} */}
             </View>
+          </View>
+        </View>
+
+        <View style={s.dayaWrapper}>
+          <TextView
+          style={s.dateTextHeader}
+            text="Is this a day-based queue?"
+            type="body-one"
+            isTextColorWhite
+          />
+          <View style={s.DaybasedQueue}>
+            <TouchableOpacity
+              onPress={() => setIsDayQueue(1)}
+              style={{
+                padding: 10,
+                marginRight: 10,
+                backgroundColor: isDayQueue === 1 ? '#4CAF50' : '#252A34',
+                borderRadius: 5
+              }}
+            >
+              <Text style={{ color: '#fff' }}>Yes</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setIsDayQueue(0)}
+              style={{
+                padding: 10,
+                backgroundColor:  isDayQueue === 0 ? '#F44336' : '#252A34',
+                borderRadius: 5
+              }}
+            >
+              <Text style={{ color: '#fff' }}>No</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -661,8 +695,10 @@ const s = StyleSheet.create({
   firstFormWrapper: { marginTop: verticalScale(30) },
   topBorder: { borderWidth: 0.5, borderColor: colors.lightWhite, marginTop: scale(30), marginHorizontal: scale(15) },
   dateWrapper: { marginTop: verticalScale(30) },
+  dayaWrapper: { marginTop: verticalScale(0) },
   dateTextHeader: { textAlign: 'center' },
   DatePickerWrapper: { flexDirection: 'row', marginTop: verticalScale(15), justifyContent: 'space-around' },
+  DaybasedQueue: { flexDirection: 'row', marginTop: verticalScale(15), justifyContent: 'center' },
   containerStyle: { flex: 1, marginHorizontal: scale(5) },
   tokenWrapper: { flexDirection: 'row', justifyContent: 'center', marginTop: verticalScale(20) },
   tokenOption: { width: '45%', paddingHorizontal: scale(20), marginHorizontal: scale(5), borderWidth: 1, borderColor: colors.white, borderRadius: borderRadius },

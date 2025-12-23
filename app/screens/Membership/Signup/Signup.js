@@ -177,13 +177,25 @@ console.log(signupObj);
     props.navigation.navigate(screens.Login);
   };
 
-  const setUserRole = (name) => {
-    setSelectedRole((prev) => ({
-      ...prev,
-      [name]: !prev[name],
-    }));
-  };
-
+  // const setUserRole = (name) => {
+  //   setSelectedRole((prev) => ({
+  //     ...prev,
+  //     [name]: !prev[name],
+  //   }));
+  // };
+const setUserRole = (name) => {
+  if (name === 'customer') {
+    setSelectedRole({
+      customer: true,
+      merchant: false,
+    });
+  } else if (name === 'merchant') {
+    setSelectedRole({
+      customer: false,
+      merchant: true,
+    });
+  }
+};
   const onTogglePassword = () => {
     setPasswordVisibility(!isPasswordVisible);
   };

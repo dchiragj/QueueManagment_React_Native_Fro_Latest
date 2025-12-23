@@ -29,10 +29,11 @@ import { CommonActions } from '@react-navigation/native';
 import { profileUpdate } from '../../../services/apiService';
 
 const Onboarding = (props) => {
-  let { profileInfo, resError = {}, loading } = props.profile;
+  let { profileInfo, resError = {} } = props.profile;
   let { user } = props.auth;
   const source = props.navigation?.route?.params?.source;
   const [selectedImage, setSelectedImage] = useState(null);
+  const [loading , setLoading] = useState(false);
   useEffect(() => {
     console.log('Onboarding');
     loadData();
@@ -60,22 +61,8 @@ const Onboarding = (props) => {
   };
 
   const onSubmit = async () => {
+    setLoading(true);
     try {
-
-  //   const formData = new FormData();
-
-  // formData.append("firstName", profileInfo.firstName);
-  // formData.append("lastName", profileInfo.lastName);
-  // formData.append("address", profileInfo.address);
-  // formData.append("gender", profileInfo.gender);
-  // console.log("selectedImage before image append:", selectedImage);
-  // If image selected
-//  formData.append("ProfileUrl", {
-//   uri: selectedImage.uri,
-//   name: "profile.jpg",
-//   type: "image/jpeg",
-// });
-
 const formData = {
   firstName :profileInfo.firstName ,
   lastName:profileInfo.lastName,
@@ -128,6 +115,8 @@ const formData = {
     }
   } catch (error) {
     console.log('Profile update error fro:', error);
+  }finally{
+    setLoading(false);
   }
   };
 
@@ -199,13 +188,13 @@ const formData = {
       return;
     }
 
-    const options = {
-      mediaType: 'photo',
-      maxWidth: 1024,
-      maxHeight: 1024,
-      quality: 0.8,
-      includeBase64: false,
-    };
+    // const options = {
+    //   mediaType: 'photo',
+    //   maxWidth: 1024,
+    //   maxHeight: 1024,
+    //   quality: 0.8,
+    //   includeBase64: false,
+    // };
 
     const pickImage = async (source) => {
       try {
@@ -222,7 +211,6 @@ const formData = {
           if (!await requestCameraPermission()) return;
           result = await launchCamera(options);
         } else {
-          if (!await requestGalleryPermission()) return;
           result = await launchImageLibrary(options);
         }
 
@@ -366,7 +354,7 @@ const formData = {
         <Button
           ButtonText='Submit'
           style={s.btn}
-          animationStyle={s.btn}
+          // animationStyle={s.btn}
           onPress={onSubmit}
           isLoading={loading}
         />

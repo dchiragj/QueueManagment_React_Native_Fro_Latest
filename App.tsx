@@ -21,6 +21,7 @@ const App = () => {
     authorizationLevel: 'whenInUse',
   });
 
+
 // 1. When a notification is received while the app is in the foreground
 useEffect(() => {
   const unsubscribe = messaging().onMessage(async remoteMessage => {
