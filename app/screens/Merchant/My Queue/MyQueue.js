@@ -1,65 +1,13 @@
-// import HeaderButton from '../../../components/HeaderButton';
-// import  colors  from '../../../styles/colors';
-// import AppStyles from '../../../styles/AppStyles';
-// import React from 'react';
-// import { SafeAreaView, ScrollView } from 'react-native';
-// import NavigationOptions from '../../../components/NavigationOptions';
-// import MyQueueListItem from './MyQueueListItem';
-// import screens from '../../constants/screens';
-// const MyQueue = () => {
-//   return (
-//     <SafeAreaView style={[AppStyles.root]}>
-//       <ScrollView showsVerticalScrollIndicator={false}>
-//         <MyQueueListItem />
-//         <MyQueueListItem />
-//         <MyQueueListItem />
-//         <MyQueueListItem />
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// };
-// MyQueue.navigationOptions = ({ navigation }) => {
-//   return NavigationOptions({
-//     title: '',
-//     isBack: false,
-//     navigation: navigation,
-//     headerLeft: (
-//       <HeaderButton
-//         type={1}
-//         iconName={'md-menu'}
-//         color={colors.primary}
-//         isFeather={false}
-//         iconType={'ionic'}
-//         onPress={() => navigation.openDrawer()}
-//       />
-//     ),
-//     headerRight: (
-//       <HeaderButton
-//         type={1}
-//         iconName={'add-circle'}
-//         color={colors.primary}
-//         isFeather={false}
-//         iconType={'ionic'}
-//         onPress={() => navigation.navigate(screens.Step1)}
-//       />
-//     ),
-//     headerStyle: { elevation: 0 }
-//   });
-// };
-// export default MyQueue;
-import HeaderButton from '../../../components/HeaderButton';
 import colors from '../../../styles/colors';
 import AppStyles from '../../../styles/AppStyles';
 import React, { useState, useEffect } from 'react';
 import { FlatList, ActivityIndicator, Alert, Text, StyleSheet, View, TouchableOpacity } from 'react-native';
-import NavigationOptions from '../../../components/NavigationOptions';
 import MyQueueListItem from './MyQueueListItem';
 import { getCategories, getQueueList, getTokenCounts } from '../../../services/apiService';
 import screens from '../../../constants/screens';
 import { verticalScale } from 'react-native-size-matters';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Button } from '../../../components/Button';
 
 const MyQueue = ({ navigation, route }) => {
   // const params = navigation.state?.params || {};

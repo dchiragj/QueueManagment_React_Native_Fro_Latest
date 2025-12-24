@@ -52,7 +52,6 @@ const MyQueueDetail = ({ navigation }) => {
       try {
         setLoading(true);
         const response = await getQueueDetails(queueId);
-        console.log(response, "res");
 
         setQueue(response?.data?.queue);
         setTokens(response?.data?.tokens)

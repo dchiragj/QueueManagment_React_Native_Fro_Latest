@@ -27,7 +27,7 @@ import messaging from '@react-native-firebase/messaging';
 
 const Login = (props) => {
   const [email, setEmail] = useState('algomacmini8511@gmail.com');
-  const [password, setPassword] = useState('test123');
+  const [password, setPassword] = useState('test');
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
   const { loading, resError = {} } = props.auth;
 
@@ -73,17 +73,12 @@ const onLogin = async () => {
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-      if (enabled) {
-        console.log('Notification permission granted');
-        
+      if (enabled) {    
         // Step 2: Now get the FCM token
         const fcmToken = await messaging().getToken();
         
         if (fcmToken) {
-          console.log('FCM Token received:', fcmToken);
           await saveFcmToken(fcmToken);  // Your API call to save token on server
-        } else {
-          console.log('FCM Token is empty');
         }
       } else {
         console.log('User denied notification permission');

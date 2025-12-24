@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import screens from '../constants/screens';
 import { StyleSheet, Image } from 'react-native';
 import AppStyles from '../styles/AppStyles';
@@ -7,16 +7,10 @@ import { Button } from '../components/Button';
 import { colors } from '../styles';
 import { scale, verticalScale } from 'react-native-size-matters';
 import {SafeAreaView} from 'react-native';
-// import SvgIcon from 'react-native-svg-icon/lib/components/SvgIcon';
-import svgs from '../assets/svg';
 
 const Welcome = ({ navigation })=> {
-  useEffect(() => {
-    console.log('Welcome');
-  });
 
   const onPressGetStarted = () => {
-    console.log('onPressLogin');
     navigation.navigate(screens.Login);
   };
 

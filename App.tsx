@@ -25,7 +25,6 @@ const App = () => {
 // 1. When a notification is received while the app is in the foreground
 useEffect(() => {
   const unsubscribe = messaging().onMessage(async remoteMessage => {
-    console.log('New FCM message in foreground:', remoteMessage);
 
     // Show a toast notification
     Toast.show({
@@ -35,12 +34,6 @@ useEffect(() => {
       position: 'top',
       visibilityTime: 6000,
     });
-
-    // Optional: Show an alert instead (uncomment if needed)
-    // Alert.alert(
-    //   remoteMessage.notification?.title,
-    //   remoteMessage.notification?.body
-    // );
   });
 
   return unsubscribe;
@@ -50,8 +43,6 @@ useEffect(() => {
 useEffect(() => {
   // App was in background → user tapped notification
   const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
-    console.log('Notification opened app from background:', remoteMessage);
-
     const { body, title } = remoteMessage.notification;
     const { tokenNumber } = remoteMessage.data;
 
@@ -61,9 +52,6 @@ useEffect(() => {
       text2:title || `Token ${tokenNumber} - Please come now!`,
       visibilityTime: 8000,
     });
-
-    // Navigate to queue screen if needed
-    // navigation.navigate('Servicing', { queueId });
   });
 
   // App was completely closed → user tapped notification to open it
@@ -71,7 +59,6 @@ useEffect(() => {
     .getInitialNotification()
     .then(remoteMessage => {
       if (remoteMessage) {
-        console.log('Notification opened app from quit state:', remoteMessage);
         const { tokenNumber } = remoteMessage.data;
 
         setTimeout(() => {
@@ -92,7 +79,6 @@ useEffect(() => {
     <View style={AppStyles.rootStyle}>
       <StatusBar
         translucent
-        // backgroundColor={colors.primary}
         barStyle="light-content"
       />
       <Provider store={store}>

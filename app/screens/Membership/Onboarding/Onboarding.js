@@ -27,22 +27,22 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CommonActions } from '@react-navigation/native';
 import { profileUpdate } from '../../../services/apiService';
+import { getBaseUrl } from '../../../global/Environment';
+import Toast from 'react-native-toast-message';
 
 const Onboarding = (props) => {
-  let { profileInfo, resError = {} } = props.profile;
+  let { resError = {} } = props.profile;
   let { user } = props.auth;
   const source = props.navigation?.route?.params?.source;
   const [selectedImage, setSelectedImage] = useState(null);
-  const [loading , setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    console.log('Onboarding');
     loadData();
     return () => {
       props.clearProfileResponseMsg();
     };
   }, []);
   useEffect(() => {
-    console.log("getUserProfile in props:", props.getUserProfile);
     loadData();
   }, []);
 
@@ -52,82 +52,117 @@ const Onboarding = (props) => {
   };
   const handleFormChange = (key, value) => {
     if (!key) return;
-    profileInfo = props.profile.profileInfo;
-    if (profileInfo) {
-      profileInfo[key] = value;
-      props.setProfile(profileInfo);
-      console.log(profileInfo);
+    user = props.auth.user;
+    if (user) {
+      user[key] = value;
+      props.setCurrentUser(user);
     }
   };
 
+  const validateProfile = () => {
+    const errors = [];
+
+    if (!user.firstName) errors.push('First name');
+    if (!user.lastName) errors.push('Last name');
+    if (!user.address) errors.push('Address');
+    if (!user.gender) errors.push('Gender');
+
+    if (errors.length) {
+      Toast.show({
+        type: 'error',
+        text1: 'Missing Fields',
+        text2: `${errors.join(', ')} required`,
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+
   const onSubmit = async () => {
     setLoading(true);
+    validateProfile()
     try {
-const formData = {
-  firstName :profileInfo.firstName ,
-  lastName:profileInfo.lastName,
-  address:profileInfo.address,
-  gender:profileInfo.gender
-}
+      const data = new FormData();
 
-  console.log("FormData before image append:", formData);
+      data.append('firstName', user.firstName);
+      data.append('lastName', user.lastName);
+      data.append('address', user.address);
+      data.append('gender', user.gender);
 
-
-  const result = await profileUpdate(formData);
-
-    if (result) {
-      // Update local storage
-      const userDetails = await getAuthUser();
-      delete userDetails.onboardingRequired;
-      await saveUserDetails(userDetails);
-
-      // Check where we came from
-      const source = props.route.params?.source;
-
-      if (source === screens.Profile) {
-        // If came from Profile → go back to Settings (inside Drawer/Tab)
-        props.navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: 'MainApp' }], // or your main app stack name
-          })
-        );
-        props.navigation.navigate('MainApp', {
-          screen: screens.SettingsRoot,
-          params: { screen: screens.Settings },
+      if (selectedImage) {
+        data.append('ProfileUrl', {
+          uri: selectedImage.uri,
+          type: selectedImage.type,
+          name: selectedImage.name,
         });
-      } else {
-        // Normal flow: Onboarding → Home
-        props.navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [
-              {
-                name: 'MainApp',
-                state: {
-                  routes: [{ name: screens.HomeRoot }],
-                },
-              },
-            ],
-          })
-        );
       }
+      const result = await profileUpdate(data);
+
+      if (result) {
+        setSelectedImage(null);
+        // Update local storage
+        const userDetails = await getAuthUser();
+        delete userDetails.onboardingRequired;
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Profile updated successfully',
+        });
+        await saveUserDetails(userDetails);
+
+        // Check where we came from
+        const source = props.route.params?.source;
+
+        if (source === screens.Profile) {
+          // If came from Profile → go back to Settings (inside Drawer/Tab)
+          props.navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: 'MainApp' }], // or your main app stack name
+            })
+          );
+          props.navigation.navigate('MainApp', {
+            screen: screens.SettingsRoot,
+            params: { screen: screens.Settings },
+          });
+        } else {
+          // Normal flow: Onboarding → Home
+          props.navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'MainApp',
+                  state: {
+                    routes: [{ name: screens.HomeRoot }],
+                  },
+                },
+              ],
+            })
+          );
+        }
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Update Failed',
+        text2: error.message || 'Something went wrong',
+      });
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.log('Profile update error fro:', error);
-  }finally{
-    setLoading(false);
-  }
   };
 
   const saveUserDetails = async (userDetails) => {
     user = props.auth.user;
-    const name = getDisplayName(profileInfo.firstName, profileInfo.lastName);
+    const name = getDisplayName(user.firstName, user.lastName);
     const userInfo = { ...user, name };
     const localUser = {
       ...userDetails,
-      firstName: profileInfo.firstName,
-      lastName: profileInfo.lastName,
+      firstName: user.firstName,
+      lastName: user.lastName,
       name,
       ProfileUrl: selectedImage ? selectedImage.uri : userDetails.ProfileUrl || '',
     };
@@ -160,42 +195,12 @@ const formData = {
       return false;
     }
   };
-
-  const requestGalleryPermission = async () => {
-    if (Platform.OS === 'ios') {
-      return true; // iOS handles via Info.plist
-    }
-    try {
-      const permission = Platform.Version >= 29 ? PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
-      const granted = await PermissionsAndroid.request(permission, {
-        title: 'Gallery Permission',
-        message: 'This app needs access to your gallery to select a profile picture.',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      });
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    } catch (err) {
-      console.warn('Gallery permission error:', err);
-      return false;
-    }
-  };
-
   const handleImagePick = async () => {
-    console.log('ImagePicker functions:', { launchCamera, launchImageLibrary }); // Debug
     if (!launchCamera || !launchImageLibrary) {
       console.error('ImagePicker functions are undefined. Verify library installation.');
       Alert.alert('Error', 'Image picker module not found. Please restart the app or contact support.');
       return;
     }
-
-    // const options = {
-    //   mediaType: 'photo',
-    //   maxWidth: 1024,
-    //   maxHeight: 1024,
-    //   quality: 0.8,
-    //   includeBase64: false,
-    // };
-
     const pickImage = async (source) => {
       try {
         const options = {
@@ -229,7 +234,6 @@ const formData = {
             name: fileName || `profile_${Date.now()}.jpg`,
           };
 
-          console.log('Final Image Object:', imageData);
 
           setSelectedImage(imageData);
           handleFormChange('ProfileUrl', uri); // preview માટે
@@ -273,8 +277,24 @@ const formData = {
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
         <Touchable onPress={handleImagePick}>
           <View style={s.profileImgMain}>
-            {/* <Image source={selectedImage ? { uri: selectedImage.uri } : profileInfo?.ProfileUrl ? { uri: profileInfo.ProfileUrl } : require('../../../assets/images/profile.png')} style={s.ProfileUrl} /> */}
-            <Image source={ require('../../../assets/images/profile.png')} style={s.ProfileUrl} />
+            {/* <Image source={selectedImage ? { uri: selectedImage.uri } : user?.ProfileUrl ? { uri: user.ProfileUrl } : require('../../../assets/images/profile.png')} style={s.ProfileUrl} /> */}
+            {/* <Image source={ require('../../../assets/images/profile.png')} style={s.ProfileUrl} /> */}
+            <Image
+              source={
+                user?.ProfileUrl
+                  ? {
+                    uri: user.ProfileUrl.startsWith('file')
+                      ? user.ProfileUrl
+                      : user.ProfileUrl.startsWith('http')
+                        ? user.ProfileUrl
+                        : `${getBaseUrl()}/${user.ProfileUrl}`,
+                  }
+                  : require('../../../assets/images/profile.png')
+              }
+              style={s.ProfileUrl}
+              resizeMode="cover"
+            />
+
             <TextView color={colors.primary} text={'Upload Photo'} type={'body-head'} style={[s.uploadPhotoText]} />
           </View>
         </Touchable>
@@ -286,7 +306,7 @@ const formData = {
               isIconLeft={true}
               leftIconName={'create'}
               color={colors.white}
-              value={profileInfo.firstName}
+              value={user.firstName}
               editable={!loading}
               onChangeText={(text) => {
                 handleFormChange('firstName', text);
@@ -301,7 +321,7 @@ const formData = {
               isIconLeft={true}
               leftIconName={'create'}
               color={colors.white}
-              value={profileInfo.lastName}
+              value={user.lastName}
               editable={!loading}
               onChangeText={(text) => {
                 handleFormChange('lastName', text);
@@ -319,7 +339,7 @@ const formData = {
               rightIconName={'locate'}
               iconColor={colors.primary}
               color={colors.white}
-              value={profileInfo.address}
+              value={user.address}
               onChangeText={(text) => {
                 handleFormChange('address', text);
               }}
@@ -335,7 +355,7 @@ const formData = {
                 return (
                   <TouchableOpacity
                     key={gender.value}
-                    style={[s.genderbtn, profileInfo.gender === gender.value && s.genderbtnActive]}
+                    style={[s.genderbtn, user.gender === gender.value && s.genderbtnActive]}
                     onPress={() => handleFormChange('gender', gender.value)}
                   >
                     <Icon name={gender.iconName} color={colors.lightWhite} isFeather={false} />

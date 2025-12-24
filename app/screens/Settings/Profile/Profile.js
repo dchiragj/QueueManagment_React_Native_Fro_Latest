@@ -14,23 +14,11 @@ import { getUserProfile } from '../../../actions/profileActions';
 import { logout } from '../../../services/authService';
 import Loading from '../../../components/Loading';
 import { Button } from '../../../components/Button';
+import { getBaseUrl } from '../../../global/Environment';
 
 const Profile = (props) => {
   const { user } = props.auth;
-  // useEffect(() => {
 
-  //   loadData();
-  //   props.navigation.setParams({ onPressEdit });
-  //   const focusListener = props.navigation.addListener('didFocus', () => {
-  //   });
-  //   return () => {
-  //     focusListener.remove();
-  //   };
-  // }, []);
-
-  const loadData = async () => {
-    // await props.getUserProfile();
-  };
   const onPressEdit = () => {
     props.navigation.navigate(screens.Onboarding, {
       source: screens.Profile
@@ -49,7 +37,21 @@ const Profile = (props) => {
     <SafeAreaView style={[AppStyles.root]}>
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
         <View style={s.profileWrapper}>
-          <Image source={require('../../../assets/images/profile.png')} />
+          <Image
+            source={
+              user?.ProfileUrl
+                ? {
+                  uri: user.ProfileUrl.startsWith('file')
+                    ? user.ProfileUrl
+                    : user.ProfileUrl.startsWith('http')
+                      ? user.ProfileUrl
+                      : `${getBaseUrl()}/${user.ProfileUrl}`,
+                }
+                : require('../../../assets/images/profile.png')
+            }
+            style={{ width: 100, height: 100, borderRadius: 50 }}
+            resizeMode="cover"
+          />
           <TextView color={colors.white} text={user?.name} type={'body-head'} style={[s.profileInfo]} />
           <TextView
             color={colors.lightWhite}
@@ -72,7 +74,7 @@ const Profile = (props) => {
             numberOfLines={1}
             style={s.mailTextStyle}
             color={colors.white}
-            text={user.gander}
+            text={user.gender}
             type={'body'}
           />
         </View>
@@ -186,7 +188,7 @@ const s = StyleSheet.create({
     flex: 0.99,
     marginHorizontal: 8
   },
- buttonRow: {
+  buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: scale(30),
@@ -197,7 +199,7 @@ const s = StyleSheet.create({
 
   editBtn: {
     flex: 1,
-    backgroundColor: colors.primary,      
+    backgroundColor: colors.primary,
     borderRadius: borderRadius,
     paddingVertical: verticalScale(14),
     // width: 'auto',

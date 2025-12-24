@@ -36,7 +36,6 @@ export const getCategories = async () => {
 export const saveFcmToken = async (fcmToken) => {
   try {
     const response = await apiService.post('/auth/save-fcm-token', { fcmToken });
-    console.log('FCM Token saved on server:', fcmToken);
     return response.data;
   } catch (error) {
     console.warn('Failed to save FCM token:', error.response?.data || error.message);
@@ -57,7 +56,6 @@ export const getCurrentToken = async (queueId, categoryId) => {
 export const notifyThirdUser = async (fcmToken) => {
   try {
     const response = await apiService.post('/auth/notify-third', { fcmToken });
-    console.log('FCM Token saved on server:', fcmToken);
     return response.data;
   } catch (error) {
     console.warn('Failed to save FCM token:', error.response?.data || error.message);
@@ -119,36 +117,38 @@ export const verificationcode = async ( code ) => {
   }
 };
 
-export const profileUpdate = async ( obj ) => {
-  console.log( obj, "updateprofilepayload" );
-  try {
-    const response = await apiService.post( '/user/profile', obj );
-    console.log(response);
-    
-    return response.data;
-  } catch ( error ) {
-    console.error( 'Profile update error:', error.response?.data?.message || error.message );
-    throw new Error( error.response?.data?.message || 'Failed to update profile' );
-  }
-};
-// export const profileUpdate = async (formData) => {
-//   console.log(formData,"data");
-
+// export const profileUpdate = async ( obj ) => {
+//   console.log( obj, "updateprofilepayload" );
 //   try {
-//     const response = await axios.post('http://192.168.2.11:8008/api/user/profile', formData, {
-//       headers: {
-//         'Content-Type': 'multipart/form-data', // optional, axios sets automatically
-//       },
-//     });
+//     const response = await apiService.post( '/user/profile', obj );
+//     console.log(response,"resimg");
+    
 //     return response.data;
-//   } catch (error) {``
-//     console.error(
-//       'Profile update error:',
-//       error.response?.data?.message || error.message
-//     );
-//     throw new Error(error.response?.data?.message || 'Failed to update profile');
+//   } catch ( error ) {
+//     console.error( 'Profile update error:', error.response?.data?.message || error.message );
+//     throw new Error( error.response?.data?.message || 'Failed to update profile' );
 //   }
 // };
+export const profileUpdate = async (formData) => {
+  console.log( await getAuthUser(),"data");
+
+  try {
+    const response = await axios.post(`${getBaseUrl()}/api/user/profile`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    console.log(response,"resimg");
+    return response.data;
+
+  } catch (error) {``
+    console.error(
+      'Profile update error:',
+      error.response?.data?.message || error.message
+    );
+    throw new Error(error.response?.data?.message || 'Failed to update profile');
+  }
+};
 
 export const getUserProfileme = async () => {
   try {

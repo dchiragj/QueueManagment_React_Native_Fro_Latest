@@ -11,7 +11,6 @@ import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { borderRadius } from '../../styles/dimensions';
 import { ScrollView } from 'react-native-gesture-handler';
 import { getCategories } from '../../services/apiService';
-// import utility from '../../utility'; // Import utility for toast notification
 
 const Categories = (props) => {
   const [categories, setCategories] = useState([]);
@@ -80,7 +79,7 @@ const Categories = (props) => {
           leftIconName={'search'}
           color={colors.white}
           value={searchQuery}
-          onChangeText={handleSearch} // Update search query on text change
+          onChangeText={handleSearch} 
         />
         {categories?.length === 0 && searchQuery ? (
           <View style={s.noDataContainer}>
@@ -89,8 +88,6 @@ const Categories = (props) => {
         ) : (
           <View style={s.Categories}>
             {categories?.map((category, index) => (
-              console.log(category, "category"),
-
               <TouchableOpacity
                 key={category.id}
                 style={s.CategoriesOption}

@@ -13,7 +13,7 @@ export const setAuthLoader = (payload) => {
 /**
  * @desc Set Current User
  */
-export const setCurrentUser = (payload) => {
+export const setCurrentUser = (payload) => { 
   return {
     type: actions.SET_CURRENT_USER,
     payload: payload

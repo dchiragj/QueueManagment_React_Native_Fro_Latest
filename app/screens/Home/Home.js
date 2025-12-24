@@ -134,7 +134,6 @@ const Home = (props) => {
 
 const processJoin = async (qrData) => {
   try {
-    console.log('Scanned QR Data:', qrData);
 
     let payload = { joinMethods: joinMethod };
 

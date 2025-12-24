@@ -36,11 +36,6 @@ function DrawerDesignComponent(props) {
   const filteredRoutes = props.state.routes.filter(route =>
     allowedRouteNames.includes(route.name)
   );
-
-  useEffect(() => {
-    console.log('drawer menu');
-  }, []);
-
   const showLogoutModal = () => {
     setLogoutVisible(true);
     Animated.spring(scaleAnim, {

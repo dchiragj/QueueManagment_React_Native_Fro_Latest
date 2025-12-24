@@ -43,7 +43,6 @@ export const login = (obj) => async (dispatch) => {
     const response = await axios.post(`${baseUrl}/auth/login`, obj);
 
     const { data } = response.data;
-    // console.log("data------>",data);
     dispatch(setLoginToken(data));
     return true;
   } catch (e) {
@@ -114,8 +113,6 @@ export const signup = (obj) => async (dispatch) => {
  * @desc set login token and set user
  */
 export const setLoginToken = (data) => async (dispatch) => {
-  console.log(data, "setlogin");
-
   await saveToken(data);
 
   const userObj = {
@@ -125,10 +122,10 @@ export const setLoginToken = (data) => async (dispatch) => {
     lastName: data.lastName,
     mobileNumber: data.mobileNumber,
     name: data.name,
-    gander: data.gender,
+    gender: data.gender,
     address: data.address,
     id: data.id,
-    Image: data.profileImage
+    ProfileUrl: data.ProfileUrl
   }
 
   // const decoded = jwtDecode(data.token);

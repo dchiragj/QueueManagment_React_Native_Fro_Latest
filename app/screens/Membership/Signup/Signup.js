@@ -44,7 +44,6 @@ function Signup(props) {
   const { loading, resError = {} } = props.auth;
 
   useEffect(() => {
-    console.log('Signup');
     return () => {
       props.clearAuthResponseMsg();
     };
@@ -131,7 +130,6 @@ function Signup(props) {
         businessPhone: businessPhone.trim(),
       }),
     };
-console.log(signupObj);
 
     const result = await props.signup(signupObj);
 
@@ -151,13 +149,11 @@ console.log(signupObj);
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
       if (enabled) {
-        console.log('Notification permission granted');
-        
+      
         // Step 2: Now get the FCM token
         const fcmToken = await messaging().getToken();
         
         if (fcmToken) {
-          console.log('FCM Token received:', fcmToken);
           await saveFcmToken(fcmToken);  // Your API call to save token on server
         } else {
           console.log('FCM Token is empty');

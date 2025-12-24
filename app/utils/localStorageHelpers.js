@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const AUTH_USER_KEY = 'kimarketing_user';
 
-export const saveAuthUser = async (data) => {
+export const saveAuthUser = async (data) => {  
   try {
     var jsonOfItem = await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(data));
     return jsonOfItem;
