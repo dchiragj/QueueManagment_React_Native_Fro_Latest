@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import HeaderButton from '../../../components/HeaderButton';
 import  colors  from '../../../styles/colors';
 import AppStyles from '../../../styles/AppStyles';
-import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import NavigationOptions from '../../../components/NavigationOptions';
 import screens from '../../../constants/screens';
 import { getCategories, getCompletedHistory, getTokenList } from '../../../services/apiService';
@@ -96,10 +96,10 @@ const CompletedToken = ({ navigation }) => {
     );
   } 
 
-  if (myTokens.length === 0) {
+  if (myTokens.length === 0) { 
     return (
       <SafeAreaView style={[AppStyles.root, styles.center]}>
-        <TextView style={styles.emptyText}>You have no tokens yet</TextView>
+        <Text style={styles.emptyText}>You have no tokens yet</Text>
       </SafeAreaView>
     );
   }

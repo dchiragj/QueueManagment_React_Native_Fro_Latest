@@ -17,7 +17,7 @@ import NavigationOptions from '../../components/NavigationOptions';
 import { getBaseUrl } from '../../global/Environment';
 
 const Settings = (props) => {
-  const { user } = props.auth;
+  const { user } = props.auth; 
   const ImageUrl = props.profile.profileInfo?.ProfileUrl;
   useEffect(() => {
     props.navigation.setParams({ openDrawer: _openDrawer });
@@ -58,7 +58,6 @@ const Settings = (props) => {
             />
 
           </View>
-
           <View style={s.profileTextMain}>
             <TextView color={colors.white} text={user.name} type={'body'} style={s.profileText} />
             <TextView color={colors.lightWhite} text={user.email} type={'body-one'} style={s.profileText} />

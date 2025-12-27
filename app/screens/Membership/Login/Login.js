@@ -26,8 +26,8 @@ import { saveFcmToken } from '../../../services/apiService';
 import messaging from '@react-native-firebase/messaging';
 
 const Login = (props) => {
-  const [email, setEmail] = useState('algomacmini8511@gmail.com');
-  const [password, setPassword] = useState('test');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
   const { loading, resError = {} } = props.auth;
 
@@ -122,7 +122,7 @@ const onLogin = async () => {
               <TextInput
                 style={s.textInput}
                 placeholder="example@gmail.com"
-                // placeholderTextColor="#888"
+                placeholderTextColor="#888"
                 keyboardType="email-address"
                 value={email}
                 onChangeText={setEmail}
@@ -139,7 +139,7 @@ const onLogin = async () => {
               <TextInput
                 style={s.textInput}
                 placeholder="Password"
-                // placeholderTextColor="#888"
+                placeholderTextColor="#888"
                 secureTextEntry={!isPasswordVisible}
                 value={password}
                 onChangeText={setPassword}

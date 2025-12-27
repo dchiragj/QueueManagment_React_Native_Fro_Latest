@@ -138,7 +138,6 @@ export const profileUpdate = async (formData) => {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log(response,"resimg");
     return response.data;
 
   } catch (error) {``
