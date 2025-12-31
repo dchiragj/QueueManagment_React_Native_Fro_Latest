@@ -70,7 +70,7 @@ const Home = (props) => {
         setCategories(list);
       } catch (err) {
         console.error('Error fetching categories:', err);
-        Alert.alert('Error', 'Failed to load categories.');
+        // Alert.alert('Error', 'Failed to load categories.');
       } finally {
         setIsLoadingCategories(false);
       }

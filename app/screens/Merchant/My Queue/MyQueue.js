@@ -18,6 +18,8 @@ const MyQueue = ({ navigation, route }) => {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
+  const [refreshing, setRefreshing] = useState(false);
+
 
   const getStatusLabel = (status) => {
     switch (status) {
@@ -71,7 +73,7 @@ const MyQueue = ({ navigation, route }) => {
       }));
 
       setQueues(updatedQueues);
-      filterQueues(activeTab);
+      // filterQueues(activeTab);
 
     } catch (e) {
       console.error('Queue list fetch error:', e);
@@ -80,6 +82,12 @@ const MyQueue = ({ navigation, route }) => {
       setLoading(false);
     }
   };
+
+  const onrefresh = async () => {
+    setRefreshing(true);
+    await fetchQueueList();
+    setRefreshing(false);
+  }
 
   const filterQueues = (tab) => {
     let updatedQueues = [...queues];
@@ -173,7 +181,10 @@ const MyQueue = ({ navigation, route }) => {
       <FlatList
         data={filteredQueues}
         renderItem={renderQueueItem}
-        keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+        refreshing={refreshing}
+        onRefresh={onrefresh}
+       keyExtractor={(item) => item.id?.toString()}
+
         ListEmptyComponent={
           error ? (
             <Text style={styles.errorText}>{error}</Text>
