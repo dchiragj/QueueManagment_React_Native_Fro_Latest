@@ -21,6 +21,7 @@ const App = () => {
     skipPermissionRequests: false,
     authorizationLevel: 'whenInUse',
   });
+
   // 🔥 Internet Listener — AUTO UPDATE
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -97,16 +98,17 @@ const App = () => {
             alignItems: 'center',
             justifyContent: 'center',
             padding: 20,
-            gap:10
+            gap:10,
+            backgroundColor:colors.backgroundColor
           }}>
-            <Text style={{fontSize:28,fontWeight:900}}>Queue Flow</Text>
+            <Text style={{fontSize:28,fontWeight:900,color:colors.white}}>Queue Flow</Text>
               <Icon
               name="cloud-offline"
               isFeather={false}
               size={100}
               color={colors.primary}
             />
-            <Text style={{fontSize:20}}> Please connect to internet</Text>
+            <Text style={{fontSize:20,color:colors.white}}> Please connect to internet</Text>
           </View>
         ) : (
           <AppNavigator />
