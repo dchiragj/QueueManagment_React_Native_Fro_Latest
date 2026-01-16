@@ -4,7 +4,9 @@ import SettingsNavigator from './SettingsNavigator';
 import MyTokenNavigator from './MyTokenNavigator';
 import CompletedTokenNavigator from './CompletedTokenNavigator';
 import MyQueueNavigator from './MyQueueNavigator';
-import ServiceNavigator from './ServiceNavigator';
+import ServiceNavigator from './BusinessNavigator';
+import BusinessNavigator from './BusinessNavigator';
+import DeskNavigator from './DeskNavigator';
 
 
 export {
@@ -14,5 +16,7 @@ export {
   CompletedTokenNavigator,
   SettingsNavigator,
   MyQueueNavigator,
-  ServiceNavigator
+  ServiceNavigator,
+  BusinessNavigator,
+  DeskNavigator
 };

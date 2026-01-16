@@ -79,18 +79,22 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
           <TextView color={colors.white} text={name || 'Unnamed Queue'} type={'body-one'} />
           <TextView color={colors.lightWhite} text={category || 'Unknown Doctor'} type={'body-one'} />
           <TextView color={colors.lightWhite} text={date || 'No Date'} type={'body-one'} />
+
         </View>
         <View style={s.lastWrapper}>
-          <View style={s.mainWrapper}>
-            <Icon name='desktop' color={colors.primary} isFeather={false} />
-            <TextView style={s.LastText} color={colors.white} text={desks?.toString() || '0'} type={'body-one'} />
-          </View>
+
           <View style={[s.mainWrapper, s.secondTextWrapper]}>
             <Icon name='people-circle' color={colors.primary} isFeather={false} />
             <TextView style={s.LastText} color={colors.white} text={people?.toString() || '0'} type={'body-one'} />
           </View>
         </View>
       </Touchable>
+
+      <View style={s.desksWrapper}>
+        <Icon name='desktop' color={colors.primary} isFeather={false} />
+        <TextView style={s.LastText} color={colors.white} text={desks?.toString() || '0'} type={'body-one'} />
+      </View>
+
       <View style={s.topBorder} />
       <View style={s.linkTextWrapper}>
         <Touchable onPress={handleQueueDetails}>
@@ -163,13 +167,22 @@ const s = StyleSheet.create({
   },
   mainWrapper: {
     flexDirection: 'row',
+    // marginLeft: scale(10),
+  },
+  desksWrapper: {
+    flexDirection: 'row',
+    gap: scale(10),
+    marginLeft: scale(10),
+    marginBottom: scale(10)
   },
   touchableWrapper: {
     paddingVertical: verticalScale(20),
+    paddingBottom: scale(10)
   },
   mainImg: {
     marginLeft: scale(10),
     flex: 0.2,
+
   },
   textWrapper: {
     flex: 0.6,

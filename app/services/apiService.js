@@ -5,31 +5,31 @@ import { getBaseUrl } from '../global/Environment';
 import { getAuthUser } from '../utils/localStorageHelpers';
 
 
-const apiService = axios.create( {
+const apiService = axios.create({
   baseURL: `${getBaseUrl()}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
-} );
+});
 
-apiService.interceptors.request.use( async ( config ) => {
+apiService.interceptors.request.use(async (config) => {
   const authData = await getAuthUser();
   // alert('🔑 Token from storage:', authData?.token);  // DEBUG
-  if ( authData && authData.token ) {
-    config.headers.Authorization = `Bearer ${ authData.token }`;
+  if (authData && authData.token) {
+    config.headers.Authorization = `Bearer ${authData.token}`;
   }
   return config;
-}, ( error ) => {
-  return Promise.reject( error );
-} );
+}, (error) => {
+  return Promise.reject(error);
+});
 
 
 export const getCategories = async () => {
   try {
-    const response = await apiService.get( '/queue/category' );
+    const response = await apiService.get('/queue/category');
     return response.data;
-  } catch ( error ) {
-    throw new Error( error.message || 'Failed to fetch categories' );
+  } catch (error) {
+    throw new Error(error.message || 'Failed to fetch categories');
   }
 };
 
@@ -44,7 +44,8 @@ export const saveFcmToken = async (fcmToken) => {
 };
 export const getCurrentToken = async (queueId, categoryId) => {
   try {
-    const response = await apiService.get('/token/current/token', {params: { queueId, categoryId }
+    const response = await apiService.get('/token/current/token', {
+      params: { queueId, categoryId }
     });
     return response.data.data.upcoming;
   } catch (error) {
@@ -71,49 +72,49 @@ export const getDesksByCategory = async (categoryId) => {
     throw new Error(error.response?.data?.message || 'Failed to fetch desks');
   }
 };
-export const forgotPassword = async ( email ) => {
+export const forgotPassword = async (email) => {
   try {
-    const response = await apiService.post( '/auth/forgot-password', { email } );
+    const response = await apiService.post('/auth/forgot-password', { email });
     return response.data;  // return backend response
-  } catch ( error ) {
+  } catch (error) {
     // Bubble up server message if available
     const msg = error.response?.data?.message || 'Failed to send reset link';
-    throw new Error( msg );
+    throw new Error(msg);
   }
 };
-export const verifyOtp = async ( email, otp ) => {
+export const verifyOtp = async (email, otp) => {
   try {
-    const response = await apiService.post( '/auth/verify-otp', { email, otp } );
+    const response = await apiService.post('/auth/verify-otp', { email, otp });
     return response.data;
-  } catch ( error ) {
-    throw new Error( error.response?.data?.message || 'Failed to verify OTP' );
-  }
-};
-
-export const resetPassword = async ( email, password, otp ) => {
-  try {
-    const response = await apiService.post( '/auth/reset-password', { email, password, otp } );
-    return response.data;
-  } catch ( error ) {
-    console.log( error );
-    throw new Error( error.response?.data?.message || 'Failed to reset password' );
-  }
-};
-export const verifyEmailApi = async ( code ) => {
-  try {
-    const response = await apiService.post( '/auth/verify', { code } );
-    return response.data;
-  } catch ( error ) {
-    throw new Error( error.response?.data?.message || 'Failed to verify email' );
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to verify OTP');
   }
 };
 
-export const verificationcode = async ( code ) => {
+export const resetPassword = async (email, password, otp) => {
   try {
-    const response = await apiService.post( '/auth/verification-code', { code } );
+    const response = await apiService.post('/auth/reset-password', { email, password, otp });
     return response.data;
-  } catch ( error ) {
-    throw new Error( error.response?.data?.message || 'Failed to verify email' );
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.response?.data?.message || 'Failed to reset password');
+  }
+};
+export const verifyEmailApi = async (code) => {
+  try {
+    const response = await apiService.post('/auth/verify', { code });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to verify email');
+  }
+};
+
+export const verificationcode = async (code) => {
+  try {
+    const response = await apiService.post('/auth/verification-code', { code });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to verify email');
   }
 };
 
@@ -122,7 +123,7 @@ export const verificationcode = async ( code ) => {
 //   try {
 //     const response = await apiService.post( '/user/profile', obj );
 //     console.log(response,"resimg");
-    
+
 //     return response.data;
 //   } catch ( error ) {
 //     console.error( 'Profile update error:', error.response?.data?.message || error.message );
@@ -130,7 +131,7 @@ export const verificationcode = async ( code ) => {
 //   }
 // };
 export const profileUpdate = async (formData) => {
-  console.log( await getAuthUser(),"data");
+  console.log(await getAuthUser(), "data");
 
   try {
     const response = await axios.post(`${getBaseUrl()}/api/user/profile`, formData, {
@@ -140,7 +141,8 @@ export const profileUpdate = async (formData) => {
     });
     return response.data;
 
-  } catch (error) {``
+  } catch (error) {
+    ``
     console.error(
       'Profile update error:',
       error.response?.data?.message || error.message
@@ -151,89 +153,96 @@ export const profileUpdate = async (formData) => {
 
 export const getUserProfileme = async () => {
   try {
-    const response = await apiService.get( '/user/me' );
+    const response = await apiService.get('/user/me');
     return response.data;
-  } catch ( error ) {
-    throw new Error( error.response?.data?.message || 'Failed to get user profile' );
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to get user profile');
   }
 };
-export const createQueue = async ( queueData ) => {
+export const createQueue = async (queueData) => {
   try {
-    const response = await apiService.post( '/queue', queueData );
+    const response = await apiService.post('/queue', queueData);
     return response.data;
-  } catch ( error ) {
-    throw new Error( error.response?.data?.message || 'Failed to create queue' );
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to create queue');
   }
 };
-export const getQueueList = async ( params = {} ) => {
+export const getQueueList = async (params = {}) => {
   try {
     const user = await getAuthUser();
     const defaultParams = {
       merchantId: user?.id
     };
-    const response = await apiService.get( '/queue/list', { params: defaultParams } );
+    const response = await apiService.get('/queue/list', { params: defaultParams });
     return response.status === 200 ? response.data || [] : [];
-  } catch ( error ) {
+  } catch (error) {
     throw error;
   }
 };
-
-export const checkToken = async ( payload ) => {
+export const getBusinessList = async () => {
   try {
-    const response = await apiService.post( '/token/check-token',  payload  );
+    const response = await apiService.get('/queue/business/list');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch business list');
+  }
+};
+export const checkToken = async (payload) => {
+  try {
+    const response = await apiService.post('/token/check-token', payload);
     return response;
-  } catch ( error ) {
-    console.error( 'Check token error:', error.response?.data || error.message );
-    throw new Error( error.response?.data?.message || 'Failed to check token' );
+  } catch (error) {
+    console.error('Check token error:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to check token');
   }
 };
 
-export const generateToken = async ( { queueId, categoryId } ) => {
+export const generateToken = async ({ queueId, categoryId }) => {
   try {
-    const response = await apiService.post( '/token/generate-token', { queueId, categoryId } );
+    const response = await apiService.post('/token/generate-token', { queueId, categoryId });
     return response.data;
-  } catch ( error ) {
-    console.error( 'Generate token error:', error.response?.data || error.message );
-    throw new Error( error.response?.data?.message || 'Failed to generate token' );
+  } catch (error) {
+    console.error('Generate token error:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to generate token');
   }
 };
 
 export const getTokenList = async () => {
   try {
-    const response = await apiService.get( '/token/list' );
+    const response = await apiService.get('/token/list');
     return response.data;
-  } catch ( error ) {
-    throw new Error( error.response?.data?.message || 'Failed to get user profile' );
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to get user profile');
   }
 };
 
 export const getQueueDetails = async (queueId) => {
   try {
-    const response = await apiService.get( `/queue/details/${queueId}` );
+    const response = await apiService.get(`/queue/details/${queueId}`);
     return response.data;
-  } catch ( error ) {
-    throw new Error( error.response?.data?.message || 'Failed to get user profile' );
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to get user profile');
   }
 };
 
 export const getTokenDelete = async (TokenId) => {
   try {
-    const response = await apiService.delete( `/token/delete/${TokenId}` );
+    const response = await apiService.delete(`/token/delete/${TokenId}`);
     return response.data;
-  } catch ( error ) {
-    console.log(error,"error");
-    
-    throw new Error( error.response?.data?.message || 'Failed to get user profile' );
+  } catch (error) {
+    console.log(error, "error");
+
+    throw new Error(error.response?.data?.message || 'Failed to get user profile');
   }
 };
 
 export const getQueueDelete = async (queueId) => {
   try {
-    const response = await apiService.delete( `/queue/delete/${queueId}`);
+    const response = await apiService.delete(`/queue/delete/${queueId}`);
     return response.data;
-  } catch ( error ) {
-    console.log(error,"error");
-    throw new Error( error.response?.data?.message || 'Failed to get user profile' );
+  } catch (error) {
+    console.log(error, "error");
+    throw new Error(error.response?.data?.message || 'Failed to get user profile');
   }
 };
 export const getServicingList = async (queueId, categoryId) => {
@@ -287,8 +296,8 @@ export const getTokenCounts = async (queueId, categoryId) => {
 
 export const completeToken = async (tokenId) => {
   try {
-    const payload = Array.isArray(tokenId) 
-      ? { tokenIds: tokenId } 
+    const payload = Array.isArray(tokenId)
+      ? { tokenIds: tokenId }
       : { tokenId };
     const response = await apiService.post('/token/complete', payload);
     return response.data;
@@ -327,5 +336,51 @@ export const markUserAvailable = async (queueId, tokenNumber) => {
     throw new Error(error.response?.data?.message || 'Failed to get servicing list');
   }
 };
+
+export const createBusiness = async (data) => {
+  try {
+    const response = await apiService.post('/queue/business/create', data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to create business');
+  }
+};
+
+export const createDesk = async (data) => {
+  try {
+    const response = await apiService.post('/queue/desk/create', data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to create desk');
+  }
+};
+
+export const updateDesk = async (deskId, data) => {
+  try {
+    const response = await apiService.put(`/queue/desk/update/${deskId}`, data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to update desk');
+  }
+};
+
+export const deleteDesk = async (deskId) => {
+  try {
+    const response = await apiService.delete(`/queue/desk/delete/${deskId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to delete desk');
+  }
+};
+
+export const getDeskList = async () => {
+  try {
+    const response = await apiService.get('/queue/desk/list');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch desk list');
+  }
+};
+
 // Add other API methods as needed
 export default apiService;

@@ -6,7 +6,7 @@ export default {
   Signup: 'Signup',
   VerifyEmail: 'VerifyEmail',
   Onboarding: 'Onboarding',
-  QRScanner:'QRScanner',
+  QRScanner: 'QRScanner',
   ForgotPassword: 'ForgotPassword',
 
   DrawerRoot: 'DrawerRoot',
@@ -40,5 +40,10 @@ export default {
   Step3: 'Step3',
   Step4: 'Step4',
 
-  Service: "Service"
+  Service: "Service",
+
+  Business: "Business",
+  AddBranch: "AddBranch",
+  DeskList: "DeskList",
+  AddDesk: "AddDesk"
 };

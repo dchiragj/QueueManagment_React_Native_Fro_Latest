@@ -53,11 +53,11 @@ function DrawerDesignComponent(props) {
     }).start(() => setLogoutVisible(false));
   };
 
-const handleLogout = async () => {
-  hideLogoutModal();
-  await props.logout();
-  props.navigation.navigate('Auth', { screen: screens.Login });
-};
+  const handleLogout = async () => {
+    hideLogoutModal();
+    await props.logout();
+    props.navigation.navigate('Auth', { screen: screens.Login });
+  };
 
   return (
     <>

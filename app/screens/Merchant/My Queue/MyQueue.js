@@ -133,7 +133,7 @@ const MyQueue = ({ navigation, route }) => {
             })
             : 'No Date'
         }
-        desks={item.noOfDesk || 0}
+        desks={item.Desk || 0}
         people={item.tokenCount || 0}
         navigation={navigation}
         item={item}
@@ -183,7 +183,7 @@ const MyQueue = ({ navigation, route }) => {
         renderItem={renderQueueItem}
         refreshing={refreshing}
         onRefresh={onrefresh}
-       keyExtractor={(item) => item.id?.toString()}
+        keyExtractor={(item) => item.id?.toString()}
 
         ListEmptyComponent={
           error ? (

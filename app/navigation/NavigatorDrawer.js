@@ -2,7 +2,7 @@ import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation, useRoute } from '@react-navigation/native'; 
+import { useNavigation, useRoute, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 import DrawerDesignComponent from '../components/DrawerDesign';
 import RootRoutes from './routes/RootRoutes';
@@ -13,7 +13,7 @@ const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   return (
-   <Drawer.Navigator
+    <Drawer.Navigator
       initialRouteName={screens.HomeRoot}
       drawerContent={(props) => <DrawerDesignComponent {...props} />}
       screenOptions={{
@@ -34,24 +34,40 @@ const DrawerNavigator = () => {
             </TouchableOpacity>
           );
         },
-
         headerRight: () => {
           const route = useRoute();
           const navigation = useNavigation();
+          const routeName = getFocusedRouteNameFromRoute(route);
 
-          const isMyQueue = route.name === screens.MyQueue || route.name === 'MyQueue';
-          if (!isMyQueue) {
-            return null;
+          if (routeName === screens.AddBranch) {
+            return (
+              <TouchableOpacity
+                style={{ marginRight: 15 }}
+                onPress={() =>
+                  navigation.navigate(screens.Business, {
+                    screen: screens.Business
+                  })
+                }
+              >
+                <Icon name="close" size={30} color={colors.primary} />
+              </TouchableOpacity>
+            );
           }
 
-          return (
-            <TouchableOpacity
-              style={{ marginRight: 15 }}
-              onPress={() => navigation.navigate(screens.Step1)}
-            >
-              <Icon name="add-circle-outline" size={30} color={colors.primary} />
-            </TouchableOpacity>
-          );
+          if (routeName === screens.AddDesk) {
+            return (
+              <TouchableOpacity
+                style={{ marginRight: 15 }}
+                onPress={() =>
+                  navigation.navigate(screens.DeskList, {
+                    screen: routeName === screens.AddDesk ? screens.DeskList : screens.DeskList
+                  })
+                }
+              >
+                <Icon name="close" size={30} color={colors.primary} />
+              </TouchableOpacity>
+            );
+          }
         },
 
         drawerActiveTintColor: '#FF6B00',
@@ -59,11 +75,11 @@ const DrawerNavigator = () => {
         drawerType: 'front',
         drawerStyle: { width: '80%' },
       }}
-      >
+    >
       {Object.keys(RootRoutes).map((routeName) => {
         const { screen: ScreenComponent, navigationOptions } = RootRoutes[routeName];
-        const options = typeof navigationOptions === 'function' 
-          ? navigationOptions() 
+        const options = typeof navigationOptions === 'function'
+          ? navigationOptions()
           : navigationOptions;
 
         return (

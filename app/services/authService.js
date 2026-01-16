@@ -116,19 +116,10 @@ export const setLoginToken = (data) => async (dispatch) => {
   await saveToken(data);
 
   const userObj = {
-    email: data.email,
-    firstName: data.firstName,
-    role: data.role,
-    lastName: data.lastName,
-    mobileNumber: data.mobileNumber,
-    name: data.name,
-    gender: data.gender,
-    address: data.address,
-    id: data.id,
+    ...data, // Include all fields (email, firstName, role, queue_id, desk_id, etc.)
     ProfileUrl: data.ProfileUrl
   }
 
-  // const decoded = jwtDecode(data.token);
   dispatch(setCurrentUser(userObj));
 };
 

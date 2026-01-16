@@ -48,50 +48,50 @@ const Login = (props) => {
     }
   }, [resError]);
 
-const onLogin = async () => {
-  const loginObj = {
-    username: String(email),
-    password: String(password),
-    role: 'merchant'
-  };
+  const onLogin = async () => {
+    const loginObj = {
+      username: String(email),
+      password: String(password),
+      role: 'merchant'
+    };
 
-  const result = await props.login(loginObj);
+    const result = await props.login(loginObj);
 
-  if (result) {
-    Toast.show({
-      type: 'success',
-      text1: 'Welcome!',
-      text2: 'Login successful',
-      position: 'top',
-    });
+    if (result) {
+      Toast.show({
+        type: 'success',
+        text1: 'Welcome!',
+        text2: 'Login successful',
+        position: 'top',
+      });
 
-    // Get FCM Token and save it
-    try {
-      // Step 1: Request notification permission (required on Android 13+)
-      const authStatus = await messaging().requestPermission();
-      const enabled = 
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      // Get FCM Token and save it
+      try {
+        // Step 1: Request notification permission (required on Android 13+)
+        const authStatus = await messaging().requestPermission();
+        const enabled =
+          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-      if (enabled) {    
-        // Step 2: Now get the FCM token
-        const fcmToken = await messaging().getToken();
-        
-        if (fcmToken) {
-          await saveFcmToken(fcmToken);  // Your API call to save token on server
+        if (enabled) {
+          // Step 2: Now get the FCM token
+          const fcmToken = await messaging().getToken();
+
+          if (fcmToken) {
+            await saveFcmToken(fcmToken);  // Your API call to save token on server
+          }
+        } else {
+          console.log('User denied notification permission');
         }
-      } else {
-        console.log('User denied notification permission');
+      } catch (error) {
+        console.warn('FCM Token error (not critical):', error.message || error);
+        // App will continue working even if token fails – user experience stays smooth
       }
-    } catch (error) {
-      console.warn('FCM Token error (not critical):', error.message || error);
-      // App will continue working even if token fails – user experience stays smooth
-    }
 
-    // Finally navigate to main app
-    props.navigation.navigate("MainApp");
-  }
-};
+      // Finally navigate to main app
+      props.navigation.navigate("MainApp");
+    }
+  };
 
 
 
@@ -150,7 +150,7 @@ const onLogin = async () => {
                 <Ionicons
                   name={isPasswordVisible ? "eye-off" : "eye"}
                   size={24}
-                 color={colors.primary}
+                  color={colors.primary}
                   style={s.iconRight}
                 />
               </TouchableOpacity>
@@ -232,7 +232,7 @@ const s = StyleSheet.create({
   footerMain: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: verticalScale(indent + 50),
+    marginTop: verticalScale(20),
     marginBottom: verticalScale(8),
   },
 });

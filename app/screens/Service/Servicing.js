@@ -9,17 +9,26 @@ import CheckBox from 'react-native-check-box';
 import colors from '../../styles/colors';
 import Toast from 'react-native-toast-message';
 import { useRoute } from '@react-navigation/native';
-import Speech from '@mhpdev/react-native-speech';
+import { connect } from 'react-redux';
+import screens from '../../constants/screens';
 
 
-const Servicing = ({ navigation }) => {
+const Servicing = (props) => {
+  const { navigation, auth } = props;
   const route = useRoute();
-  const { queueId, categoryid } = route.params;
+  const role = auth.user?.role;
 
-  
+  // Use params if available, otherwise fallback to user's assigned queue (for direct operator login)
+  const queueId = route.params?.queueId || auth.user?.queue_id || auth.user?.assignedQueueId;
+  const categoryid = route.params?.categoryid || auth.user?.category_id || auth.user?.categoryId;
+
   const SERVICE_TIME = 10;
 
   const [nowServing, setNowServing] = useState(0);
+
+  useEffect(() => {
+    navigation.setParams({ role });
+  }, [role]);
   const [lastIssued, setLastIssued] = useState(0);
   const [customers, setCustomers] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -214,68 +223,68 @@ const Servicing = ({ navigation }) => {
 
     }
   };
-const callNext = async () => {
-  if (customers.length === 0) {
-    showToast('info', 'Empty', 'No customers in queue');
-    return;
-  }
-
-  const current = customers.find(c => c.isActive);
-  if (!current) return;
-
-  try {
-    const res = await completeToken(current.id);
-    if (res.status !== 'ok') throw new Error(res.message);
-
-    // Add to Completed History
-    setCompletedHistory(prev => [{
-      id: current.id,
-      tokenNumber: current.tokenNumber,
-      name: current.name,
-      service: current.service,
-      completedAt: new Date().toISOString()
-    }, ...prev]);
-
-    const remaining = customers.filter(c => c.id !== current.id);
-
-    if (remaining.length > 0) {
-      const sorted = [...remaining].sort((a, b) => a.tokenNumber - b.tokenNumber);
-      const next = sorted[0];
-
-      // Voice Announcement (in English)
-      const announceText = `Token number ${next.tokenNumber}, please come to the counter.`;
-
-      Speech.speak(announceText, {
-        language: 'en-US',  // English (you can also use 'en-IN' for Indian accent)
-        rate: 2.0,
-        pitch: 0.5,
-      });
-
-      // UI Update
-      setNowServing(next.tokenNumber);
-      setCustomers(sorted.map(c => ({
-        ...c,
-        isActive: c.tokenNumber === next.tokenNumber
-      })));
-
-      showToast('success', 'Next Called', `Now serving token ${next.tokenNumber}`);
-
-    } else {
-      setCustomers([]);
-      setNowServing(0);
-
-      Speech.speak('The queue has been completed. All work for today is finished.', {
-        language: 'en-US',
-      });
-
-      showToast('success', 'All Done!', 'Queue completed!');
+  const callNext = async () => {
+    if (customers.length === 0) {
+      showToast('info', 'Empty', 'No customers in queue');
+      return;
     }
 
-  } catch (err) {
-    console.log(err);
-    showToast('error', 'Failed', err.message || 'Could not complete token');
-  }
-};
+    const current = customers.find(c => c.isActive);
+    if (!current) return;
+
+    try {
+      const res = await completeToken(current.id);
+      if (res.status !== 'ok') throw new Error(res.message);
+
+      // Add to Completed History
+      setCompletedHistory(prev => [{
+        id: current.id,
+        tokenNumber: current.tokenNumber,
+        name: current.name,
+        service: current.service,
+        completedAt: new Date().toISOString()
+      }, ...prev]);
+
+      const remaining = customers.filter(c => c.id !== current.id);
+
+      if (remaining.length > 0) {
+        const sorted = [...remaining].sort((a, b) => a.tokenNumber - b.tokenNumber);
+        const next = sorted[0];
+
+        // Voice Announcement (in English)
+        const announceText = `Token number ${next.tokenNumber}, please come to the counter.`;
+
+        Speech.speak(announceText, {
+          language: 'en-US',  // English (you can also use 'en-IN' for Indian accent)
+          rate: 2.0,
+          pitch: 0.5,
+        });
+
+        // UI Update
+        setNowServing(next.tokenNumber);
+        setCustomers(sorted.map(c => ({
+          ...c,
+          isActive: c.tokenNumber === next.tokenNumber
+        })));
+
+        showToast('success', 'Next Called', `Now serving token ${next.tokenNumber}`);
+
+      } else {
+        setCustomers([]);
+        setNowServing(0);
+
+        Speech.speak('The queue has been completed. All work for today is finished.', {
+          language: 'en-US',
+        });
+
+        showToast('success', 'All Done!', 'Queue completed!');
+      }
+
+    } catch (err) {
+      console.log(err);
+      showToast('error', 'Failed', err.message || 'Could not complete token');
+    }
+  };
 
   const skip = async () => {
     if (selected.length === 0) {
@@ -535,16 +544,22 @@ Servicing.navigationOptions = ({ navigation }) => {
         onPress={() => navigation.openDrawer()}
       />
     ),
-    headerRight: (
-      <HeaderButton
-        type={1}
-        iconName={'close-circle'}
-        color={colors.primary}
-        isFeather={false}
-        iconType={'ionic'}
-        onPress={() => navigation.goBack()}
-      />
-    ),
+    headerRight: ({ route }) => {
+      const role = route?.params?.role;
+      if (role === 'desk') {
+        return null;
+      }
+      return (
+        <HeaderButton
+          type={1}
+          iconName={'close-circle'}
+          color={colors.primary}
+          isFeather={false}
+          iconType={'ionic'}
+          onPress={() => navigation.goBack()}
+        />
+      );
+    },
     headerStyle: { elevation: 0 },
   });
 };
@@ -785,7 +800,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
-  textcount:{
+  textcount: {
     color: colors.primary,
     fontSize: 16,
     fontWeight: '600',
@@ -793,4 +808,8 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Servicing;
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+});
+
+export default connect(mapStateToProps)(Servicing);
