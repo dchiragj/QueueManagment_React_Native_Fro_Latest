@@ -13,6 +13,7 @@ import svgs from '../../../assets/svg';
 import { getQueueDelete } from '../../../services/apiService';
 import screens from '../../../constants/screens';
 import Toast from 'react-native-toast-message';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const MyQueueListItem = ({ name, category, date, desks, people, navigation, item, onDeleteQueue, categoryid }) => {
   const [showAlert, setShowAlert] = useState(false);
@@ -36,26 +37,46 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
 
 
   const handleDeleteQueue = async () => {
+    console.log('🗑️ Delete initiated for queue:', item.id || item._id);
     try {
-      setDeleting(true);   // 👈 start loading
-      await getQueueDelete(item.id || item._id);
+      setDeleting(true);
+      console.log('🔄 Calling delete API...');
+      const result = await getQueueDelete(item.id || item._id);
+      console.log('✅ Delete API response:', result);
 
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Queue deleted successfully',
+      });
+
+      // Close modal first
+      setVisible(false);
+      console.log('✅ Modal closed');
+
+      // Then refresh the list
       if (typeof onDeleteQueue === "function") {
+        console.log('🔄 Refreshing queue list...');
         await onDeleteQueue();
+        console.log('✅ Queue list refreshed');
+      } else {
+        console.warn('⚠️ onDeleteQueue is not a function');
       }
 
-      console.log("Queue deleted");
     } catch (err) {
+      console.error('❌ Delete error:', err);
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Failed to delete queue. Please try again.',
+        text2: err.message || 'Failed to delete queue. Please try again.',
       });
-
     } finally {
-      setDeleting(false);  // 👈 stop loading
+      setDeleting(false);
+      console.log('✅ Delete process completed');
     }
   };
+
+
 
 
   const handleSignInDesk = () => {
@@ -71,7 +92,7 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
 
   return (
     <Card style={s.wrapper}>
-      <Touchable style={[s.mainWrapper, s.touchableWrapper]}>
+      <View style={[s.mainWrapper, s.touchableWrapper]} pointerEvents="box-none">
         <View style={s.mainImg}>
           <Icon name='storefront-sharp' color={colors.primary} isFeather={false} size={moderateScale(50)} />
         </View>
@@ -82,33 +103,35 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
 
         </View>
         <View style={s.lastWrapper}>
-
-          <View style={[s.mainWrapper, s.secondTextWrapper]}>
-            <Icon name='people-circle' color={colors.primary} isFeather={false} />
+          <View style={s.badgeBorder}>
+            <Icon name='people' color={colors.primary} isFeather={false} size={moderateScale(15)} />
             <TextView style={s.LastText} color={colors.white} text={people?.toString() || '0'} type={'body-one'} />
           </View>
         </View>
-      </Touchable>
+      </View>
 
-      <View style={s.desksWrapper}>
-        <Icon name='desktop' color={colors.primary} isFeather={false} />
-        <TextView style={s.LastText} color={colors.white} text={desks?.toString() || '0'} type={'body-one'} />
+      <View style={s.desksWrapperBg}>
+        <View style={s.desksWrapper}>
+          <MaterialCommunityIcons name='monitor' color={colors.primary} size={moderateScale(18)} />
+          <TextView style={s.LastText} color={colors.white} text={desks?.toString() || '0'} type={'body-one'} />
+        </View>
       </View>
 
       <View style={s.topBorder} />
       <View style={s.linkTextWrapper}>
-        <Touchable onPress={handleQueueDetails}>
-          <TextView color={colors.primary} text={'View Details'} type={'body-one'} style={s.TextLink} />
-        </Touchable>
-        <Touchable onPress={handleSignInDesk}>
-          {/* <TextView color={colors.primary} text={'Sign In-Desk'} type={'body-one'} style={s.TextLink} /> */}
-          <TextView color={colors.primary} text={'Start Serving'} type={'body-one'} style={s.TextLink} />
-        </Touchable>
-        <Touchable
-          onPress={() => setVisible(true)}
-        >
-          <Delete name="delete" size={30} color={colors.primary} />
-        </Touchable>
+        <TouchableOpacity onPress={handleQueueDetails} style={s.actionRow}>
+          <MaterialCommunityIcons name="eye-outline" size={20} color={colors.primary} />
+          <TextView color={colors.primary} text={'View Details'} type={'body-one'} style={s.actionText} />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleSignInDesk} style={s.actionRow}>
+          <MaterialCommunityIcons name="play-circle-outline" size={20} color={colors.primary} />
+          <TextView color={colors.primary} text={'Start Serving'} type={'body-one'} style={s.actionText} />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => setVisible(true)}>
+          <Delete name="delete-outline" size={28} color={colors.primary} />
+        </TouchableOpacity>
       </View>
       <Modal
         transparent
@@ -129,14 +152,10 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
 
               <TouchableOpacity
                 disabled={deleting}
-                onPress={async () => {
-                  await handleDeleteQueue();
-                  setVisible(false);
-                }}
+                onPress={handleDeleteQueue}
                 style={{ backgroundColor: colors.primary, padding: 10, borderRadius: 5 }}
               >
-                <Text>
-
+                <Text style={{ color: '#fff' }}>
                   {deleting ? "Deleting..." : "Yes, Delete"}
                 </Text>
               </TouchableOpacity>
@@ -167,7 +186,7 @@ const s = StyleSheet.create({
   },
   mainWrapper: {
     flexDirection: 'row',
-    // marginLeft: scale(10),
+    alignItems: 'center',
   },
   desksWrapper: {
     flexDirection: 'row',
@@ -185,10 +204,12 @@ const s = StyleSheet.create({
 
   },
   textWrapper: {
-    flex: 0.6,
+    flex: 0.55,
   },
   lastWrapper: {
-    flex: 0.2,
+    flex: 0.25,
+    alignItems: 'flex-end',
+    marginRight: scale(15),
   },
   LastText: {
     marginLeft: scale(5),
@@ -203,12 +224,40 @@ const s = StyleSheet.create({
   },
   linkTextWrapper: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  TextLink: {
     paddingVertical: verticalScale(10),
+    paddingHorizontal: scale(15),
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: scale(5),
+  },
+  actionText: {
+    marginLeft: scale(5),
+  },
+  badgeBorder: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 15,
+    paddingHorizontal: scale(8),
+    paddingVertical: verticalScale(6),
+  },
+  desksWrapperBg: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    marginHorizontal: scale(15),
+    borderRadius: 8,
+    marginBottom: verticalScale(10),
+  },
+  desksWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: verticalScale(8),
+    paddingHorizontal: scale(10),
   },
 });
 

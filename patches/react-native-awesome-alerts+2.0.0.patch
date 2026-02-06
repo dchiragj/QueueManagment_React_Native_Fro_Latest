@@ -1,0 +1,46 @@
+diff --git a/node_modules/react-native-awesome-alerts/src/AwesomeAlert.js b/node_modules/react-native-awesome-alerts/src/AwesomeAlert.js
+index 9977d01..b8a4546 100644
+--- a/node_modules/react-native-awesome-alerts/src/AwesomeAlert.js
++++ b/node_modules/react-native-awesome-alerts/src/AwesomeAlert.js
+@@ -34,7 +34,7 @@ export default class AwesomeAlert extends Component {
+   }
+ 
+   componentDidMount() {
+-    HwBackHandler.addEventListener(HW_BACK_EVENT, this._handleHwBackEvent);
++    this.backHandler = HwBackHandler.addEventListener(HW_BACK_EVENT, this._handleHwBackEvent);
+   }
+ 
+   _springShow = (fromConstructor) => {
+@@ -103,8 +103,8 @@ export default class AwesomeAlert extends Component {
+     } = data;
+ 
+     return (
+-      <TouchableOpacity  style={[styles.button, { backgroundColor }, buttonStyle]} testID={testID} onPress={onPress}>
+-          <Text style={[styles.buttonText, buttonTextStyle]}>{text}</Text>
++      <TouchableOpacity style={[styles.button, { backgroundColor }, buttonStyle]} testID={testID} onPress={onPress}>
++        <Text style={[styles.buttonText, buttonTextStyle]}>{text}</Text>
+       </TouchableOpacity>
+     );
+   };
+@@ -216,7 +216,7 @@ export default class AwesomeAlert extends Component {
+           {this._renderAlert()}
+         </Modal>
+       ) : this._renderAlert()
+-    : null;
++      : null;
+   }
+ 
+   UNSAFE_componentWillReceiveProps(nextProps) {
+@@ -228,7 +228,11 @@ export default class AwesomeAlert extends Component {
+   }
+ 
+   componentWillUnmount() {
+-    HwBackHandler.removeEventListener(HW_BACK_EVENT, this._handleHwBackEvent);
++    if (this.backHandler) {
++      this.backHandler.remove();
++    } else if (HwBackHandler.removeEventListener) {
++      HwBackHandler.removeEventListener(HW_BACK_EVENT, this._handleHwBackEvent);
++    }
+   }
+ }
+ 

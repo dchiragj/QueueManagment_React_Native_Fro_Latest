@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import HeaderButton from '../../../components/HeaderButton';
-import  colors  from '../../../styles/colors';
+import colors from '../../../styles/colors';
 import AppStyles from '../../../styles/AppStyles';
-import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, RefreshControl } from 'react-native';
 import NavigationOptions from '../../../components/NavigationOptions';
 import screens from '../../../constants/screens';
-import { getCategories, getCompletedHistory, getTokenList } from '../../../services/apiService';
+import { getCategories, getCompletedHistory, getTokenList, getCompletedTokenList, getTokenDelete } from '../../../services/apiService';
+import { getAuthUser } from '../../../utils/localStorageHelpers';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { useBranch } from '../../../context/BranchContext';
 import Card from '../../../components/Card';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -15,37 +17,62 @@ import TextView from '../../../components/TextView/TextView';
 
 const CompletedToken = ({ navigation }) => {
   const [myTokens, setMyTokens] = useState([]);
+  const { selectedBranchId } = useBranch();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [selectedTokenId, setSelectedTokenId] = useState(null);
-  const [ categories, setCategories ] = useState( [] );
-  
+  const [categories, setCategories] = useState([]);
+  const [userRole, setUserRole] = useState(null);
+
+
   const onPressMyTokenDetails = (tokenId) => {
     navigation.navigate(screens.MyTokenDetails, { tokenId });
   };
 
-  useEffect(() => {
-    const loadMyTokens = async () => {
-      try {
-        const res = await getTokenList();
-        if (res.status === 'ok' && Array.isArray(res.data)) {
-            const filtered = res.data.filter(t => t.status === 'COMPLETED');
-          setMyTokens(filtered);
-        } else {
-          setMyTokens([]);
-        }
-      } catch (err) {
-        console.log('Failed to load my tokens', err);
+  const loadMyTokens = async () => {
+    setLoading(true);
+    try {
+      const user = await getAuthUser();
+      setUserRole(user?.role);
+      const branchId = selectedBranchId !== 'all' ? selectedBranchId : null;
+      const res = await getCompletedTokenList(branchId);
+      if (res.status === 'ok' && Array.isArray(res.data)) {
+        setMyTokens(res.data);
+      } else {
         setMyTokens([]);
-      } finally {
-        setLoading(false);
       }
-    };
-   fetchCategories()
+    } catch (err) {
+      console.log('Failed to load completed tokens', err);
+      setMyTokens([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const user = await getAuthUser();
+      setUserRole(user?.role);
+      const branchId = selectedBranchId !== 'all' ? selectedBranchId : null;
+      const res = await getCompletedTokenList(branchId);
+      if (res.status === 'ok' && Array.isArray(res.data)) {
+        setMyTokens(res.data);
+      } else {
+        setMyTokens([]);
+      }
+    } catch (err) {
+      console.log('Failed to refresh completed tokens', err);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
     loadMyTokens();
-    const interval = setInterval(loadMyTokens, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  }, [selectedBranchId]);
 
   const handleDeleteToken = async (tokenId) => {
     try {
@@ -67,46 +94,68 @@ const CompletedToken = ({ navigation }) => {
       hour12: true
     });
   };
- const fetchCategories = async () => {
+  const fetchCategories = async () => {
     try {
       const res = await getCategories();
-      const list = res?.data?.map( ( c ) => ( {
+      const list = res?.data?.map((c) => ({
         text: c.name,
         value: c.id,
-      } ) );
-      setCategories( list || [] );
-    } catch ( err ) {
-      console.error( "Error fetching categories:", err );
-      setCategories( [] );
+      }));
+      setCategories(list || []);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      setCategories([]);
     }
   };
-  const getCategoryName = ( categoryId ) => {
-    if ( categoryId === null || categoryId === undefined ) {
+  const getCategoryName = (categoryId) => {
+    if (categoryId === null || categoryId === undefined) {
       return 'Category';
     }
-    const category = categories.find( ( cat ) => cat.value === categoryId );
+    const category = categories.find((cat) => cat.value === categoryId);
     return category ? category.text : ' Category';
   };
 
- if ( loading ) {
+  if (loading) {
     return (
-      <SafeAreaView style={ [ AppStyles.root ] }>
-        <ActivityIndicator size="large" color={ colors.primary } style={ AppStyles.loading } />
+      <SafeAreaView style={[AppStyles.root]}>
+        <ActivityIndicator size="large" color={colors.primary} style={AppStyles.loading} />
       </SafeAreaView>
     );
-  } 
+  }
 
-  if (myTokens.length === 0) { 
+  if (myTokens.length === 0) {
     return (
-      <SafeAreaView style={[AppStyles.root, styles.center]}>
-        <Text style={styles.emptyText}>You have no tokens yet</Text>
+      <SafeAreaView style={[AppStyles.root]}>
+        <ScrollView
+          contentContainerStyle={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
+        >
+          <Text style={styles.emptyText}>You have no tokens yet</Text>
+        </ScrollView>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={[AppStyles.root]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[colors.primary]}
+            tintColor={colors.primary}
+          />
+        }
+      >
         {myTokens.map((token) => (
           <Card key={token.id} style={styles.wrapper} onPress={() => onPressMyTokenDetails(token.id)}>
             <View style={styles.mainWrapper}>
@@ -123,7 +172,15 @@ const CompletedToken = ({ navigation }) => {
               {/* Details */}
               <View style={styles.textWrapper}>
                 <TextView color={colors.white} text={token.queueName || 'Queue'} type="body-one" />
-                <TextView color={colors.lightWhite} text={getCategoryName( token.categoryId )} type="body-one" />
+                {userRole === 'merchant' && token.customerName && (
+                  <TextView
+                    color={colors.lightWhite}
+                    text={token.customerName}
+                    type="body-one"
+                    style={{ fontSize: moderateScale(14), fontWeight: '500' }}
+                  />
+                )}
+                <TextView color={colors.lightWhite} text={getCategoryName(token.categoryId)} type="body-one" />
                 <TextView
                   color={colors.lightWhite}
                   text={formatDate(token.createdAt)}
@@ -133,7 +190,7 @@ const CompletedToken = ({ navigation }) => {
 
               {/* Delete + Status */}
               <View style={styles.deleteIconWrapper}>
-                
+
 
                 <View style={styles.tokenStatusWrapper}>
                   <View style={styles.tokenStatusTriangle}></View>
@@ -258,7 +315,7 @@ const styles = StyleSheet.create({
   },
   tokenStatusRectangle: {
     width: scale(78),
-    padding:4,
+    padding: 4,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,

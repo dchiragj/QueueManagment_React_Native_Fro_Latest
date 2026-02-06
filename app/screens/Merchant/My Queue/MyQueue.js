@@ -8,10 +8,12 @@ import screens from '../../../constants/screens';
 import { verticalScale } from 'react-native-size-matters';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useBranch } from '../../../context/BranchContext'; // Import context
 
 const MyQueue = ({ navigation, route }) => {
   // const params = navigation.state?.params || {};
   const params = route.params || {};
+  const { selectedBranchId } = useBranch(); // Consume context
   const [queues, setQueues] = useState(params.queues || []);
   const [filteredQueues, setFilteredQueues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +28,8 @@ const MyQueue = ({ navigation, route }) => {
       case 1:
         return 'running';
       case 2:
+        return 'running';
+      case 4:
         return 'cancel';
       default:
         return 'unknown';
@@ -47,10 +51,18 @@ const MyQueue = ({ navigation, route }) => {
     setLoading(true);
     setError(null);
     try {
-      const queueRes = await getQueueList();
+      const fetchParams = {};
+      if (params.businessId) {
+        fetchParams.businessId = params.businessId;
+      } else if (selectedBranchId !== 'all') { // Use selectedBranchId
+        fetchParams.businessId = selectedBranchId;
+      }
+      const queueRes = await getQueueList(fetchParams);
       let queueData = queueRes.data || [];
 
-      const tokenData = await getTokenCounts();
+      // Filter token counts by branch if selected
+      const tokenCountsParams = selectedBranchId !== 'all' ? selectedBranchId : null;
+      const tokenData = await getTokenCounts(tokenCountsParams);
 
       const tokenMap = {};
       tokenData.forEach(t => {
@@ -94,7 +106,7 @@ const MyQueue = ({ navigation, route }) => {
     if (tab === 'all') {
       setFilteredQueues(updatedQueues);
     } else {
-      const tabStatus = tab === 'running' ? 1 : tab === 'cancel' ? 2 : null;
+      const tabStatus = tab === 'running' ? 1 : tab === 'cancel' ? 4 : null;
       if (tabStatus !== null) {
         setFilteredQueues(updatedQueues.filter((queue) => queue.status === tabStatus));
       } else {
@@ -106,7 +118,7 @@ const MyQueue = ({ navigation, route }) => {
   useEffect(() => {
     fetchCategories();
     fetchQueueList();
-  }, [params.queues]);
+  }, [params.queues, params.businessId, selectedBranchId]); // Add dependency
 
   useEffect(() => {
     filterQueues(activeTab);
@@ -133,7 +145,7 @@ const MyQueue = ({ navigation, route }) => {
             })
             : 'No Date'
         }
-        desks={item.Desk || 0}
+        desks={item.desks?.length > 0 ? item.desks.map(d => d.name).join(', ') : item.Desk || '0'}
         people={item.tokenCount || 0}
         navigation={navigation}
         item={item}
@@ -169,13 +181,6 @@ const MyQueue = ({ navigation, route }) => {
         { renderTab( 'running', 'Running' ) }
         { renderTab( 'cancel', 'Cancel' ) }
       </View> */}
-      <TouchableOpacity
-        style={styles.addQueueButton}
-        onPress={() => navigation.navigate(screens.Step1)}
-      >
-        <Text style={styles.addQueueText}>Add Queue</Text>
-        <Icon name="add-circle" size={26} color={colors.primary} />
-      </TouchableOpacity>
 
 
       <FlatList

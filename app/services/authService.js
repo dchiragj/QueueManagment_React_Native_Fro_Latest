@@ -43,6 +43,9 @@ export const login = (obj) => async (dispatch) => {
     const response = await axios.post(`${baseUrl}/auth/login`, obj);
 
     const { data } = response.data;
+
+    console.log(data.token, "datalogin");
+
     dispatch(setLoginToken(data));
     return true;
   } catch (e) {

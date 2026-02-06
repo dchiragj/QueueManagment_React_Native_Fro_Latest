@@ -63,9 +63,9 @@ export const notifyThirdUser = async (fcmToken) => {
     return null;
   }
 };
-export const getDesksByCategory = async (categoryId) => {
+export const getDesksByCategory = async (categoryId, params = {}) => {
   try {
-    const response = await apiService.get(`/queue/desks/${categoryId}`);
+    const response = await apiService.get(`/queue/desks/${categoryId}`, { params });
     return response.data.data || []; // backend returns { success: true, data: [...] }
   } catch (error) {
     console.error('getDesksByCategory error:', error.response?.data || error.message);
@@ -170,10 +170,11 @@ export const createQueue = async (queueData) => {
 export const getQueueList = async (params = {}) => {
   try {
     const user = await getAuthUser();
-    const defaultParams = {
-      merchantId: user?.id
+    const requestParams = {
+      merchantId: user?.id,
+      ...params
     };
-    const response = await apiService.get('/queue/list', { params: defaultParams });
+    const response = await apiService.get('/queue/list', { params: requestParams });
     return response.status === 200 ? response.data || [] : [];
   } catch (error) {
     throw error;
@@ -207,12 +208,21 @@ export const generateToken = async ({ queueId, categoryId }) => {
   }
 };
 
-export const getTokenList = async () => {
+export const getTokenList = async (businessId) => {
   try {
-    const response = await apiService.get('/token/list');
+    const response = await apiService.get('/token/list', { params: { businessId } });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to get user profile');
+  }
+};
+
+export const getCompletedTokenList = async (businessId) => {
+  try {
+    const response = await apiService.get('/token/completed', { params: { businessId } });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to get completed tokens');
   }
 };
 
@@ -242,12 +252,14 @@ export const getQueueDelete = async (queueId) => {
     return response.data;
   } catch (error) {
     console.log(error, "error");
-    throw new Error(error.response?.data?.message || 'Failed to get user profile');
+    throw new Error(error.response?.data?.message || 'Failed to delete queue');
   }
 };
-export const getServicingList = async (queueId, categoryId) => {
+export const getServicingList = async (queueId, categoryId, businessId) => {
   try {
-    const response = await apiService.get(`/token/servicing/${queueId}?categoryId=${categoryId}`);
+    const response = await apiService.get(`/token/servicing/${queueId}`, {
+      params: { categoryId, businessId }
+    });
     return response.data;
   } catch (error) {
     console.log(error, "error");
@@ -275,18 +287,26 @@ export const recoverSkippedToken = async (tokenNumber) => {
   }
 };
 
-export const getSkippedList = async (queueId, categoryId) => {
+export const getSkippedList = async (queueId, categoryId, businessId) => {
   try {
-    const response = await apiService.get(`/token/skippedTokens/${queueId}?categoryId=${categoryId}`);
+    const response = await apiService.get(`/token/skippedTokens/${queueId}`, {
+      params: { categoryId, businessId }
+    });
     return response.data;
   } catch (error) {
     console.log(error, "error");
     throw new Error(error.response?.data?.message || 'Failed to get servicing list');
   }
 };
-export const getTokenCounts = async (queueId, categoryId) => {
+export const getTokenCounts = async (businessId) => {
   try {
-    const response = await apiService.get(`/token/token-counts/count`);
+    const user = await getAuthUser();
+    const response = await apiService.get(`/token/token-counts/count`, {
+      params: {
+        businessId,
+        merchantId: user?.id
+      }
+    });
     return response.data.data;
   } catch (error) {
     console.log(error, "error");
@@ -306,10 +326,10 @@ export const completeToken = async (tokenId) => {
     throw error.response?.data || error;
   }
 };
-export const getCompletedHistory = async (queueId, categoryId) => {
+export const getCompletedHistory = async (queueId, categoryId, businessId) => {
   try {
     const response = await apiService.get(`/token/completed/history`, {
-      params: { queueId, categoryId }
+      params: { queueId, categoryId, businessId }
     });
     return response.data.data;
   } catch (error) {
@@ -346,6 +366,15 @@ export const createBusiness = async (data) => {
   }
 };
 
+export const updateBusiness = async (businessId, data) => {
+  try {
+    const response = await apiService.put(`/queue/business/update/${businessId}`, data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to update business');
+  }
+};
+
 export const createDesk = async (data) => {
   try {
     const response = await apiService.post('/queue/desk/create', data);
@@ -373,9 +402,13 @@ export const deleteDesk = async (deskId) => {
   }
 };
 
-export const getDeskList = async () => {
+export const getDeskList = async (params = {}) => {
   try {
-    const response = await apiService.get('/queue/desk/list');
+    const user = await getAuthUser();
+    const requestParams = {
+      ...params
+    };
+    const response = await apiService.get('/queue/desk/list', { params: requestParams });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to fetch desk list');

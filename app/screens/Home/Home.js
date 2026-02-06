@@ -48,13 +48,13 @@ const Home = (props) => {
 
   const tabs = user?.role === 'customer'
     ? [
-        { key: 'private', label: 'Invite code' },
-        { key: 'link', label: 'Link' },
-        { key: 'location', label: 'Location' },
-        { key: 'qr', label: 'QR Code' },
-      ]
+      { key: 'private', label: 'Invite code' },
+      { key: 'link', label: 'Link' },
+      { key: 'location', label: 'Location' },
+      { key: 'qr', label: 'QR Code' },
+    ]
     : [];
-    
+
 
   useEffect(() => {
     props.navigation.setParams({ openDrawer: _openDrawer });
@@ -132,61 +132,61 @@ const Home = (props) => {
     }
   };
 
-const processJoin = async (qrData) => {
-  try {
+  const processJoin = async (qrData) => {
+    try {
 
-    let payload = { joinMethods: joinMethod };
+      let payload = { joinMethods: joinMethod };
 
-    switch (joinMethod) {
-      case 'private':
-        payload.joinCode = joinCode;
-        break;
-      case 'link':
-        payload.link = link;
-        break;
-      case 'location':
-        const [latStr, longStr] = location.split(',');
-        const lat = parseFloat(latStr?.trim());
-        const long = parseFloat(longStr?.trim());
-        if (isNaN(lat) || isNaN(long)) {
-          throw new Error('Enter valid lat,long (e.g., 23.12,72.57)');
-        }
-        payload.lat = lat;
-        payload.long = long;
-        break;
-      case 'qr':
-        if (!qrData?.queueId || !qrData?.category) {
-          throw new Error('QR code missing queueId or category');
-        }
-        payload.queueId = qrData.queueId;
-        payload.categoryId = qrData.category;
-        break;
-      default:
-        throw new Error('Invalid join method');
-    }
+      switch (joinMethod) {
+        case 'private':
+          payload.joinCode = joinCode;
+          break;
+        case 'link':
+          payload.link = link;
+          break;
+        case 'location':
+          const [latStr, longStr] = location.split(',');
+          const lat = parseFloat(latStr?.trim());
+          const long = parseFloat(longStr?.trim());
+          if (isNaN(lat) || isNaN(long)) {
+            throw new Error('Enter valid lat,long (e.g., 23.12,72.57)');
+          }
+          payload.lat = lat;
+          payload.long = long;
+          break;
+        case 'qr':
+          if (!qrData?.queueId || !qrData?.category) {
+            throw new Error('QR code missing queueId or category');
+          }
+          payload.queueId = qrData.queueId;
+          payload.categoryId = qrData.category;
+          break;
+        default:
+          throw new Error('Invalid join method');
+      }
 
-         const tokenCheckResponse = await checkToken( payload );
+      const tokenCheckResponse = await checkToken(payload);
 
-      if ( tokenCheckResponse.status === 200 && tokenCheckResponse.data?.data && tokenCheckResponse.data.status === "ok" ) {
-        setTokenDetails( tokenCheckResponse.data.data );
+      if (tokenCheckResponse.status === 200 && tokenCheckResponse.data?.data && tokenCheckResponse.data.status === "ok") {
+        setTokenDetails(tokenCheckResponse.data.data);
         showToast(
           'info',
           'Token Already Generated',
-          `You already have a token, your token number is ${ tokenCheckResponse.data.data.tokenNumber }`
+          `You already have a token, your token number is ${tokenCheckResponse.data.data.tokenNumber}`
         );
         clearInputs();
         setActiveTab();
-        setQrDetails( null );
+        setQrDetails(null);
       } else {
-        setQrDetails( tokenCheckResponse.data.data );
-        showToast( 'info', 'No Token', 'Please press "Generate Token" to create a new token.' );
+        setQrDetails(tokenCheckResponse.data.data);
+        showToast('info', 'No Token', 'Please press "Generate Token" to create a new token.');
       }
-    } catch ( error ) {
-      console.error( 'Error processing QR code:', error.message, error.response?.data );
-      showToast( 'error', 'Scan Failed', error.message || 'Could not process QR code' );
-      setIsScanning( false );
+    } catch (error) {
+      console.error('Error processing QR code:', error.message, error.response?.data);
+      showToast('error', 'Scan Failed', error.message || 'Could not process QR code');
+      setIsScanning(false);
     }
-};
+  };
   const onScanSuccess = async (e) => {
     try {
       const data = e.data || e.rawValue;
@@ -219,11 +219,11 @@ const processJoin = async (qrData) => {
       });
       if (res.status === 'ok' && res.data) {
         setTokenDetails(res.data);
-       showToast(
-        'success',
-        'Token Generated!',
-        `Your token number is ${res.data.tokenNumber} 🎉`
-      );
+        showToast(
+          'success',
+          'Token Generated!',
+          `Your token number is ${res.data.tokenNumber} 🎉`
+        );
         setQrDetails(null);
         clearInputs();
         setActiveTab(null);
@@ -347,11 +347,11 @@ const processJoin = async (qrData) => {
           )}
 
           {activeTab && activeTab !== 'qr' && (
-            <Button 
-              ButtonText="Check & Join" 
-              onPress={processJoin} 
+            <Button
+              ButtonText="Check & Join"
+              onPress={processJoin}
               disabled={isLoading}
-              style={s.SendBut} 
+              style={s.SendBut}
             />
           )}
 
@@ -359,10 +359,10 @@ const processJoin = async (qrData) => {
           {qrDetails && (
             <Card>
               <View style={s.qrDetails}>
-                <TextView 
-                  text={`Queue: ${qrDetails.queueName || 'N/A'}`} 
-                  color={colors.white} 
-                  type="body" 
+                <TextView
+                  text={`Queue: ${qrDetails.queueName || 'N/A'}`}
+                  color={colors.white}
+                  type="body"
                   style={s.profileText}
                 />
                 <TextView
@@ -371,10 +371,10 @@ const processJoin = async (qrData) => {
                   type="body"
                   style={s.profileText}
                 />
-                <TextView 
-                  text={`Token Range: ${qrDetails.tokenRange}`} 
-                  color={colors.white} 
-                  type="body" 
+                <TextView
+                  text={`Token Range: ${qrDetails.tokenRange}`}
+                  color={colors.white}
+                  type="body"
                   style={s.profileText}
                 />
                 {tokenDetails && (

@@ -10,45 +10,46 @@ import AppStyles from '../../../styles/AppStyles';
 import colors from '../../../styles/colors';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button/Button';
-import { createDesk, updateDesk, getCategories, getQueueList } from '../../../services/apiService';
+import { createDesk, updateDesk, getBusinessList } from '../../../services/apiService';
 import { indent } from '../../../styles/dimensions';
 import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
 import { scale, verticalScale } from 'react-native-size-matters';
+import { useBranch } from '../../../context/BranchContext';
+
 
 const AddDesk = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const deskToEdit = route.params?.desk;
+    const { selectedBranchId } = useBranch();
 
     const [loading, setLoading] = useState(false);
-    const [queues, setQueues] = useState([]);
-    const [rawQueues, setRawQueues] = useState([]);
+
+    const [businesses, setBusinesses] = useState([]);
     const [formData, setFormData] = useState({
         name: deskToEdit?.name || '',
-        categoryId: deskToEdit?.category_id || '',
-        queueId: deskToEdit?.queue_id || '',
+        businessId: deskToEdit?.businessId || (selectedBranchId !== 'all' ? selectedBranchId : ''),
         email: deskToEdit?.email || '',
         password: '',
         status: deskToEdit?.status || 1,
     });
 
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const queueRes = await getQueueList();
-                const queueData = queueRes?.data || [];
+                const businessRes = await getBusinessList();
+                const businessData = businessRes?.data || [];
 
-                setRawQueues(queueData);
-
-                const queueList = queueData.map((q) => ({
-                    key: q.id,
-                    value: q.name,
+                const businessList = businessData.map((b) => ({
+                    key: b.id,
+                    value: b.businessName,
                 }));
-                setQueues(queueList);
+                setBusinesses(businessList);
             } catch (err) {
                 console.error(err);
-                setQueues([]);
+                setBusinesses([]);
             } finally {
                 setLoading(false);
             }
@@ -57,30 +58,19 @@ const AddDesk = () => {
     }, []);
 
     const handleChange = (name, value) => {
-        setFormData(prev => {
-            const newData = { ...prev, [name]: value };
-
-            // If selecting a queue, automatically set the categoryId
-            if (name === 'queueId') {
-                const selectedQueue = rawQueues.find(q => q.id === value);
-                if (selectedQueue) {
-                    newData.categoryId = selectedQueue.category;
-                }
-            }
-
-            return newData;
-        });
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSave = async () => {
-        if (!formData.name.trim() || !formData.categoryId || !formData.queueId) {
+        if (!formData.name.trim()) {
             Toast.show({
                 type: 'error',
                 text1: 'Validation Error',
-                text2: 'Desk name, category, and queue are required.',
+                text2: 'Desk name is required.',
             });
             return;
         }
+
 
         try {
             setLoading(true);
@@ -88,6 +78,8 @@ const AddDesk = () => {
                 await updateDesk(deskToEdit.id, formData);
                 Toast.show({ type: 'success', text1: 'Success', text2: 'Desk updated successfully!' });
             } else {
+                console.log(formData);
+
                 await createDesk(formData);
                 Toast.show({ type: 'success', text1: 'Success', text2: 'Desk created successfully!' });
             }
@@ -121,25 +113,28 @@ const AddDesk = () => {
                         isFeather={false}
                     />
 
-                    <Text style={styles.label}>Select Queue *</Text>
+                    <Text style={styles.label}>Select Branch (Optional)</Text>
+
                     <View style={styles.pickerContainer}>
-                        {!loading && queues.length > 0 ? (
+                        {loading ? (
+                            <ActivityIndicator size="small" color={colors.primary} />
+                        ) : (
                             <SelectList
-                                setSelected={(value) => handleChange('queueId', value)}
-                                data={queues}
+
+                                setSelected={(value) => handleChange('businessId', value)}
+                                data={businesses.length > 0 ? businesses : [{ key: '', value: 'No branches available', disabled: true }]}
                                 save="key"
-                                defaultOption={queues.find(q => String(q.key) === String(formData.queueId))}
-                                placeholder="Select Queue"
+                                defaultOption={businesses.find(b => String(b.key) === String(formData.businessId))}
+                                placeholder={businesses.length > 0 ? "Select Branch" : "No branches available"}
                                 boxStyles={styles.selectListBox}
                                 inputStyles={{ color: colors.white }}
                                 dropdownStyles={styles.selectListDropdown}
+                                dropdownItemStyles={styles.selectListItem}
+                                disabledItemStyles={styles.selectListItem}
                                 dropdownTextStyles={{ color: colors.white }}
                                 searchicon={<Icon name="search" size={20} color={colors.white} style={{ marginRight: scale(10) }} isFeather={false} />}
                             />
-                        ) : loading ? (
-                            <ActivityIndicator size="small" color={colors.primary} />
-                        ) : (
-                            <Text style={{ color: colors.red }}>No queues found. Please create a queue first.</Text>
+
                         )}
                     </View>
 
@@ -205,7 +200,13 @@ const styles = StyleSheet.create({
         backgroundColor: colors.inputBackgroundColor,
         borderColor: colors.lightWhite,
     },
+    selectListItem: {
+        backgroundColor: colors.inputBackgroundColor,
+        paddingVertical: 10,
+    },
     buttonContainer: {
+
+
         marginTop: 40,
     },
     saveButton: {

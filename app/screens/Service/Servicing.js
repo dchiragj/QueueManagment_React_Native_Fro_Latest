@@ -11,11 +11,14 @@ import Toast from 'react-native-toast-message';
 import { useRoute } from '@react-navigation/native';
 import { connect } from 'react-redux';
 import screens from '../../constants/screens';
+import Speech from '@mhpdev/react-native-speech';
+import { useBranch } from '../../context/BranchContext';
 
 
 const Servicing = (props) => {
   const { navigation, auth } = props;
   const route = useRoute();
+  const { selectedBranchId } = useBranch();
   const role = auth.user?.role;
 
   // Use params if available, otherwise fallback to user's assigned queue (for direct operator login)
@@ -40,9 +43,9 @@ const Servicing = (props) => {
 
   const showToast = (type, title, message) => {
     Toast.show({
-      type,
-      text1: title,
-      text2: message,
+      type: String(type),
+      text1: String(title),
+      text2: String(message),
       position: 'top',
       visibilityTime: 3000,
     });
@@ -57,7 +60,7 @@ const Servicing = (props) => {
       showToast('error', 'Error', 'Missing queue or category information.');
       setLoading(false);
     }
-  }, [queueId, categoryid]);
+  }, [queueId, categoryid, selectedBranchId]);
   useEffect(() => {
     if (!queueId || !categoryid) return;
 
@@ -79,7 +82,7 @@ const Servicing = (props) => {
     // const interval = setInterval(fetchCurrentAndUpcoming, 8000);
 
     // return () => clearInterval(interval);
-  }, [queueId, categoryid]);
+  }, [queueId, categoryid, selectedBranchId]);
 
   useEffect(() => {
     if (!queueId || !categoryid) return;
@@ -93,10 +96,11 @@ const Servicing = (props) => {
     }, 8000);
 
     return () => clearInterval(interval);
-  }, [queueId, categoryid]);
+  }, [queueId, categoryid, selectedBranchId]);
   const fetchCompletedHistory = async () => {
     try {
-      const res = await getCompletedHistory(queueId, categoryid);
+      const branchId = selectedBranchId !== 'all' ? selectedBranchId : null;
+      const res = await getCompletedHistory(queueId, categoryid, branchId);
       if (res) {
         setCompletedHistory(res.data);
       }
@@ -132,8 +136,9 @@ const Servicing = (props) => {
       const categoryList = await handledcategorylist();
       const categoryMap = new Map(categoryList.map(cat => [cat.key, cat.value]));
 
+      const branchId = selectedBranchId !== 'all' ? selectedBranchId : null;
       const [servicingData, queueDetails] = await Promise.all([
-        getServicingList(queueId, categoryId),
+        getServicingList(queueId, categoryId, branchId),
         getQueueDetails(queueId),
       ]);
 
@@ -196,7 +201,8 @@ const Servicing = (props) => {
     const categoryList = await handledcategorylist();
     const categoryMap = new Map(categoryList.map(cat => [cat.key, cat.value]));
     try {
-      const response = await getSkippedList(queueId, categoryid);
+      const branchId = selectedBranchId !== 'all' ? selectedBranchId : null;
+      const response = await getSkippedList(queueId, categoryid, branchId);
       if (response.status === 'ok' && response.data) {
         const mappedCustomers = response.data.map(token => {
           const category =

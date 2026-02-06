@@ -114,6 +114,11 @@ const MyQueueDetail = ({ navigation }) => {
                 <DetailRow label="Queue Name" value={queue.name || 'Unnamed Queue'} />
                 <DetailRow label="Category" value={category || 'Unknown'} />
                 <DetailRow label="Status" value={getStatusLabel(queue.status) || 'Unknown'} />
+                {queue.desks?.length > 0 ? (
+                  <DetailRow label="Desks" value={queue.desks.map(d => d.name).join(', ')} />
+                ) : queue.Desk ? (
+                  <DetailRow label="Desk" value={queue.Desk} />
+                ) : null}
               </View>
 
               {/* Date & Time */}
@@ -391,7 +396,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   qrshow: {
-    flexDirection: 'row',          
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginVertical: 20,
@@ -399,14 +404,14 @@ const styles = StyleSheet.create({
 
   qrBox: {
     alignItems: 'center',
-    width: '48%',                
+    width: '48%',
   },
 
   qrTitle: {
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 8,
-    color:colors.primary
+    color: colors.primary
   },
 
   qrImage: {

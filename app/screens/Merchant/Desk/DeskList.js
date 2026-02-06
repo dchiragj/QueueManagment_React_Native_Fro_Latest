@@ -8,6 +8,7 @@ import colors from '../../../styles/colors';
 import Icon from '../../../components/Icon';
 import { getDeskList, deleteDesk } from '../../../services/apiService';
 import screens from '../../../constants/screens';
+import { useBranch } from '../../../context/BranchContext'; // Import context
 
 const DeskList = () => {
     const navigation = useNavigation();
@@ -15,13 +16,17 @@ const DeskList = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
+    const { selectedBranchId } = useBranch(); // Consume context
 
     const fetchDesks = async () => {
         try {
             setError(null);
-            const res = await getDeskList();
-            console.log(res);
-            setDesks(res.data.data || []);
+            const params = {};
+            if (selectedBranchId !== 'all') {
+                params.businessId = selectedBranchId;
+            }
+            const res = await getDeskList(params);
+            setDesks(res.data || []);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -33,7 +38,7 @@ const DeskList = () => {
     useFocusEffect(
         useCallback(() => {
             fetchDesks();
-        }, [])
+        }, [selectedBranchId]) // Add dependency
     );
 
     const onRefresh = () => {

@@ -10,6 +10,7 @@ import messaging from '@react-native-firebase/messaging';
 import NetInfo from '@react-native-community/netinfo';
 import Icon from './app/components/Icon';
 import { colors } from './app/styles';
+import { BranchProvider } from './app/context/BranchContext';
 
 const App = () => {
   const [isConnected, setIsConnected] = useState(true);
@@ -80,40 +81,31 @@ const App = () => {
   }, []);
 
   return (
-    // <View style={AppStyles.rootStyle}>
-    //   <StatusBar
-    //     translucent
-    //     barStyle="light-content"
-    //   />
-    //   <Provider store={store}>
-    //     <AppNavigator />
-    //   </Provider>
-    //   <Toast />
-    // </View>
     <View style={AppStyles.rootStyle}>
       <Provider store={store}>
-        {!isConnected ? (
-          <View style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 20,
-            gap:10,
-            backgroundColor:colors.backgroundColor
-          }}>
-            <Text style={{fontSize:28,fontWeight:900,color:colors.white}}>Queue Flow</Text>
+        <BranchProvider>
+          {!isConnected ? (
+            <View style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 20,
+              gap: 10,
+              backgroundColor: colors.backgroundColor
+            }}>
+              <Text style={{ fontSize: 28, fontWeight: 900, color: colors.white }}>Queue Flow</Text>
               <Icon
-              name="cloud-offline"
-              isFeather={false}
-              size={100}
-              color={colors.primary}
-            />
-            <Text style={{fontSize:20,color:colors.white}}> Please connect to internet</Text>
-          </View>
-        ) : (
-          <AppNavigator />
-        )}
-
+                name="cloud-offline"
+                isFeather={false}
+                size={100}
+                color={colors.primary}
+              />
+              <Text style={{ fontSize: 20, color: colors.white }}> Please connect to internet</Text>
+            </View>
+          ) : (
+            <AppNavigator />
+          )}
+        </BranchProvider>
       </Provider>
       <Toast />
     </View>

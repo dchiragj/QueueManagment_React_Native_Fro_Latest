@@ -24,12 +24,16 @@ import Toast from 'react-native-toast-message';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { saveFcmToken } from '../../../services/apiService';
 import messaging from '@react-native-firebase/messaging';
+import { useBranch } from '../../../context/BranchContext';
+
 
 const Login = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
+  const { setToken } = useBranch();
   const { loading, resError = {} } = props.auth;
+
 
   useEffect(() => {
     return () => props.clearAuthResponseMsg();
@@ -58,12 +62,21 @@ const Login = (props) => {
     const result = await props.login(loginObj);
 
     if (result) {
+      console.log(result, "result");
+
       Toast.show({
         type: 'success',
         text1: 'Welcome!',
         text2: 'Login successful',
         position: 'top',
       });
+
+      // Update token in BranchContext
+      const user = await getAuthUser();
+      if (user?.token) {
+        setToken(user.token);
+      }
+
 
       // Get FCM Token and save it
       try {

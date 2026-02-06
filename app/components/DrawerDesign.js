@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import { DrawerItemList } from '@react-navigation/drawer';
 import screens from '../constants/screens';
 import { logout } from '../services/authService';
+import { useBranch } from '../context/BranchContext'; // Import useBranch
 import { colors } from '../styles';
 import { indent } from '../styles/dimensions';
 import { Touchable } from './Button';
@@ -27,6 +28,8 @@ function DrawerDesignComponent(props) {
   const scaleAnim = useRef(new Animated.Value(0)).current;
 
   const role = props.auth.user?.role;
+  const { businesses, selectedBranchId, changeBranch, setToken } = useBranch(); // Consume context
+  const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
 
   const allowedRouteNames =
     role === 'customer'
@@ -57,12 +60,76 @@ function DrawerDesignComponent(props) {
     hideLogoutModal();
     await props.logout();
     props.navigation.navigate('Auth', { screen: screens.Login });
+    setToken(null);
   };
 
   return (
     <>
       <SafeAreaView style={[AppStyles.root]}>
         <View style={s.bordertop} />
+
+        {/* BRANCH SELECTOR */}
+        <View style={s.branchSelectorContainer}>
+          <Touchable
+            style={s.branchSelectorHeader}
+            onPress={() => setIsBranchDropdownOpen(!isBranchDropdownOpen)}
+          >
+            <View style={s.branchInfo}>
+              <Icon name="business" isFeather={false} size={20} color={colors.primary} />
+              <TextView
+                text={
+                  selectedBranchId === 'all'
+                    ? 'All Branches'
+                    : businesses.find(b => String(b.id) === String(selectedBranchId))?.businessName || 'Select Branch'
+                }
+                type={'body'}
+                style={s.branchName}
+                color={colors.white} // Explicit white color
+              />
+            </View>
+            <Icon
+              name={isBranchDropdownOpen ? 'chevron-up' : 'chevron-down'}
+              size={20}
+              color={colors.white} // White icon
+            />
+          </Touchable>
+
+          {isBranchDropdownOpen && (
+            <View style={s.branchDropdown}>
+              <Touchable
+                style={[
+                  s.branchItem,
+                  selectedBranchId === 'all' && s.selectedBranchItem
+                ]}
+                onPress={() => {
+                  changeBranch('all');
+                  setIsBranchDropdownOpen(false);
+                }}
+              >
+                <TextView text="All Branches" type="caption" color={colors.white} />
+                {selectedBranchId === 'all' && <Icon name="check" size={16} color={colors.primary} />}
+              </Touchable>
+              {businesses.map(business => (
+                <Touchable
+                  key={business.id}
+                  style={[
+                    s.branchItem,
+                    String(selectedBranchId) === String(business.id) && s.selectedBranchItem
+                  ]}
+                  onPress={() => {
+                    changeBranch(business.id);
+                    setIsBranchDropdownOpen(false);
+                  }}
+                >
+                  <TextView text={business.businessName} type="caption" color={colors.white} />
+                  {String(selectedBranchId) === String(business.id) && (
+                    <Icon name="check" size={16} color={colors.primary} />
+                  )}
+                </Touchable>
+              ))}
+            </View>
+          )}
+        </View>
 
         <ScrollView contentContainerStyle={s.container}>
           {/* ROLE FILTERED DRAWER LIST */}
@@ -127,12 +194,58 @@ const s = StyleSheet.create({
   },
   borderBottom: {
     borderColor: colors.primary,
-    borderWidth: 0.5,
     marginVertical: verticalScale(50),
     width: '100%'
   },
+  branchSelectorContainer: {
+    paddingHorizontal: scale(indent),
+    paddingTop: verticalScale(indent),
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(255,255,255,0.1)', // Lighter border
+    paddingBottom: verticalScale(10),
+  },
+  branchSelectorHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: verticalScale(10), // More padding
+    backgroundColor: 'rgba(255,255,255,0.05)', // Slight background
+    paddingHorizontal: scale(10),
+    borderRadius: 8,
+  },
+  branchInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scale(10),
+  },
+  branchName: {
+    marginLeft: scale(10),
+    fontWeight: '600',
+    color: colors.white, // Ensure white text
+  },
+  branchDropdown: {
+    marginTop: verticalScale(5),
+    backgroundColor: '#1E2235', // Darker background for dropdown
+    borderRadius: 8,
+    padding: scale(5),
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  branchItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: verticalScale(10),
+    paddingHorizontal: scale(10),
+    borderRadius: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  selectedBranchItem: {
+    backgroundColor: 'rgba(255, 106, 0, 0.2)', // More visible selection
+  },
   container: {
-    marginTop: verticalScale(50)
+    marginTop: verticalScale(10) // Reduced margin since we added specific Branch Selector section
   },
   signOutMain: {
     flexDirection: 'row',

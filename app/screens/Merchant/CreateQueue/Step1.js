@@ -226,15 +226,17 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import DatePicker from '../../../components/DatePicker';
 import { borderRadius } from '../../../styles/dimensions';
 import { Button } from '../../../components/Button';
-import { createQueue, getCategories, getQueueList, getDesksByCategory } from '../../../services/apiService';
+import { createQueue, getCategories, getQueueList, getDesksByCategory, getBusinessList, getDeskList } from '../../../services/apiService';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Geolocation from 'react-native-geolocation-service';
 import Toast from 'react-native-toast-message';
-
+import { useBranch } from '../../../context/BranchContext'; // Import useBranch
 
 const Step1 = ({ navigation }) => {
+  const { selectedBranchId } = useBranch(); // Get selected branch
   const [formData, setFormData] = useState({
     category: '',
+    businessId: selectedBranchId !== 'all' ? selectedBranchId : '', // Set initial businessId
     name: '',
     description: '',
     start_date: new Date(),
@@ -243,6 +245,7 @@ const Step1 = ({ navigation }) => {
     end_number: 50,
     address: '',
     deskDetails: [],
+    selectedDesks: [], // Array of selected desk IDs
     joinMethods: '',
     latitude: 0,
     longitude: 0,
@@ -251,11 +254,19 @@ const Step1 = ({ navigation }) => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [businesses, setBusinesses] = useState([]);
   const [desks, setDesks] = useState([]);
   const [locationError, setLocationError] = useState('');
   const [userLocation, setUserLocation] = useState({ lat: 0, long: 0 });
   const [errorMessages, setErrorMassages] = useState('')
   const [isDayQueue, setIsDayQueue] = useState(0);
+
+  // Update businessId if selectedBranchId changes
+  useEffect(() => {
+    if (selectedBranchId && selectedBranchId !== 'all') {
+      setFormData(prev => ({ ...prev, businessId: selectedBranchId }));
+    }
+  }, [selectedBranchId]);
 
   const JOIN_METHODS = [
     { key: 'private', label: 'Invite-only', icon: 'lock' },
@@ -290,6 +301,8 @@ const Step1 = ({ navigation }) => {
       });
       return false;
     }
+
+    // businessId is now optional - removed validation
 
     if (!formData.description.trim()) {
       Toast.show({
@@ -360,6 +373,17 @@ const Step1 = ({ navigation }) => {
       });
       return false;
     }
+
+    // desk selection is now optional for single merchant mode
+    // if (!formData.selectedDesks || formData.selectedDesks.length === 0) {
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Validation Error',
+    //     text2: 'Please select at least one desk',
+    //     position: 'top',
+    //   });
+    //   return false;
+    // }
 
     return true;
   };
@@ -434,14 +458,17 @@ const Step1 = ({ navigation }) => {
       const payload = {
         ...formData,
         category: formData.category.toString(),
+        businessId: formData.businessId, // Added businessId
         start_date: formatDateForSQL(formData.start_date),
         end_date: formatDateForSQL(formData.end_date),
-        isDayQueue:isDayQueue,
+        isDayQueue: isDayQueue,
         end_number: parseInt(formData.end_number || 0),
-        deskDetails: formData.deskDetails,
+        deskDetails: formData.selectedDesks.map(deskId => ({ deskId })),
         joinMethods: formData.joinMethods,
       };
-      
+      console.log(payload);
+
+
       await createQueue(payload);
       Toast.show({
         type: 'success',
@@ -464,16 +491,22 @@ const Step1 = ({ navigation }) => {
     }
   };
 
-  const fetchDesksByCategory = async (categoryId) => {
+  const fetchAllDesks = async () => {
     try {
-      const res = await getDesksByCategory(categoryId);
-      const deskList = (res?.data || []).map((desk) => ({
+      const params = {};
+      if (selectedBranchId && selectedBranchId !== 'all') {
+        params.businessId = selectedBranchId;
+      }
+      const res = await getDeskList(params);
+      const desksData = res?.data?.data || res?.data || [];
+      const deskList = (Array.isArray(desksData) ? desksData : []).map((desk) => ({
         key: desk.id,
         value: desk.name,
+        branchName: desk.branch?.businessName || ''
       }));
       setDesks(deskList);
     } catch (err) {
-      console.error(err);
+      console.error('❌ Error fetching desks:', err);
       setDesks([]);
     }
   };
@@ -481,18 +514,35 @@ const Step1 = ({ navigation }) => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await getCategories();
-        const list = (res?.data || []).map((c) => ({
+        setLoading(true);
+        const [catRes, busRes] = await Promise.all([
+          getCategories(),
+          getBusinessList()
+        ]);
+
+        const catList = (catRes?.data || []).map((c) => ({
           key: c.id,
           value: c.name,
         }));
-        setCategories(list);
+        setCategories(catList);
+
+        const busList = (busRes?.data || []).map((b) => ({
+          key: b.id,
+          value: b.businessName,
+        }));
+        setBusinesses(busList);
+
+        // Load all desks for the selected branch (or all branches)
+        await fetchAllDesks();
       } catch (err) {
         console.error(err);
         setCategories([]);
+        setBusinesses([]);
+      } finally {
+        setLoading(false);
       }
     })();
-  }, []);
+  }, [selectedBranchId]);
 
   return (
     <SafeAreaView style={AppStyles.root}>
@@ -518,7 +568,6 @@ const Step1 = ({ navigation }) => {
           <SelectList
             setSelected={(value) => {
               setFormData({ ...formData, category: value });
-              fetchDesksByCategory(value);
             }}
             data={categories}
             save="key"
@@ -530,8 +579,70 @@ const Step1 = ({ navigation }) => {
             disabled={loading}
             searchicon={<Icon name="search" size={20} color={colors.white} style={{ marginRight: scale(10) }} />}
           />
-          {/* {errors.category && <Text style={s.errorText}>{errors.category}</Text>} */}
         </FormGroup>
+
+        {/* Desk Selection Section */}
+        <FormGroup>
+          <TextView
+            text="Select Desks for this Queue"
+            type="body-one"
+            isTextColorWhite
+            style={s.deskSectionHeader}
+          />
+          {desks.length > 0 ? (
+            <View style={s.deskListContainer}>
+              {desks.map((desk) => {
+                const isSelected = formData.selectedDesks.includes(desk.key);
+                return (
+                  <TouchableOpacity
+                    key={desk.key}
+                    style={[s.deskItem, isSelected && s.deskItemSelected]}
+                    onPress={() => {
+                      setFormData(prev => ({
+                        ...prev,
+                        selectedDesks: isSelected
+                          ? prev.selectedDesks.filter(id => id !== desk.key)
+                          : [...prev.selectedDesks, desk.key]
+                      }));
+                    }}
+                    disabled={loading}
+                  >
+                    <Icon
+                      name={isSelected ? 'check-square-o' : 'square-o'}
+                      size={24}
+                      color={isSelected ? colors.primary : colors.white}
+                    />
+                    <Text style={[s.deskLabel, isSelected && s.deskLabelSelected]}>
+                      {desk.value} {desk.branchName ? `- ${desk.branchName}` : ''}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          ) : (
+            <TextView
+              text="No desks available"
+              type="body-two"
+              isTextColorWhite
+              style={{ textAlign: 'center', marginTop: verticalScale(10), opacity: 0.6 }}
+            />
+          )}
+        </FormGroup>
+
+        {/* <FormGroup>
+          <SelectList
+            setSelected={(value) => setFormData({ ...formData, businessId: value })}
+            data={businesses}
+            save="key"
+            placeholder="Select Branch / Business"
+            boxStyles={[s.fullborderBox, { borderColor: colors.lightWhite, backgroundColor: colors.background }]}
+            inputStyles={{ color: colors.white }}
+            dropdownStyles={{ backgroundColor: colors.background, borderColor: colors.lightWhite }}
+            dropdownTextStyles={{ color: colors.white }}
+            disabled={loading}
+            searchicon={<Icon name="building" size={20} color={colors.white} style={{ marginRight: scale(10) }} />}
+          />
+        </FormGroup> */}
 
         <View style={s.topBorder} />
         <View style={s.dateWrapper}>
@@ -566,7 +677,7 @@ const Step1 = ({ navigation }) => {
 
         <View style={s.dayaWrapper}>
           <TextView
-          style={s.dateTextHeader}
+            style={s.dateTextHeader}
             text="Is this a day-based queue?"
             type="body-one"
             isTextColorWhite
@@ -588,7 +699,7 @@ const Step1 = ({ navigation }) => {
               onPress={() => setIsDayQueue(0)}
               style={{
                 padding: 10,
-                backgroundColor:  isDayQueue === 0 ? '#F44336' : '#252A34',
+                backgroundColor: isDayQueue === 0 ? '#F44336' : '#252A34',
                 borderRadius: 5
               }}
             >
@@ -688,9 +799,6 @@ const Step1 = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-
-
-
 const s = StyleSheet.create({
   firstFormWrapper: { marginTop: verticalScale(30) },
   topBorder: { borderWidth: 0.5, borderColor: colors.lightWhite, marginTop: scale(30), marginHorizontal: scale(15) },
@@ -726,6 +834,40 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 999,
+  },
+  deskSectionHeader: {
+    textAlign: 'center',
+    marginTop: verticalScale(20),
+    marginBottom: verticalScale(10),
+  },
+  deskListContainer: {
+    marginTop: verticalScale(10),
+    marginHorizontal: scale(15),
+  },
+  deskItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: verticalScale(12),
+    paddingHorizontal: scale(15),
+    marginBottom: verticalScale(8),
+    borderWidth: 1,
+    borderColor: colors.lightWhite,
+    borderRadius: borderRadius,
+    backgroundColor: colors.background,
+  },
+  deskItemSelected: {
+    borderColor: colors.primary,
+    backgroundColor: 'rgba(255, 106, 0, 0.1)',
+  },
+  deskLabel: {
+    color: colors.white,
+    fontSize: scale(14),
+    marginLeft: scale(12),
+    flex: 1,
+  },
+  deskLabelSelected: {
+    color: colors.primary,
+    fontWeight: '600',
   },
 
 });

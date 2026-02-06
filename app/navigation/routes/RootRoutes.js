@@ -50,7 +50,8 @@ const RootRoutes = {
     navigationOptions: () => ({
       drawerLabel: 'My Queue',
       title: 'My Queue',
-      drawerIcon: ({ tintColor }) => <MaterialIcons name='queue' size={24} color={colors.primary} />
+      drawerIcon: ({ tintColor }) => <MaterialIcons name='queue' size={24} color={colors.primary} />,
+      headerShown: false,
     })
   },
   [screens.Business]: {

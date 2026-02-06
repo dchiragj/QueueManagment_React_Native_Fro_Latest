@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Text, View, FlatList, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native';
+import { Text, View, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import AppStyles from '../../../styles/AppStyles';
 import colors from '../../../styles/colors';
 import Icon from '../../../components/Icon';
-import { getBusinessList } from '../../../services/apiService';
+import { getBusinessList, updateBusiness } from '../../../services/apiService';
 import screens from '../../../constants/screens';
+import Toast from 'react-native-toast-message';
 
 const Business = () => {
   const navigation = useNavigation();
@@ -20,7 +21,11 @@ const Business = () => {
     try {
       setError(null);
       const data = await getBusinessList();
-      setBusinesses(data.data || []);
+      const list = data.data || [];
+      setBusinesses(list);
+
+
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -50,49 +55,57 @@ const Business = () => {
     });
   };
 
+
+
   const renderBusinessItem = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <View style={styles.iconContainer}>
-          <Icon name="briefcase" type="feather" size={20} color={colors.white} />
+    <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={() => navigation.navigate(screens.MyQueue, { businessId: item.id })}
+    >
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <View style={styles.iconContainer}>
+            <Icon name="briefcase" type="feather" size={20} color={colors.white} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Text style={styles.businessName} numberOfLines={1}>
+              {item?.businessName || 'Business Name'}
+            </Text>
+            <Text style={styles.businessType}>
+              {item?.businessType || 'Retail'}
+            </Text>
+          </View>
+
         </View>
-        <View style={{ flex: 1, marginLeft: 12 }}>
-          <Text style={styles.businessName} numberOfLines={1}>
-            {item?.businessName || 'Business Name'}
-          </Text>
-          <Text style={styles.businessType}>
-            {item?.businessType || 'Retail'}
-          </Text>
+
+        <View style={styles.divider} />
+
+        <View style={styles.cardBody}>
+          <View style={styles.infoRow}>
+            <Icon name="map-pin" type="feather" size={14} color={colors.dustRodeo} />
+            <Text style={styles.infoText} numberOfLines={1}>
+              {item?.businessAddress || 'No address provided'}
+            </Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Icon name="phone" type="feather" size={14} color={colors.dustRodeo} />
+            <Text style={styles.infoText}>
+              {item?.businessPhoneNumber || '-'}
+            </Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Icon name="file-text" type="feather" size={14} color={colors.dustRodeo} />
+            <Text style={styles.infoText}>
+              Reg: {item?.businessRegistrationNumber || '-'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.cardFooter}>
+          <Text style={styles.dateText}>Created: {formatDate(item?.createdAt)}</Text>
         </View>
       </View>
-
-      <View style={styles.divider} />
-
-      <View style={styles.cardBody}>
-        <View style={styles.infoRow}>
-          <Icon name="map-pin" type="feather" size={14} color={colors.dustRodeo} />
-          <Text style={styles.infoText} numberOfLines={1}>
-            {item?.businessAddress || 'No address provided'}
-          </Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Icon name="phone" type="feather" size={14} color={colors.dustRodeo} />
-          <Text style={styles.infoText}>
-            {item?.businessPhoneNumber || '-'}
-          </Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Icon name="file-text" type="feather" size={14} color={colors.dustRodeo} />
-          <Text style={styles.infoText}>
-            Reg: {item?.businessRegistrationNumber || '-'}
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.cardFooter}>
-        <Text style={styles.dateText}>Created: {formatDate(item?.createdAt)}</Text>
-      </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const handleAddBranch = () => {

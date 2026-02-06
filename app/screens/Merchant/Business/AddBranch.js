@@ -11,10 +11,12 @@ import Button from '../../../components/Button/Button';
 import { createBusiness } from '../../../services/apiService';
 import { indent } from '../../../styles/dimensions';
 import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
+import { useBranch } from '../../../context/BranchContext';
 
 const AddBranch = () => {
    const navigation = useNavigation();
    const [loading, setLoading] = useState(false);
+   const { refreshBranches } = useBranch();
 
    const [formData, setFormData] = useState({
       businessName: '',
@@ -48,6 +50,11 @@ const AddBranch = () => {
             text1: 'Success',
             text2: 'Business created successfully!',
          });
+
+         // Sync the branch list in the drawer/selector
+         if (refreshBranches) {
+            await refreshBranches();
+         }
 
          navigation.goBack();
 
