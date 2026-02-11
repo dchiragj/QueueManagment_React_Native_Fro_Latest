@@ -16,7 +16,7 @@ import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard
 import { View, Image, StyleSheet, Alert, PermissionsAndroid, Platform, ActionSheetIOS, TouchableOpacity } from 'react-native';
 import AppStyles from '../../../styles/AppStyles';
 import { getAuthUser } from '../../../utils/localStorageHelpers';
-import { getUserProfile, updateUserProfile } from '../../../actions/profileActions';
+import { getUserProfile, updateUserProfile } from '../../../services/profileService';
 import { setCurrentUser } from '../../../actions/authActions';
 import { clearProfileResponseMsg, setProfile } from './../../../actions/profileActions';
 import { getDisplayName } from '../../../global/Helpers';

@@ -19,8 +19,6 @@ const MyQueueDetail = ({ navigation }) => {
   const [error, setError] = useState(null);
 
 
-  console.log(queue, "queue");
-
   // Helper function to map status to label
   const getStatusLabel = (status) => {
     switch (status) {

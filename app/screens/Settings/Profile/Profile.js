@@ -10,7 +10,7 @@ import { verticalScale, scale, moderateScale } from 'react-native-size-matters';
 import Icon from '../../../components/Icon';
 import { borderRadius } from '../../../styles/dimensions';
 import { connect } from 'react-redux';
-import { getUserProfile } from '../../../actions/profileActions';
+import { getUserProfile } from '../../../services/profileService';
 import { logout } from '../../../services/authService';
 import Loading from '../../../components/Loading';
 import { Button } from '../../../components/Button';
@@ -273,7 +273,7 @@ const s = StyleSheet.create({
     color: colors.primary,
     fontWeight: '600',
   },
-    overlay: {
+  overlay: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -283,14 +283,14 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-    modal: {
+  modal: {
     width: 280,
     backgroundColor: '#fff',
     borderRadius: 15,
     padding: 20,
     alignItems: 'center'
   },
-   title: {
+  title: {
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 8
@@ -305,7 +305,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
-    btn: {
+  btn: {
     flex: 1,
     marginHorizontal: 5,
     padding: 12,

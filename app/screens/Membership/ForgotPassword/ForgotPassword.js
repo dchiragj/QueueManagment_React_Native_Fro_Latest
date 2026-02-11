@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { scale, verticalScale } from 'react-native-size-matters';
-import  colors  from '../../../styles/colors';
+import colors from '../../../styles/colors';
 import { borderRadius, indent, halfindent } from '../../../styles/dimensions';
 import TextView from '../../../components/TextView/TextView';
 import Input from '../../../components/Input';
-import {Button} from '../../../components/Button';
+import { Button } from '../../../components/Button';
 import Validation from '../../../components/Validation/Validation';
-import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard' ;
+import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
 import Toast from 'react-native-toast-message';
 import { forgotPassword, verifyOtp, resetPassword } from '../../../services/apiService';
 
@@ -109,7 +109,7 @@ const ForgotPassword = ({ navigation }) => {
       const data = await resetPassword(email, password, otp);
       if (data?.status === 'ok') {
         showToast('success', 'Success', 'Password updated successfully');
-        navigation.navigate('Login'); 
+        navigation.navigate('Login');
       } else {
         showToast('error', 'Failed', data?.message || 'Could not reset password');
       }

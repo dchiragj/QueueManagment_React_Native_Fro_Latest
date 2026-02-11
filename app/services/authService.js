@@ -44,13 +44,11 @@ export const login = (obj) => async (dispatch) => {
 
     const { data } = response.data;
 
-    console.log(data.token, "datalogin");
 
     dispatch(setLoginToken(data));
     return true;
   } catch (e) {
     console.log(e, "errorrrrr");
-
     dispatchAuthError('error', getAPIResponseError(e) || 'Unable to login please try again', dispatch);
     return false;
   } finally {

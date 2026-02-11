@@ -78,7 +78,6 @@ const AddDesk = () => {
                 await updateDesk(deskToEdit.id, formData);
                 Toast.show({ type: 'success', text1: 'Success', text2: 'Desk updated successfully!' });
             } else {
-                console.log(formData);
 
                 await createDesk(formData);
                 Toast.show({ type: 'success', text1: 'Success', text2: 'Desk created successfully!' });

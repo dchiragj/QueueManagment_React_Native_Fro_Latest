@@ -62,7 +62,6 @@ const Login = (props) => {
     const result = await props.login(loginObj);
 
     if (result) {
-      console.log(result, "result");
 
       Toast.show({
         type: 'success',
@@ -105,8 +104,6 @@ const Login = (props) => {
       props.navigation.navigate("MainApp");
     }
   };
-
-
 
   const onTogglePassword = () => {
     setPasswordVisibility(!isPasswordVisible);

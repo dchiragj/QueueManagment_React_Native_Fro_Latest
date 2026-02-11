@@ -45,5 +45,5 @@ export default {
   Business: "Business",
   AddBranch: "AddBranch",
   DeskList: "DeskList",
-  AddDesk: "AddDesk"
+  AddDesk: "AddDesk",
 };

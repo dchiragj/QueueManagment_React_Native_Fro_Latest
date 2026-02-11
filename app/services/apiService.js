@@ -415,5 +415,27 @@ export const getDeskList = async (params = {}) => {
   }
 };
 
+export const getMerchantAnalytics = async (businessId) => {
+  try {
+    const response = await apiService.get('/token/merchant/analytics', {
+      params: { businessId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('getMerchantAnalytics error:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const sendBroadcast = async (data) => {
+  try {
+    const response = await apiService.post('/token/broadcast', data);
+    return response.data;
+  } catch (error) {
+    console.error('sendBroadcast error:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 // Add other API methods as needed
 export default apiService;

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { connect } from 'react-redux';
-import {SafeAreaView} from 'react-native';
+import { SafeAreaView } from 'react-native';
 import AppStyles from '../../../styles/AppStyles';
 import TextView from '../../../components/TextView/TextView';
 import { Touchable } from '../../../components/Button';
 import Button from '../../../components/Button/Button';
 import screens from '../../../constants/screens';
-import  colors  from '../../../styles/colors';
-import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard' ;
+import colors from '../../../styles/colors';
+import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
 import { clearAuthResponseMsg } from '../../../actions/authActions';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { signup } from '../../../services/authService';
@@ -73,17 +73,17 @@ function Signup(props) {
     }
   }, [resError]);
 
- const onPressSignup = async () => {
+  const onPressSignup = async () => {
     props.clearAuthResponseMsg();
 
     const role =
       selectRole.customer && selectRole.merchant
         ? 'both'
         : selectRole.customer
-        ? 'customer'
-        : selectRole.merchant
-        ? 'merchant'
-        : '';
+          ? 'customer'
+          : selectRole.merchant
+            ? 'merchant'
+            : '';
 
     if (!role) {
       Toast.show({
@@ -140,31 +140,31 @@ function Signup(props) {
         text2: 'Please verify your email',
         position: 'top',
       });
-       // Get FCM Token and save it
-    try {
-      // Step 1: Request notification permission (required on Android 13+)
-      const authStatus = await messaging().requestPermission();
-      const enabled = 
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      // Get FCM Token and save it
+      try {
+        // Step 1: Request notification permission (required on Android 13+)
+        const authStatus = await messaging().requestPermission();
+        const enabled =
+          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-      if (enabled) {
-      
-        // Step 2: Now get the FCM token
-        const fcmToken = await messaging().getToken();
-        
-        if (fcmToken) {
-          await saveFcmToken(fcmToken);  // Your API call to save token on server
+        if (enabled) {
+
+          // Step 2: Now get the FCM token
+          const fcmToken = await messaging().getToken();
+
+          if (fcmToken) {
+            await saveFcmToken(fcmToken);  // Your API call to save token on server
+          } else {
+            console.log('FCM Token is empty');
+          }
         } else {
-          console.log('FCM Token is empty');
+          console.log('User denied notification permission');
         }
-      } else {
-        console.log('User denied notification permission');
+      } catch (error) {
+        console.warn('FCM Token error (not critical):', error.message || error);
+        // App will continue working even if token fails – user experience stays smooth
       }
-    } catch (error) {
-      console.warn('FCM Token error (not critical):', error.message || error);
-      // App will continue working even if token fails – user experience stays smooth
-    }
       props.navigation.navigate(screens.VerifyEmail);
     }
   };
@@ -179,19 +179,19 @@ function Signup(props) {
   //     [name]: !prev[name],
   //   }));
   // };
-const setUserRole = (name) => {
-  if (name === 'customer') {
-    setSelectedRole({
-      customer: true,
-      merchant: false,
-    });
-  } else if (name === 'merchant') {
-    setSelectedRole({
-      customer: false,
-      merchant: true,
-    });
-  }
-};
+  const setUserRole = (name) => {
+    if (name === 'customer') {
+      setSelectedRole({
+        customer: true,
+        merchant: false,
+      });
+    } else if (name === 'merchant') {
+      setSelectedRole({
+        customer: false,
+        merchant: true,
+      });
+    }
+  };
   const onTogglePassword = () => {
     setPasswordVisibility(!isPasswordVisible);
   };
@@ -469,7 +469,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: verticalScale(50),
-    marginBottom: verticalScale(8),
+    marginBottom: verticalScale(40),
   },
 });
 

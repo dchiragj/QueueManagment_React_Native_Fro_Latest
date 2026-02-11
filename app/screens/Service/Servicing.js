@@ -455,7 +455,7 @@ const Servicing = (props) => {
             />
           </View>
         )}
-        {completedHistory.length > 0 && (
+        {completedHistory?.length > 0 && (
           <View style={styles.historySection}>
             <Text style={styles.historyTitle}>
               Completed History (Served Today) - {completedHistory.length}

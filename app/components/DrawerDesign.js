@@ -21,7 +21,6 @@ import AppStyles from '../styles/AppStyles';
 import Icon from './Icon';
 import { verticalScale, scale } from 'react-native-size-matters';
 import { CommonActions } from '@react-navigation/native';
-import { Image } from 'react-native-svg';
 
 function DrawerDesignComponent(props) {
   const [logoutVisible, setLogoutVisible] = useState(false);
@@ -31,14 +30,31 @@ function DrawerDesignComponent(props) {
   const { businesses, selectedBranchId, changeBranch, setToken } = useBranch(); // Consume context
   const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
 
+  const { state } = props;
+
+  // Fallback if state is not yet available
+  if (!state || !state.routes) {
+    return null;
+  }
+
   const allowedRouteNames =
     role === 'customer'
-      ? ['HomeRoot', 'MyTokenRoot', 'CompletedTokenRoot', 'SettingsRoot']
-      : props.state.routes.map(r => r.name); // merchant = all
+      ? [screens.HomeRoot, screens.MyTokenRoot, screens.CompletedTokenRoot, screens.SettingsRoot]
+      : state.routes.map(r => r.name); // merchant = all
 
-  const filteredRoutes = props.state.routes.filter(route =>
+  const filteredRoutes = state.routes.filter(route =>
     allowedRouteNames.includes(route.name)
   );
+
+  // Recalculate index for the filtered routes to avoid "key of undefined" crashes
+  const focusedRoute = state.routes[state.index];
+  const newIndex = filteredRoutes.findIndex(r => r.key === focusedRoute?.key);
+
+  const filteredState = {
+    ...state,
+    routes: filteredRoutes,
+    index: newIndex === -1 ? 0 : newIndex,
+  };
   const showLogoutModal = () => {
     setLogoutVisible(true);
     Animated.spring(scaleAnim, {
@@ -135,10 +151,7 @@ function DrawerDesignComponent(props) {
           {/* ROLE FILTERED DRAWER LIST */}
           <DrawerItemList
             {...props}
-            state={{
-              ...props.state,
-              routes: filteredRoutes
-            }}
+            state={filteredState}
           />
 
           <View style={s.borderBottom} />

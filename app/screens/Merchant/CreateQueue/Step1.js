@@ -466,7 +466,6 @@ const Step1 = ({ navigation }) => {
         deskDetails: formData.selectedDesks.map(deskId => ({ deskId })),
         joinMethods: formData.joinMethods,
       };
-      console.log(payload);
 
 
       await createQueue(payload);
