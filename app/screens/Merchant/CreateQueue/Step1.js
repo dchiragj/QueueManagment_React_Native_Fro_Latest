@@ -498,11 +498,14 @@ const Step1 = ({ navigation }) => {
       }
       const res = await getDeskList(params);
       const desksData = res?.data?.data || res?.data || [];
-      const deskList = (Array.isArray(desksData) ? desksData : []).map((desk) => ({
-        key: desk.id,
-        value: desk.name,
-        branchName: desk.branch?.businessName || ''
-      }));
+      // Only show active desks for queue creation
+      const deskList = (Array.isArray(desksData) ? desksData : [])
+        .filter(desk => desk.isActive == 1 || desk.status == 1 || desk.isActive === true || desk.status === true)
+        .map((desk) => ({
+          key: desk.id,
+          value: desk.name,
+          branchName: desk.branch?.businessName || ''
+        }));
       setDesks(deskList);
     } catch (err) {
       console.error('❌ Error fetching desks:', err);
@@ -519,16 +522,23 @@ const Step1 = ({ navigation }) => {
           getBusinessList()
         ]);
 
-        const catList = (catRes?.data || []).map((c) => ({
+        const catData = Array.isArray(catRes) ? catRes : (catRes?.data || []);
+        const catList = catData.map((c) => ({
           key: c.id,
           value: c.name,
         }));
         setCategories(catList);
 
-        const busList = (busRes?.data || []).map((b) => ({
-          key: b.id,
-          value: b.businessName,
-        }));
+        const busData = Array.isArray(busRes) ? busRes : (busRes?.data || []);
+        const busList = busData
+          .filter(b =>
+            b.isActive == 1 || b.status == 1 || b.isActive === true || b.status === true ||
+            b.is_active == 1 || b.is_active === true
+          )
+          .map((b) => ({
+            key: b.id,
+            value: b.businessName,
+          }));
         setBusinesses(busList);
 
         // Load all desks for the selected branch (or all branches)
@@ -628,7 +638,7 @@ const Step1 = ({ navigation }) => {
           )}
         </FormGroup>
 
-        {/* <FormGroup>
+        <FormGroup>
           <SelectList
             setSelected={(value) => setFormData({ ...formData, businessId: value })}
             data={businesses}
@@ -641,7 +651,7 @@ const Step1 = ({ navigation }) => {
             disabled={loading}
             searchicon={<Icon name="building" size={20} color={colors.white} style={{ marginRight: scale(10) }} />}
           />
-        </FormGroup> */}
+        </FormGroup>
 
         <View style={s.topBorder} />
         <View style={s.dateWrapper}>

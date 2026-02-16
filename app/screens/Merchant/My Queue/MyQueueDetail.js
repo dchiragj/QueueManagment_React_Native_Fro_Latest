@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, StatusBar, Image } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, StatusBar, Image, TouchableOpacity, Platform, PermissionsAndroid, Modal, Pressable } from 'react-native';
+import Share from 'react-native-share';
+import RNFS from 'react-native-fs';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import colors from '../../../styles/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppStyles from '../../../styles/AppStyles';
@@ -17,6 +20,7 @@ const MyQueueDetail = ({ navigation }) => {
   const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [fullScreenQr, setFullScreenQr] = useState(null); // URL of the QR code to show in full screen
 
 
   // Helper function to map status to label
@@ -42,6 +46,38 @@ const MyQueueDetail = ({ navigation }) => {
         return '#F44336'; // Red
       default:
         return '#9E9E9E'; // Grey
+    }
+  };
+
+  const handleShare = async (url, title) => {
+    try {
+      setLoading(true);
+      const fileName = url.split('/').pop();
+      const localFile = `${RNFS.CachesDirectoryPath}/${fileName}`;
+
+      const options = {
+        fromUrl: url,
+        toFile: localFile,
+      };
+
+      const result = await RNFS.downloadFile(options).promise;
+
+      if (result.statusCode === 200) {
+        const shareOptions = {
+          title: title,
+          url: `file://${localFile}`,
+          type: 'image/png', // Adjust based on your image type
+          failOnCancel: false,
+        };
+        await Share.open(shareOptions);
+      } else {
+        alert('Failed to download image for sharing');
+      }
+    } catch (error) {
+      console.log('Share Error:', error);
+      // alert(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -150,22 +186,40 @@ const MyQueueDetail = ({ navigation }) => {
             {queue?.qrCode && (
               <View style={styles.qrBox}>
                 <Text style={styles.qrTitle}>App QR Code</Text>
-                <Image
-                  style={styles.qrImage}
-                  source={{ uri: `${getBaseUrl()}/${queue.qrCode}` }}
-                  resizeMode="contain"
-                />
+                <TouchableOpacity onPress={() => setFullScreenQr(`${getBaseUrl()}/${queue.qrCode}`)}>
+                  <Image
+                    style={styles.qrImage}
+                    source={{ uri: `${getBaseUrl()}/${queue.qrCode}` }}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.shareButton}
+                  onPress={() => handleShare(`${getBaseUrl()}/${queue.qrCode}`, 'App QR Code')}
+                >
+                  <Ionicons name="share-social-outline" size={20} color={colors.primary} />
+                  <Text style={styles.shareText}>Share</Text>
+                </TouchableOpacity>
               </View>
             )}
 
             {queue?.webBaseqrCode && (
               <View style={styles.qrBox}>
                 <Text style={styles.qrTitle}>Web QR Code</Text>
-                <Image
-                  style={styles.qrImage}
-                  source={{ uri: `${getBaseUrl()}/${queue.webBaseqrCode}` }}
-                  resizeMode="contain"
-                />
+                <TouchableOpacity onPress={() => setFullScreenQr(`${getBaseUrl()}/${queue.webBaseqrCode}`)}>
+                  <Image
+                    style={styles.qrImage}
+                    source={{ uri: `${getBaseUrl()}/${queue.webBaseqrCode}` }}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.shareButton}
+                  onPress={() => handleShare(`${getBaseUrl()}/${queue.webBaseqrCode}`, 'Web QR Code')}
+                >
+                  <Ionicons name="share-social-outline" size={20} color={colors.primary} />
+                  <Text style={styles.shareText}>Share</Text>
+                </TouchableOpacity>
               </View>
             )}
 
@@ -198,6 +252,36 @@ const MyQueueDetail = ({ navigation }) => {
           </View>
         </View>
       </ScrollableAvoidKeyboard>
+
+      {/* Full Screen QR Modal */}
+      <Modal
+        visible={!!fullScreenQr}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setFullScreenQr(null)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setFullScreenQr(null)}
+        >
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setFullScreenQr(null)}
+            >
+              <Ionicons name="close-circle" size={40} color="#fff" />
+            </TouchableOpacity>
+            {fullScreenQr && (
+              <Image
+                source={{ uri: fullScreenQr }}
+                style={styles.fullQrImage}
+                resizeMode="contain"
+              />
+            )}
+          </View>
+        </Pressable>
+      </Modal>
+
     </SafeAreaView>
   );
 };
@@ -416,6 +500,23 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
   },
+  shareButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.primary
+  },
+  shareText: {
+    marginLeft: 6,
+    color: colors.primary,
+    fontWeight: '600',
+    fontSize: 14,
+  },
 
 
   tokenItem: {
@@ -465,6 +566,30 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    height: '80%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: -50,
+    right: 0,
+    zIndex: 1,
+  },
+  fullQrImage: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
   },
 });
 

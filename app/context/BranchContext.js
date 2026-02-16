@@ -36,7 +36,17 @@ export const BranchProvider = ({ children }) => {
 
             // Fetch business list
             const response = await getBusinessList();
-            const list = response?.data || [];
+
+            // Handle both { data: [...] } and [...] structures
+            let list = [];
+            if (Array.isArray(response)) {
+                list = response;
+            } else if (response?.data && Array.isArray(response.data)) {
+                list = response.data;
+            } else if (Array.isArray(response?.list)) { // Fallback for other potential keys
+                list = response.list;
+            }
+
             setBusinesses(list);
         } catch (error) {
             console.error('Failed to fetch businesses in context', error);
@@ -51,12 +61,16 @@ export const BranchProvider = ({ children }) => {
         await AsyncStorage.setItem('qflow_selected_branch', stringId);
     };
 
-    const activeBranch = businesses.find(b => String(b.id) === String(selectedBranchId));
+    const activeBranches = businesses.filter(b =>
+        b.isActive == 1 || b.status == 1 || b.isActive === true || b.status === true || b.is_active == 1 || b.is_active === true
+    );
+    const activeBranch = activeBranches.find(b => Number(b.id) === Number(selectedBranchId));
 
     return (
         <BranchContext.Provider
             value={{
                 businesses,
+                activeBranches,
                 selectedBranchId,
                 activeBranch,
                 changeBranch,

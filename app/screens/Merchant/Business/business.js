@@ -1,17 +1,19 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Text, View, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Switch } from 'react-native';
+import { Alert, Text, View, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import AppStyles from '../../../styles/AppStyles';
 import colors from '../../../styles/colors';
 import Icon from '../../../components/Icon';
-import { getBusinessList, updateBusiness } from '../../../services/apiService';
+import { getBusinessList, updateBusiness, deleteBusiness } from '../../../services/apiService';
 import screens from '../../../constants/screens';
 import Toast from 'react-native-toast-message';
+import { useBranch } from '../../../context/BranchContext';
 
 const Business = () => {
   const navigation = useNavigation();
+  const { businesses: contextBusinesses, refreshBranches } = useBranch();
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -20,8 +22,8 @@ const Business = () => {
   const fetchBusinesses = async () => {
     try {
       setError(null);
-      const data = await getBusinessList();
-      const list = data.data || [];
+      const response = await getBusinessList();
+      const list = Array.isArray(response) ? response : (response?.data || []);
       setBusinesses(list);
 
 
@@ -34,9 +36,16 @@ const Business = () => {
     }
   };
 
+  useEffect(() => {
+    if (contextBusinesses) {
+      setBusinesses(contextBusinesses);
+      setLoading(false);
+    }
+  }, [contextBusinesses]);
+
   useFocusEffect(
     useCallback(() => {
-      fetchBusinesses();
+      refreshBranches();
     }, [])
   );
 
@@ -56,6 +65,82 @@ const Business = () => {
   };
 
 
+
+  const handleStatusToggle = async (item) => {
+    const currentIsActive = item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true;
+    const newStatus = currentIsActive ? 0 : 1;
+
+    // Immediate local update
+    setBusinesses(prev => prev.map(b => b.id === item.id ? { ...b, isActive: newStatus, status: newStatus } : b));
+
+    try {
+      // Send only necessary data to avoid potential backend payload issues
+      const updatePayload = {
+        businessName: item.businessName,
+        businessRegistrationNumber: item.businessRegistrationNumber || "BR12345",
+        businessAddress: item.businessAddress,
+        businessPhoneNumber: item.businessPhoneNumber,
+        isActive: newStatus,
+        status: newStatus // Support both field names for backend compatibility
+      };
+
+      await updateBusiness(item.id, updatePayload);
+
+      // Sync the app-wide branch dropdown
+      await refreshBranches();
+
+      Toast.show({
+        type: 'success',
+        text1: 'Status Updated',
+        text2: `Branch is now ${newStatus === 1 ? 'Active' : 'Inactive'}`,
+      });
+    } catch (err) {
+      // Revert if failed
+      setBusinesses(prev => prev.map(b => b.id === item.id ? { ...b, isActive: item.isActive } : b));
+      Toast.show({
+        type: 'error',
+        text1: 'Update Failed',
+        text2: err.message,
+      });
+    }
+  };
+
+  const handleDeleteBusiness = async (item) => {
+    Alert.alert(
+      'Delete Branch',
+      `Are you sure you want to delete "${item.businessName}"? This action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await deleteBusiness(item.id);
+
+              Toast.show({
+                type: 'success',
+                text1: 'Deleted',
+                text2: 'Branch removed successfully',
+              });
+
+              await refreshBranches();
+              fetchBusinesses();
+            } catch (err) {
+              Toast.show({
+                type: 'error',
+                text1: 'Deletion Failed',
+                text2: err.message,
+              });
+            } finally {
+              setLoading(false);
+            }
+          }
+        }
+      ]
+    );
+  };
 
   const renderBusinessItem = ({ item }) => (
     <TouchableOpacity
@@ -99,10 +184,38 @@ const Business = () => {
               Reg: {item?.businessRegistrationNumber || '-'}
             </Text>
           </View>
+          <View style={[styles.infoRow, { justifyContent: 'space-between' }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Icon name="activity" type="feather" size={14} color={colors.dustRodeo} />
+              <Text style={[styles.infoText, { color: (item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true) ? '#4CAF50' : colors.red }]}>
+                {(item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true) ? 'Active' : 'Inactive'}
+              </Text>
+            </View>
+            <Switch
+              value={!!(item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true)}
+              onValueChange={() => handleStatusToggle(item)}
+              trackColor={{ false: '#767577', true: colors.primary }}
+              thumbColor={(item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true) ? colors.white : '#f4f3f4'}
+            />
+          </View>
         </View>
 
         <View style={styles.cardFooter}>
           <Text style={styles.dateText}>Created: {formatDate(item?.createdAt)}</Text>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate(screens.AddBranch, { branchData: item })}
+              style={styles.actionBtn}
+            >
+              <Icon name="edit" type="feather" size={18} color={colors.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => handleDeleteBusiness(item)}
+              style={styles.actionBtn}
+            >
+              <Icon name="trash-2" type="feather" size={18} color={colors.red} />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -252,7 +365,15 @@ const styles = StyleSheet.create({
   },
   cardFooter: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  actionBtn: {
+    padding: 4,
   },
   dateText: {
     fontSize: 11,

@@ -27,7 +27,8 @@ import {
   getQueueList,
   getDeskList,
   getMerchantAnalytics,
-  sendBroadcast
+  sendBroadcast,
+  getQueueDetails
 } from '../../services/apiService';
 import { Button } from '../../components/Button';
 import Card from '../../components/Card';
@@ -325,6 +326,25 @@ const Home = (props) => {
         Alert.alert('Error', 'No queue data. Scan QR code first.');
         return;
       }
+
+      // Fetch latest queue details to check limit
+      const queueDetailsRes = await getQueueDetails(qrDetails.queueId);
+      const queueData = queueDetailsRes?.data?.queue;
+      const currentTokens = queueDetailsRes?.data?.tokens || [];
+      const endNumber = parseInt(queueData?.end_number || 0);
+
+      if (endNumber > 0 && currentTokens.length >= endNumber) {
+        showToast(
+          'error',
+          'Token Limit Reached',
+          'You cannot generate a token now, the token limit has been reached.'
+        );
+        setQrDetails(null);
+        clearInputs();
+        setActiveTab(null);
+        return;
+      }
+
       const res = await generateToken({
         queueId: qrDetails.queueId,
         categoryId: qrDetails.category,
@@ -424,28 +444,30 @@ const Home = (props) => {
           {user?.role === 'customer' && (
             <Input placeholder="Search Shop Here" isIconLeft leftIconName="search" color={colors.white} />
           )}
-          <View style={s.tabContainer}>
-            {tabs.map((tab) => (
-              <TouchableOpacity
-                key={tab.key}
-                onPress={() => handleTabPress(tab.key)}
-                style={[s.tab, activeTab === tab.key && s.activeTab]}
-              >
-                <Icon
-                  name={tab.icon}
-                  size={20}
-                  color={activeTab === tab.key ? colors.white : colors.lightWhite}
-                  style={{ marginBottom: 4 }}
-                />
-                <TextView
-                  text={tab.label}
-                  color={activeTab === tab.key ? colors.white : colors.lightWhite}
-                  type="tiny"
-                  style={{ fontWeight: activeTab === tab.key ? '700' : '500' }}
-                />
-              </TouchableOpacity>
-            ))}
-          </View>
+          {tabs.length > 0 && (
+            <View style={s.tabContainer}>
+              {tabs.map((tab) => (
+                <TouchableOpacity
+                  key={tab.key}
+                  onPress={() => handleTabPress(tab.key)}
+                  style={[s.tab, activeTab === tab.key && s.activeTab]}
+                >
+                  <Icon
+                    name={tab.icon}
+                    size={20}
+                    color={activeTab === tab.key ? colors.white : colors.lightWhite}
+                    style={{ marginBottom: 4 }}
+                  />
+                  <TextView
+                    text={tab.label}
+                    color={activeTab === tab.key ? colors.white : colors.lightWhite}
+                    type="tiny"
+                    style={{ fontWeight: activeTab === tab.key ? '700' : '500' }}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
           {user?.role === 'merchant' && (
             <View style={s.dashboardContainer}>
@@ -1028,9 +1050,9 @@ const s = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
-  input: { marginHorizontal: 5, marginTop: verticalScale(20), marginBottom: verticalScale(10) },
+  input: { marginHorizontal: 5 },
   inputWrapper: {
-    marginTop: verticalScale(15),
+    marginTop: verticalScale(10),
     paddingHorizontal: scale(10),
   },
   inputHeading: {

@@ -5,7 +5,7 @@ import colors from '../../styles/colors';
 import AppStyles from '../../styles/AppStyles';
 import React, { useEffect } from 'react';
 import { scale, verticalScale } from 'react-native-size-matters';
-import { View, SafeAreaView, StyleSheet, Image } from 'react-native';
+import { View, SafeAreaView, StyleSheet, Image, Linking, Platform, Alert } from 'react-native';
 import { borderRadius, height } from '../../styles/dimensions';
 import screens from '../../constants/screens';
 // import NavigationOptions from '../../../components/NavigationOptions';
@@ -17,7 +17,7 @@ import NavigationOptions from '../../components/NavigationOptions';
 import { getBaseUrl } from '../../global/Environment';
 
 const Settings = (props) => {
-  const { user } = props.auth; 
+  const { user } = props.auth;
   const ImageUrl = props.profile.profileInfo?.ProfileUrl;
   useEffect(() => {
     props.navigation.setParams({ openDrawer: _openDrawer });
@@ -32,6 +32,27 @@ const Settings = (props) => {
     props.navigation.navigate(screens.Profile);
   };
 
+
+  const onRate = () => {
+    const GOOGLE_PACKAGE_NAME = 'com.QueueFlow';
+    const APPLE_ID = 'YOUR_APPLE_ID'; // Replace with actual Apple ID when available
+
+    if (Platform.OS === 'android') {
+      Linking.openURL(`market://details?id=${GOOGLE_PACKAGE_NAME}`).catch(() => {
+        Linking.openURL(`https://play.google.com/store/apps/details?id=${GOOGLE_PACKAGE_NAME}`);
+      });
+    } else {
+      // For iOS
+      // Linking.openURL(`itms-apps://itunes.apple.com/app/viewContentsUserReviews/id${APPLE_ID}?action=write-review`);
+      Alert.alert('Coming Soon', 'Rating functionality for iOS will be available once the app is on the App Store.');
+    }
+  };
+
+  const onHelp = () => {
+    Linking.openURL('mailto:queueflow08@gmail.com?subject=Help Support').catch(() => {
+      Alert.alert('Error', 'No email app found to send help request.');
+    });
+  };
 
   const _openDrawer = () => {
     props.navigation.openDrawer();
@@ -70,11 +91,11 @@ const Settings = (props) => {
         </Touchable>
 
         <View style={[s.rateMain, s.same]}>
-          <Touchable style={s.rate}>
+          <Touchable style={s.rate} onPress={onRate}>
             <Icon name='star-sharp' color={colors.lightWhite} isFeather={false} style={s.rateLogo} />
             <TextView color={colors.lightWhite} text={'Rate This App'} type={'body'} style={s.profileText} />
           </Touchable>
-          <Touchable style={[s.rate, s.help]}>
+          <Touchable style={[s.rate, s.help]} onPress={onHelp}>
             <Icon name='help-circle' color={colors.lightWhite} style={s.rateLogo} />
             <TextView color={colors.lightWhite} text={'Help'} type={'body-one'} style={s.profileText} />
           </Touchable>

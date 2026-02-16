@@ -27,7 +27,7 @@ function DrawerDesignComponent(props) {
   const scaleAnim = useRef(new Animated.Value(0)).current;
 
   const role = props.auth.user?.role;
-  const { businesses, selectedBranchId, changeBranch, setToken } = useBranch(); // Consume context
+  const { activeBranches, selectedBranchId, changeBranch, setToken } = useBranch(); // Consume context
   const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
 
   const { state } = props;
@@ -88,29 +88,35 @@ function DrawerDesignComponent(props) {
         <View style={s.branchSelectorContainer}>
           <Touchable
             style={s.branchSelectorHeader}
-            onPress={() => setIsBranchDropdownOpen(!isBranchDropdownOpen)}
+            onPress={() => activeBranches.length >= 1 && setIsBranchDropdownOpen(!isBranchDropdownOpen)}
           >
             <View style={s.branchInfo}>
               <Icon name="business" isFeather={false} size={20} color={colors.primary} />
               <TextView
                 text={
-                  selectedBranchId === 'all'
-                    ? 'All Branches'
-                    : businesses.find(b => String(b.id) === String(selectedBranchId))?.businessName || 'Select Branch'
+                  activeBranches.length === 0
+                    ? (props.profile.profileInfo?.businessName || props.auth.user?.name || 'Main Business')
+                    : activeBranches.length === 1
+                      ? activeBranches[0].businessName
+                      : selectedBranchId === 'all'
+                        ? 'All Branches'
+                        : activeBranches.find(b => Number(b.id) === Number(selectedBranchId))?.businessName || 'Select Branch'
                 }
                 type={'body'}
                 style={s.branchName}
-                color={colors.white} // Explicit white color
+                color={colors.white}
               />
             </View>
-            <Icon
-              name={isBranchDropdownOpen ? 'chevron-up' : 'chevron-down'}
-              size={20}
-              color={colors.white} // White icon
-            />
+            {activeBranches.length >= 1 && (
+              <Icon
+                name={isBranchDropdownOpen ? 'chevron-up' : 'chevron-down'}
+                size={20}
+                color={colors.white} // White icon
+              />
+            )}
           </Touchable>
 
-          {isBranchDropdownOpen && (
+          {isBranchDropdownOpen && activeBranches.length >= 1 && (
             <View style={s.branchDropdown}>
               <Touchable
                 style={[
@@ -125,12 +131,12 @@ function DrawerDesignComponent(props) {
                 <TextView text="All Branches" type="caption" color={colors.white} />
                 {selectedBranchId === 'all' && <Icon name="check" size={16} color={colors.primary} />}
               </Touchable>
-              {businesses.map(business => (
+              {activeBranches.map(business => (
                 <Touchable
                   key={business.id}
                   style={[
                     s.branchItem,
-                    String(selectedBranchId) === String(business.id) && s.selectedBranchItem
+                    Number(selectedBranchId) === Number(business.id) && s.selectedBranchItem
                   ]}
                   onPress={() => {
                     changeBranch(business.id);
@@ -138,7 +144,7 @@ function DrawerDesignComponent(props) {
                   }}
                 >
                   <TextView text={business.businessName} type="caption" color={colors.white} />
-                  {String(selectedBranchId) === String(business.id) && (
+                  {Number(selectedBranchId) === Number(business.id) && (
                     <Icon name="check" size={16} color={colors.primary} />
                   )}
                 </Touchable>

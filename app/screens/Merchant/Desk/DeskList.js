@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Text, View, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { Text, View, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator, Alert, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import AppStyles from '../../../styles/AppStyles';
 import colors from '../../../styles/colors';
 import Icon from '../../../components/Icon';
-import { getDeskList, deleteDesk } from '../../../services/apiService';
+import { getDeskList, deleteDesk, updateDesk } from '../../../services/apiService';
 import screens from '../../../constants/screens';
 import { useBranch } from '../../../context/BranchContext'; // Import context
 
@@ -68,6 +68,33 @@ const DeskList = () => {
         );
     };
 
+    const handleStatusToggle = async (item) => {
+        const currentIsActive = item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true;
+        const newStatus = currentIsActive ? 0 : 1;
+
+        // Immediate local update
+        setDesks(prev => prev.map(d => d.id === item.id ? { ...d, isActive: newStatus, status: newStatus } : d));
+
+        try {
+            // Send only required fields for update to avoid backend rejections
+            const payload = {
+                id: item.id,
+                name: item.name,
+                businessId: item.businessId,
+                email: item.email,
+                isActive: newStatus,
+                status: newStatus
+            };
+
+            await updateDesk(item.id, payload);
+            // fetchDesks(); // Sync with DB if needed
+        } catch (err) {
+            // Revert
+            setDesks(prev => prev.map(d => d.id === item.id ? { ...d, isActive: item.isActive } : d));
+            Alert.alert("Error", err.message);
+        }
+    };
+
     const handleEdit = (item) => {
         navigation.navigate(screens.AddDesk, { desk: item });
     };
@@ -109,11 +136,20 @@ const DeskList = () => {
                         {item?.email || 'No email associated'}
                     </Text>
                 </View>
-                <View style={styles.infoRow}>
-                    <Icon name="activity" type="feather" size={14} color={colors.dustRodeo} />
-                    <Text style={[styles.infoText, { color: item?.status === 1 ? '#4CAF50' : colors.dustRodeo }]}>
-                        {item?.status === 1 ? 'Active' : 'Inactive'}
-                    </Text>
+                <View style={[styles.infoRow, { justifyContent: 'space-between' }]}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <Icon name="activity" type="feather" size={14} color={colors.dustRodeo} />
+                        <Text style={[styles.infoText, { color: (item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true) ? '#4CAF50' : colors.red }]}>
+                            {(item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true) ? 'Active' : 'Inactive'}
+                        </Text>
+                    </View>
+                    <Switch
+                        value={!!(item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true)}
+                        onValueChange={() => handleStatusToggle(item)}
+                        trackColor={{ false: '#767577', true: colors.primary }}
+                        thumbColor={(item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true) ? colors.white : '#f4f3f4'}
+                        style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+                    />
                 </View>
             </View>
         </View>

@@ -374,6 +374,14 @@ export const updateBusiness = async (businessId, data) => {
     throw new Error(error.response?.data?.message || 'Failed to update business');
   }
 };
+export const deleteBusiness = async (businessId) => {
+  try {
+    const response = await apiService.delete(`/queue/business/delete/${businessId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to delete business');
+  }
+};
 
 export const createDesk = async (data) => {
   try {

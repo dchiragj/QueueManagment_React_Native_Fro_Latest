@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, ActivityIndicator, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
@@ -31,7 +31,7 @@ const AddDesk = () => {
         businessId: deskToEdit?.businessId || (selectedBranchId !== 'all' ? selectedBranchId : ''),
         email: deskToEdit?.email || '',
         password: '',
-        status: deskToEdit?.status || 1,
+        isActive: (deskToEdit?.isActive ?? deskToEdit?.status) ?? 1,
     });
 
 
@@ -42,10 +42,13 @@ const AddDesk = () => {
                 const businessRes = await getBusinessList();
                 const businessData = businessRes?.data || [];
 
-                const businessList = businessData.map((b) => ({
-                    key: b.id,
-                    value: b.businessName,
-                }));
+                // Only show active branches for desk assignment
+                const businessList = businessData
+                    .filter(b => b.isActive == 1 || b.status == 1 || b.isActive === true || b.status === true)
+                    .map((b) => ({
+                        key: b.id,
+                        value: b.businessName,
+                    }));
                 setBusinesses(businessList);
             } catch (err) {
                 console.error(err);
@@ -159,6 +162,22 @@ const AddDesk = () => {
                         secureTextEntry
                     />
 
+                    <View style={styles.statusContainer}>
+                        <View>
+                            <Text style={styles.statusLabel}>Desk Status</Text>
+                            <Text style={styles.statusSubLabel}>{(formData.isActive == 1 || formData.status == 1 || formData.isActive === true || formData.status === true) ? 'Active (Visible for service)' : 'Inactive (Hidden from service)'}</Text>
+                        </View>
+                        <Switch
+                            value={!!(formData.isActive == 1 || formData.status == 1 || formData.isActive === true || formData.status === true)}
+                            onValueChange={(value) => {
+                                const val = value ? 1 : 0;
+                                setFormData(prev => ({ ...prev, isActive: val, status: val }));
+                            }}
+                            trackColor={{ false: '#767577', true: colors.primary }}
+                            thumbColor={(formData.isActive == 1 || formData.status == 1 || formData.isActive === true || formData.status === true) ? colors.white : '#f4f3f4'}
+                        />
+                    </View>
+
                     <View style={styles.buttonContainer}>
                         <Button
                             ButtonText={deskToEdit ? "Update Desk" : "Create Desk"}
@@ -212,6 +231,27 @@ const styles = StyleSheet.create({
         backgroundColor: colors.primary,
         borderRadius: 12,
         paddingVertical: indent,
+    },
+    statusContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: colors.inputBackgroundColor,
+        padding: 15,
+        borderRadius: 12,
+        marginTop: 20,
+        borderWidth: 1,
+        borderColor: '#2E3650',
+    },
+    statusLabel: {
+        color: colors.white,
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    statusSubLabel: {
+        color: colors.dustRodeo,
+        fontSize: 12,
+        marginTop: 2,
     }
 });
 

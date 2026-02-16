@@ -99,10 +99,6 @@ const ForgotPassword = ({ navigation }) => {
       showToast('error', 'Error', 'Passwords do not match');
       return;
     }
-    if (password.length < 6) {
-      showToast('error', 'Error', 'Password must be at least 6 characters');
-      return;
-    }
 
     setLoading(true);
     try {

@@ -13,10 +13,12 @@ const CustomButton = (props) => {
   }));
 
   return (
-    <Animated.View entering={FadeIn.duration(300)} style={animatedStyle}>
-      <TouchableOpacity {...props} style={[styles.defaultButtonStyle, buttonStyle]} onPress={onPress} disabled={isLoading}>
-        {children}
-      </TouchableOpacity>
+    <Animated.View entering={FadeIn.duration(300)}>
+      <Animated.View style={animatedStyle}>
+        <TouchableOpacity {...props} style={[styles.defaultButtonStyle, buttonStyle]} onPress={onPress} disabled={isLoading}>
+          {children}
+        </TouchableOpacity>
+      </Animated.View>
     </Animated.View>
   );
 };
