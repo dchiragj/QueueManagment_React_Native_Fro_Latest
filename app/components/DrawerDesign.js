@@ -21,10 +21,14 @@ import AppStyles from '../styles/AppStyles';
 import Icon from './Icon';
 import { verticalScale, scale } from 'react-native-size-matters';
 import { CommonActions } from '@react-navigation/native';
+import { deleteAccount } from '../services/apiService';
+import Toast from 'react-native-toast-message';
 
 function DrawerDesignComponent(props) {
   const [logoutVisible, setLogoutVisible] = useState(false);
+  const [deleteVisible, setDeleteVisible] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
+  const deleteScaleAnim = useRef(new Animated.Value(0)).current;
 
   const role = props.auth.user?.role;
   const { activeBranches, selectedBranchId, changeBranch, setToken } = useBranch(); // Consume context
@@ -77,6 +81,44 @@ function DrawerDesignComponent(props) {
     await props.logout();
     props.navigation.navigate('Auth', { screen: screens.Login });
     setToken(null);
+  };
+
+  const showDeleteModal = () => {
+    setDeleteVisible(true);
+    Animated.spring(deleteScaleAnim, {
+      toValue: 1,
+      useNativeDriver: true
+    }).start();
+  };
+
+  const hideDeleteModal = () => {
+    Animated.timing(deleteScaleAnim, {
+      toValue: 0,
+      duration: 200,
+      easing: Easing.ease,
+      useNativeDriver: true
+    }).start(() => setDeleteVisible(false));
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      hideDeleteModal();
+      await deleteAccount();
+      Toast.show({
+        type: 'success',
+        text1: 'Account Deleted',
+        text2: 'Your account has been deleted successfully',
+      });
+      await props.logout();
+      props.navigation.navigate('Auth', { screen: screens.Login });
+      setToken(null);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Deletion Failed',
+        text2: error.message,
+      });
+    }
   };
 
   return (
@@ -159,20 +201,33 @@ function DrawerDesignComponent(props) {
             {...props}
             state={filteredState}
           />
+        </ScrollView>
 
+        {/* BOTTOM BUTTONS CONTAINER */}
+        <View style={s.bottomButtonsContainer}>
           <View style={s.borderBottom} />
-
           {/* SIGN OUT */}
           <Touchable style={s.signOutMain} onPress={showLogoutModal}>
-            <Icon name="log-out" color={colors.lightWhite} />
+            <Icon name="log-out" color={colors.primary} size={22} />
             <TextView
               style={s.logoutLink}
-              text={'Sign Out'}
+              text={'Logout'}
               type={'body'}
-              color={colors.lightWhite}
+              color={colors.primary}
             />
           </Touchable>
-        </ScrollView>
+
+          {/* DELETE ACCOUNT */}
+          <Touchable style={s.deleteAccountMain} onPress={showDeleteModal}>
+            <Icon name="trash-2" color={colors.red} size={22} />
+            <TextView
+              style={s.logoutLink}
+              text={'Delete Account'}
+              type={'body'}
+              color={colors.red}
+            />
+          </Touchable>
+        </View>
       </SafeAreaView>
 
       {/* LOGOUT MODAL */}
@@ -192,10 +247,37 @@ function DrawerDesignComponent(props) {
                 <Text style={s.btnText}>Cancel</Text>
               </Touchable>
               <Touchable
-                style={[s.btn, { backgroundColor: 'red' }]}
+                style={[s.btn, { backgroundColor: colors.primary }]}
                 onPress={handleLogout}
               >
                 <Text style={s.btnText}>OK</Text>
+              </Touchable>
+            </View>
+          </Animated.View>
+        </View>
+      )}
+
+      {/* DELETE ACCOUNT MODAL */}
+      {deleteVisible && (
+        <View style={s.overlay}>
+          <Animated.View
+            style={[s.modal, { transform: [{ scale: deleteScaleAnim }] }]}
+          >
+            <Text style={s.title}>Delete Account</Text>
+            <Text style={s.subtitle}>Are you sure you want to delete your account? This action is permanent and cannot be undone.</Text>
+
+            <View style={s.row}>
+              <Touchable
+                style={[s.btn, { backgroundColor: '#ccc' }]}
+                onPress={hideDeleteModal}
+              >
+                <Text style={s.btnText}>Cancel</Text>
+              </Touchable>
+              <Touchable
+                style={[s.btn, { backgroundColor: 'red' }]}
+                onPress={handleDeleteAccount}
+              >
+                <Text style={s.btnText}>Delete</Text>
               </Touchable>
             </View>
           </Animated.View>
@@ -213,8 +295,9 @@ const s = StyleSheet.create({
   },
   borderBottom: {
     borderColor: colors.primary,
-    marginVertical: verticalScale(50),
-    width: '100%'
+    marginVertical: verticalScale(10),
+    width: '100%',
+    borderWidth: 0.5,
   },
   branchSelectorContainer: {
     paddingHorizontal: scale(indent),
@@ -268,11 +351,35 @@ const s = StyleSheet.create({
   },
   signOutMain: {
     flexDirection: 'row',
-    paddingHorizontal: scale(indent),
-    paddingVertical: verticalScale(indent)
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: scale(indent),
+    paddingVertical: verticalScale(12),
+    backgroundColor: 'rgba(255, 106, 0, 0.05)',
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 106, 0, 0.1)',
+    marginBottom: verticalScale(10),
   },
   logoutLink: {
-    paddingLeft: scale(indent + 8)
+    paddingLeft: scale(10),
+    fontWeight: 'bold',
+  },
+  deleteAccountMain: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: scale(indent),
+    paddingVertical: verticalScale(12),
+    backgroundColor: 'rgba(255, 0, 0, 0.05)',
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 0, 0, 0.1)',
+    marginBottom: verticalScale(40),
+  },
+  bottomButtonsContainer: {
+    marginTop: 'auto',
+    paddingBottom: verticalScale(10),
   },
   overlay: {
     position: 'absolute',

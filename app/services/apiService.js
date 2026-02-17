@@ -445,5 +445,14 @@ export const sendBroadcast = async (data) => {
   }
 };
 
+export const deleteAccount = async () => {
+  try {
+    const response = await apiService.post('/auth/delete-account');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to delete account');
+  }
+};
+
 // Add other API methods as needed
 export default apiService;
