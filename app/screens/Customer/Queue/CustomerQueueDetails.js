@@ -7,7 +7,6 @@ import React from 'react';
 import { View, SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { verticalScale, scale } from 'react-native-size-matters';
 import NavigationOptions from '../../../components/NavigationOptions';
-// import SvgIcon from 'react-native-svg-icon/lib/components/SvgIcon';
 import svgs from '../../../assets/svg';
 import screens from '../../../constants/screens';
 import { Button } from '../../../components/Button';
@@ -43,7 +42,7 @@ const CustomerQueueDetails = (props) => {
           style={s.dateText}
         />
         <View style={[s.locationTextWrapper, s.totalTokenWrapper]}>
-          {/* <SvgIcon svgs={svgs} name={'bag-primary'} fill={colors.primary} width={20} height={22} /> */}
+          {}
           <View style={s.totalTokenSecondWrapper}>
             <TextView color={colors.white} text={'Total Token :'} type={'body-one'} style={s.dateRangeText} />
             <TextView color={colors.lightWhite} text={' 0 - 150 '} type={'body-one'} />

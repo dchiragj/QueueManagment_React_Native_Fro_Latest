@@ -164,8 +164,6 @@ const SpinnerComponent = (props) => {
         </View>
       );
     case 'MaterialIndicator':
-      // Note: To overcome https://github.com/n4kz/react-native-indicators/issues/11 and
-      //   https://github.com/n4kz/react-native-indicators/issues/6 ActivityIndicator is used in android
       if (Platform.OS === 'android') {
         return (
           <View

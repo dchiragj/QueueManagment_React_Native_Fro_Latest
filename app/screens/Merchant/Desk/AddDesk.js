@@ -42,7 +42,6 @@ const AddDesk = () => {
                 const businessRes = await getBusinessList();
                 const businessData = businessRes?.data || [];
 
-                // Only show active branches for desk assignment
                 const businessList = businessData
                     .filter(b => b.isActive == 1 || b.status == 1 || b.isActive === true || b.status === true)
                     .map((b) => ({
@@ -51,7 +50,7 @@ const AddDesk = () => {
                     }));
                 setBusinesses(businessList);
             } catch (err) {
-                console.error(err);
+                
                 setBusinesses([]);
             } finally {
                 setLoading(false);

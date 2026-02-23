@@ -35,7 +35,6 @@ const VerifyEmail = (props) => {
     let screen;
     const result = await props.verifyEmail(code);
 
-    // alert(result,"test")
     if (result) {
       const userDetails = await getAuthUser();
       delete userDetails.verificationRequired;

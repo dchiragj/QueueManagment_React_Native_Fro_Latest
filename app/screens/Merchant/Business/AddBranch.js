@@ -61,7 +61,6 @@ const AddBranch = () => {
             text2: `Business ${isEdit ? 'updated' : 'created'} successfully!`,
          });
 
-         // Sync the branch list in the drawer/selector
          if (refreshBranches) {
             await refreshBranches();
          }
@@ -86,9 +85,8 @@ const AddBranch = () => {
             keyboardShouldPersistTaps={'handled'}
             contentContainerStyle={{ paddingBottom: 40 }}
          >
-            {/* Form Fields */}
+            {}
             <Input
-               // label="Business Name"
                placeholder="Enter business name"
                value={formData.businessName}
                onChangeText={(text) => handleChange('businessName', text)}
@@ -97,7 +95,6 @@ const AddBranch = () => {
             />
 
             <Input
-               // label="Registration Number"
                placeholder="Business Registration No."
                value={formData.businessRegistrationNumber}
                onChangeText={(text) => handleChange('businessRegistrationNumber', text)}
@@ -106,7 +103,6 @@ const AddBranch = () => {
             />
 
             <Input
-               // label="Phone Number"
                placeholder="Enter contact number"
                value={formData.businessPhoneNumber}
                onChangeText={(text) => handleChange('businessPhoneNumber', text)}
@@ -116,7 +112,6 @@ const AddBranch = () => {
             />
 
             <Input
-               // label="Address"
                placeholder="Enter full address"
                value={formData.businessAddress}
                onChangeText={(text) => handleChange('businessAddress', text)}

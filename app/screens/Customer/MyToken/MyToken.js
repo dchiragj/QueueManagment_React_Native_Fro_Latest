@@ -1,47 +1,5 @@
-// import HeaderButton from '../../../components/HeaderButton';
-// import  colors  from '../../../styles/colors';
-// import AppStyles from '../../../styles/AppStyles';
-// import React from 'react';
-// import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-// import NavigationOptions from '../../../components/NavigationOptions';
-// import screens from '../../constants/screens';
-// import CompletedTokenListItem from '../CompletedToken/CompletedTokenListItem';
-
-// const MyToken = (props) => {
-//   const onPressMyTokenDetails = () => {
-//     // props.navigation.navigate(screens.MyTokenDetails);
-//   };
-//   return (
-//     <SafeAreaView style={[AppStyles.root]}>
-//       <ScrollView showsVerticalScrollIndicator={false}>
-//         <CompletedTokenListItem onPress={onPressMyTokenDetails} />
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// };
-// MyToken.navigationOptions = ({ navigation }) => {
-//   return NavigationOptions({
-//     title: '',
-//     isBack: false,
-//     navigation: navigation,
-//     headerLeft: (
-//       <HeaderButton
-//         type={1}
-//         iconName={'md-menu'}
-//         color={colors.primary}
-//         isFeather={false}
-//         iconType={'ionic'}
-//         onPress={() => navigation.openDrawer()}
-//       />
-//     ),
-//     headerStyle: { elevation: 0 }
-//   });
-// };
-// const s = StyleSheet.create({});
-// export default MyToken;
 
 
-// import HeaderButton from '../../../components/HeaderButton';
 import colors from '../../../styles/colors';
 import AppStyles from '../../../styles/AppStyles';
 import React, { useState, useEffect } from 'react';
@@ -82,7 +40,7 @@ const MyToken = () => {
         setMyTokens([]);
       }
     } catch (err) {
-      console.log('Failed to load my tokens', err);
+      
       setMyTokens([]);
     } finally {
       setLoading(false);
@@ -102,7 +60,7 @@ const MyToken = () => {
         setMyTokens([]);
       }
     } catch (err) {
-      console.log('Failed to refresh tokens', err);
+      
     } finally {
       setRefreshing(false);
     }
@@ -118,7 +76,7 @@ const MyToken = () => {
       await getTokenDelete(tokenId);
       setMyTokens(prev => prev.filter(t => t.id !== tokenId));
     } catch (err) {
-      console.error('Delete failed', err);
+      
     }
   };
 
@@ -142,7 +100,7 @@ const MyToken = () => {
       }));
       setCategories(list || []);
     } catch (err) {
-      console.error("Error fetching categories:", err);
+      
       setCategories([]);
     }
   };
@@ -198,7 +156,7 @@ const MyToken = () => {
         {myTokens.map((token) => (
           <Card key={token.id} style={styles.wrapper}>
             <View style={styles.mainWrapper}>
-              {/* Token Number */}
+              {}
               <View style={styles.numberTextWrapper}>
                 <TextView
                   color={colors.primary}
@@ -208,7 +166,7 @@ const MyToken = () => {
                 />
               </View>
 
-              {/* Details */}
+              {}
               <View style={styles.textWrapper}>
                 <TextView color={colors.white} text={token.queueName || 'Queue'} type="body-one" />
                 {userRole === 'merchant' && token.customerName && (
@@ -227,7 +185,7 @@ const MyToken = () => {
                 <TextView color={colors.lightWhite} text={getCategoryName(token.categoryId)} type="body-one" />
               </View>
 
-              {/* Delete + Status */}
+              {}
               <View style={styles.deleteIconWrapper}>
 
 
@@ -248,7 +206,7 @@ const MyToken = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setSelectedTokenId(token.id);
-                    setShowAlert(true);
+                    setShow
                   }}
                   style={styles.deleteButton}
                   disabled={token.status === 'COMPLETED'}
@@ -274,12 +232,12 @@ const MyToken = () => {
           confirmText="Yes, Delete"
           confirmButtonColor="#d32f2f"
           onCancelPressed={() => {
-            setShowAlert(false);
+            setShow
             setSelectedTokenId(null);
           }}
           onConfirmPressed={() => {
             if (selectedTokenId) handleDeleteToken(selectedTokenId);
-            setShowAlert(false);
+            setShow
             setSelectedTokenId(null);
           }}
         />

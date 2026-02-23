@@ -1,4 +1,4 @@
-/* eslint-disable react-native/no-color-literals */
+
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
 import NetInfo from 'react-native-netinfo';

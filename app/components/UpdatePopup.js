@@ -30,7 +30,7 @@ const UpdatePopup = () => {
       }
 
     } catch (e) {
-      console.log("Update API error:", e.message);
+      
     }
   }
 
@@ -44,7 +44,7 @@ const UpdatePopup = () => {
         alignItems: 'center'
       }}>
 
-        {/* CARD */}
+        {}
         <View style={{
           backgroundColor: '#fff',
           borderRadius: 20,
@@ -53,7 +53,7 @@ const UpdatePopup = () => {
           alignItems: 'center'
         }}>
 
-          {/* IMAGE */}
+          {}
           <Image
             source={require('../assets/images/appupdate.png')}
             style={{ width: 250, height: 150, resizeMode: 'contain', marginBottom: 10, borderRadius: 20 }}

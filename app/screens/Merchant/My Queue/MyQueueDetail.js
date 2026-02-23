@@ -20,10 +20,9 @@ const MyQueueDetail = ({ navigation }) => {
   const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [fullScreenQr, setFullScreenQr] = useState(null); // URL of the QR code to show in full screen
+  const [fullScreenQr, setFullScreenQr] = useState(null);
 
 
-  // Helper function to map status to label
   const getStatusLabel = (status) => {
     switch (status) {
       case 1:
@@ -37,15 +36,15 @@ const MyQueueDetail = ({ navigation }) => {
   const getTokenStatusColor = (status) => {
     switch (status) {
       case 'PENDING':
-        return '#FF9800'; // Orange
+        return '#FF9800';
       case 'CALLED':
-        return '#2196F3'; // Blue
+        return '#2196F3';
       case 'COMPLETED':
-        return '#4CAF50'; // Green
+        return '#4CAF50';
       case 'SKIPPED':
-        return '#F44336'; // Red
+        return '#F44336';
       default:
-        return '#9E9E9E'; // Grey
+        return '#9E9E9E';
     }
   };
 
@@ -66,16 +65,15 @@ const MyQueueDetail = ({ navigation }) => {
         const shareOptions = {
           title: title,
           url: `file://${localFile}`,
-          type: 'image/png', // Adjust based on your image type
+          type: 'image/png',
           failOnCancel: false,
         };
         await Share.open(shareOptions);
       } else {
-        alert('Failed to download image for sharing');
+        
       }
     } catch (error) {
-      console.log('Share Error:', error);
-      // alert(error.message);
+      
     } finally {
       setLoading(false);
     }
@@ -91,7 +89,7 @@ const MyQueueDetail = ({ navigation }) => {
         setTokens(response?.data?.tokens)
       } catch (err) {
         setError(err.message || 'Failed to fetch queue details');
-        console.error('Queue details fetch error:', err);
+        
       } finally {
         setLoading(false);
       }
@@ -122,7 +120,7 @@ const MyQueueDetail = ({ navigation }) => {
       <SafeAreaView style={[AppStyles.root, AppStyles.rootWithoutPadding]}>
         <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
         <View style={styles.errorContainer}>
-          <Text style={styles.errorIcon}>⚠️</Text>
+          <Text style={styles.errorIcon}>âš ï¸</Text>
           <Text style={styles.errorTitle}>Oops!</Text>
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -142,7 +140,7 @@ const MyQueueDetail = ({ navigation }) => {
 
           {queue && (
             <Card style={styles.detailsCard}>
-              {/* Main Queue Information */}
+              {}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Basic Information</Text>
                 <DetailRow label="Queue Name" value={queue.name || 'Unnamed Queue'} />
@@ -155,14 +153,14 @@ const MyQueueDetail = ({ navigation }) => {
                 ) : null}
               </View>
 
-              {/* Date & Time */}
+              {}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Date & Time</Text>
                 <DetailRow label="Start Date" value={formatDate(queue.start_date) || 'No Date'} />
                 {queue.start_time && <DetailRow label="Start Time" value={queue.start_time} />}
                 {queue.end_time && <DetailRow label="End Time" value={queue.end_time} />}
               </View>
-              {/* Additional Information */}
+              {}
               {(queue.description || queue.location) && (
                 <View style={styles.section}>
                   <Text style={styles.sectionTitle}>Additional Information</Text>
@@ -225,7 +223,7 @@ const MyQueueDetail = ({ navigation }) => {
 
           </View>
 
-          {/* Tokens List */}
+          {}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Tokens ({tokens?.length || 0})</Text>
 
@@ -253,7 +251,7 @@ const MyQueueDetail = ({ navigation }) => {
         </View>
       </ScrollableAvoidKeyboard>
 
-      {/* Full Screen QR Modal */}
+      {}
       <Modal
         visible={!!fullScreenQr}
         transparent={true}
@@ -286,7 +284,6 @@ const MyQueueDetail = ({ navigation }) => {
   );
 };
 
-// Helper Components
 const DetailRow = ({ label, value }) => (
   <View style={styles.detailRow}>
     <Text style={styles.detailLabel}>{label}</Text>
@@ -302,7 +299,6 @@ const StatCard = ({ title, value, icon }) => (
   </View>
 );
 
-// Helper Functions
 const getStatusColor = (status) => {
   const statusColors = {
     running: '#4CAF50',
@@ -388,7 +384,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   detailsCard: {
-    // backgroundColor:  '#f5cfc4ff',
     borderRadius: 16,
     padding: 20,
     shadowColor: '#000',
@@ -463,7 +458,6 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     paddingVertical: 12,
-    // borderBottomWidth: 1,
     borderBottomColor: colors.border || '#f0f0f0',
   },
   infoLabel: {

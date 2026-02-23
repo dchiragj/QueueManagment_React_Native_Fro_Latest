@@ -83,8 +83,12 @@ android {
         applicationId "com.QueueFlow"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+
+         // In the QueueFlow_Version_Update repository, you also need to change the version before uploading a new build.
+        // Whenever you upload a new build, make sure to update the latestVersionCode in QueueFlow_Version_Update.
+        // Only then will the "Update App" popup appear.
+        versionCode 13
+        versionName "2.1.7" 
     }
     signingConfigs {
         debug {

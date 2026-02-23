@@ -12,7 +12,7 @@ import Toast from 'react-native-toast-message';
 import { forgotPassword, verifyOtp, resetPassword } from '../../../services/apiService';
 
 const ForgotPassword = ({ navigation }) => {
-  const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: Reset Password
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +20,6 @@ const ForgotPassword = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState('');
 
-  // Reset fields when step changes
   useEffect(() => {
     if (step === 1) {
       setEmail('');
@@ -31,7 +30,7 @@ const ForgotPassword = ({ navigation }) => {
     }
   }, [step]);
 
-  /* -------------------------- Helper: Show Toast -------------------------- */
+  
   const showToast = (type, title, message) => {
     Toast.show({
       type,
@@ -42,7 +41,7 @@ const ForgotPassword = ({ navigation }) => {
     });
   };
 
-  /* ---------------------------- Step 1: Send OTP -------------------------- */
+  
   const handleSendOtp = async () => {
     if (!email?.trim()) {
       showToast('error', 'Error', 'Please enter your email');
@@ -65,7 +64,7 @@ const ForgotPassword = ({ navigation }) => {
     }
   };
 
-  /* --------------------------- Step 2: Verify OTP ------------------------- */
+  
   const handleVerifyOtp = async () => {
     if (!otp?.trim()) {
       showToast('error', 'Error', 'Please enter the OTP');
@@ -89,7 +88,7 @@ const ForgotPassword = ({ navigation }) => {
     }
   };
 
-  /* ------------------------- Step 3: Reset Password ----------------------- */
+  
   const handleResetPassword = async () => {
     if (!password || !confirmPassword) {
       showToast('error', 'Error', 'Please fill both password fields');
@@ -116,7 +115,7 @@ const ForgotPassword = ({ navigation }) => {
     }
   };
 
-  /* --------------------------------- UI --------------------------------- */
+  
   return (
     <ScrollableAvoidKeyboard style={styles.container}>
       <TextView
@@ -127,7 +126,7 @@ const ForgotPassword = ({ navigation }) => {
       />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* ---------- Step 1: Email ---------- */}
+        {}
         {step === 1 && (
           <Validation>
             <Input
@@ -147,7 +146,7 @@ const ForgotPassword = ({ navigation }) => {
             />
           </Validation>
         )}
-        {/* ---------- Step 2: OTP ---------- */}
+        {}
         {step === 2 && (
           <Validation>
             <Input
@@ -172,7 +171,7 @@ const ForgotPassword = ({ navigation }) => {
             />
           </Validation>
         )}
-        {/* ---------- Step 3: Reset Password ---------- */}
+        {}
         {step === 3 && (
           <Validation>
             <Input

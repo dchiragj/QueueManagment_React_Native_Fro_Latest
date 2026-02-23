@@ -1,8 +1,7 @@
-// components/IconButton.js  અથવા IconButton.tsx
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import PropTypes from 'prop-types';               // નવું
+import PropTypes from 'prop-types';
 import colors from '../../../styles/colors';
 import Icon from '../../Icon';
 import Touchable from '../Touchable';
@@ -52,7 +51,6 @@ const s = StyleSheet.create({
   },
 });
 
-// નવા PropTypes – 2025 માં ચાલે છે
 IconButton.propTypes = {
   style: PropTypes.object,
   wrapperStyle: PropTypes.object,

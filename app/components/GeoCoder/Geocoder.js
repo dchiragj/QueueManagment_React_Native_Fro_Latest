@@ -1,39 +1,27 @@
 let API_KEY;
 
-/**
- * Module to use google's geocoding & reverse geocoding.
- */
+
 let Geocoder;
 export default Geocoder = {
   options: {},
 
-  /**
-   * Initialize the module.
-   * @param {String} apiKey The api key of your application in google.
-   * @see https://developers.google.com/maps/documentation/geocoding/intro#geocoding
-   */
+  
   init(apiKey, options) {
     API_KEY = apiKey;
     this.options = options || {};
   },
 
-  /**
-   * @returns {boolean} True if the module has been initiated. False otherwise.
-   */
+  
   get isInit() {
     return !!API_KEY;
   },
 
-  /**
-   * @see {@link Geocoder.init}
-   * @deprecated
-   */
+  
   setApiKey(API_KEY) {
     this.init(API_KEY);
   },
 
   async from(...params) {
-    // check api key
     if (!Geocoder.isInit)
       throw {
         code: Geocoder.Errors.NOT_INITIATED,
@@ -41,24 +29,16 @@ export default Geocoder = {
           "Geocoder isn't initialized. Call Geocoder.init function (only once), passing it your app's api key as parameter."
       };
 
-    // --- convert parameters ---
     let queryParams;
 
-    // (latitude, longitude)
     if (!isNaN(params[0]) && !isNaN(params[1])) queryParams = { latlng: `${params[0]},${params[1]}` };
-    // [latitude, longitude]
     else if (params[0] instanceof Array) queryParams = { latlng: `${params[0][0]},${params[0][1]}` };
-    // {latitude, longitude}  or {lat, lng}
     else if (params[0] instanceof Object)
       queryParams = { latlng: `${params[0].lat || params[0].latitude},${params[0].lng || params[0].longitude}` };
-    // address
     else if (typeof params[0] === 'string') queryParams = { address: params[0] };
 
-    // --- start geocoding ---
 
-    // check query params
     if (!queryParams)
-      // no query params, means parameters where invalid
       throw {
         code: Geocoder.Errors.INVALID_PARAMETERS,
         message: 'Invalid parameters : \n' + JSON.stringify(params, null, 2)
@@ -67,12 +47,10 @@ export default Geocoder = {
     queryParams.key = API_KEY;
     if (this.options.language) queryParams.language = this.options.language;
 
-    // build url
     const url = `https://maps.googleapis.com/maps/api/geocode/json?${toQueryParams(queryParams)}`;
 
     let response, data;
 
-    // fetch
     try {
       response = await fetch(url);
     } catch (error) {
@@ -83,7 +61,6 @@ export default Geocoder = {
       };
     }
 
-    // parse
     try {
       data = await response.json();
     } catch (error) {
@@ -95,7 +72,6 @@ export default Geocoder = {
       };
     }
 
-    // check response's data
     if (data.status !== 'OK')
       throw {
         code: Geocoder.Errors.SERVER,
@@ -115,45 +91,26 @@ export default Geocoder = {
     return this.from(lat, lng);
   },
 
-  /**
-   * All possible errors.
-   */
+  
   Errors: {
-    /**
-     * Module hasn't been initiated. Call {@link Geocoder.init}.
-     */
+    
     NOT_INITIATED: 0,
 
-    /**
-     * Parameters are invalid.
-     */
+    
     INVALID_PARAMETERS: 1,
 
-    /**
-     * Error wile fetching to server.
-     * The error.origin property contains the original fetch error.
-     */
+    
     FETCHING: 2,
 
-    /**
-     * Error while parsing server response.
-     * The error.origin property contains the response.
-     */
+    
     PARSING: 3,
 
-    /**
-     * Error from the server.
-     * The error.origin property contains the response's body.
-     */
+    
     SERVER: 4
   }
 };
 
-/**
- * Convert an object into query parameters.
- * @param {Object} object Object to convert.
- * @returns {string} Encoded query parameters.
- */
+
 function toQueryParams(object) {
   return Object.keys(object)
     .filter((key) => !!object[key])

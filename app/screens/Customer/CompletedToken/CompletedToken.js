@@ -43,7 +43,7 @@ const CompletedToken = ({ navigation }) => {
         setMyTokens([]);
       }
     } catch (err) {
-      console.log('Failed to load completed tokens', err);
+      
       setMyTokens([]);
     } finally {
       setLoading(false);
@@ -63,7 +63,7 @@ const CompletedToken = ({ navigation }) => {
         setMyTokens([]);
       }
     } catch (err) {
-      console.log('Failed to refresh completed tokens', err);
+      
     } finally {
       setRefreshing(false);
     }
@@ -79,7 +79,7 @@ const CompletedToken = ({ navigation }) => {
       await getTokenDelete(tokenId);
       setMyTokens(prev => prev.filter(t => t.id !== tokenId));
     } catch (err) {
-      console.error('Delete failed', err);
+      
     }
   };
 
@@ -103,7 +103,7 @@ const CompletedToken = ({ navigation }) => {
       }));
       setCategories(list || []);
     } catch (err) {
-      console.error("Error fetching categories:", err);
+      
       setCategories([]);
     }
   };
@@ -159,7 +159,7 @@ const CompletedToken = ({ navigation }) => {
         {myTokens.map((token) => (
           <Card key={token.id} style={styles.wrapper} onPress={() => onPressMyTokenDetails(token.id)}>
             <View style={styles.mainWrapper}>
-              {/* Token Number */}
+              {}
               <View style={styles.numberTextWrapper}>
                 <TextView
                   color={colors.primary}
@@ -169,7 +169,7 @@ const CompletedToken = ({ navigation }) => {
                 />
               </View>
 
-              {/* Details */}
+              {}
               <View style={styles.textWrapper}>
                 <TextView color={colors.white} text={token.queueName || 'Queue'} type="body-one" />
                 {userRole === 'merchant' && token.customerName && (
@@ -188,7 +188,7 @@ const CompletedToken = ({ navigation }) => {
                 />
               </View>
 
-              {/* Delete + Status */}
+              {}
               <View style={styles.deleteIconWrapper}>
 
 
@@ -209,7 +209,7 @@ const CompletedToken = ({ navigation }) => {
                 <TouchableOpacity
                   onPress={() => {
                     setSelectedTokenId(token.id);
-                    setShowAlert(true);
+                    setShow
                   }}
                   style={styles.deleteButton}
                 >
@@ -231,12 +231,12 @@ const CompletedToken = ({ navigation }) => {
           confirmText="Yes, Delete"
           confirmButtonColor="#d32f2f"
           onCancelPressed={() => {
-            setShowAlert(false);
+            setShow
             setSelectedTokenId(null);
           }}
           onConfirmPressed={() => {
             if (selectedTokenId) handleDeleteToken(selectedTokenId);
-            setShowAlert(false);
+            setShow
             setSelectedTokenId(null);
           }}
         />

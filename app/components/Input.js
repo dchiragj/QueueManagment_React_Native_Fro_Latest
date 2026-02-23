@@ -87,7 +87,6 @@ const s = StyleSheet.create({
     flexGrow: 1,
     flexShrink: 0,
     flexBasis: 0
-    // paddingLeft: 0
   },
   iconButton: {
     marginLeft: 'auto',

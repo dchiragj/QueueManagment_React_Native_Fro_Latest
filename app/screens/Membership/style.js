@@ -4,47 +4,6 @@ import { colors, fontWeights } from '../../styles';
 import { halfindent, indent } from '../../styles/dimensions';
 
 export default StyleSheet.create({
-  // container: { paddingHorizontal: scale(10), marginTop: scaleVertical(120) },
-  // inputLabelStyle: { marginBottom: 5 },
-  // inputStyle: { paddingLeft: 12 },
-  // input: { marginBottom: 0 },
-  // imageStyle: {
-  //   resizeMode: 'contain',
-  //   flex: 1
-  // },
-  // backDrop: {
-  //   flex: 1,
-  //   backgroundColor: colors.black,
-  //   opacity: 0.6,
-  //   position: 'absolute',
-  //   top: 0,
-  //   left: 0,
-  //   width: '100%',
-  //   height: '100%',
-  //   zIndex: 0
-  // },
-  // buttonStyle: {
-  //   marginTop: scaleVertical(15)
-  // },
-  // rememberMeWrapper: {
-  //   flexDirection: 'row',
-  //   alignItems: 'flex-start'
-  // },
-  // checkBox: {
-  //   flex: 1
-  // },
-  // checkBoxRightTextStyle: {
-  //   color: colors.white
-  // },
-  // menuText: {
-  //   position: 'absolute',
-  //   top: scaleVertical(100),
-  //   right: scale(0),
-  //   color: colors.white,
-  //   fontWeight: fontWeights.bold,
-  //   transform: [{ rotate: '270deg' }]
-  // }
-  // loginpage
   fromGroup: {
     marginTop: verticalScale(45),
     paddingTop: verticalScale(10),

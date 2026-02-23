@@ -39,7 +39,6 @@ import { RefreshControl, Dimensions } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import moment from 'moment';
 
-// Vision Camera Imports (built-in QR support)
 import {
   Camera,
   useCameraDevice,
@@ -58,7 +57,7 @@ const Home = (props) => {
   const [activeTab, setActiveTab] = useState(null);
   const [joinCode, setJoinCode] = useState('');
   const [link, setLink] = useState('');
-  const [location, setLocation] = useState(''); // "lat,lng"
+  const [location, setLocation] = useState('');
   const [joinMethod, setJoinMethod] = useState(null);
   const [broadcastModal, setBroadcastModal] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState('');
@@ -103,7 +102,7 @@ const Home = (props) => {
         recentHistory: analyticsRes?.data?.history || [],
       });
     } catch (error) {
-      console.error('Error fetching dashboard counts:', error);
+
     } finally {
       setIsLoading(false);
       setRefreshing(false);
@@ -178,8 +177,7 @@ const Home = (props) => {
         }));
         setCategories(list);
       } catch (err) {
-        console.error('Error fetching categories:', err);
-        // Alert.alert('Error', 'Failed to load categories.');
+
       } finally {
         setIsLoadingCategories(false);
       }
@@ -216,7 +214,7 @@ const Home = (props) => {
       }
       return status === RESULTS.GRANTED;
     } catch (err) {
-      console.error('Permission error:', err);
+
       showToast('error', 'Permission Error', 'Failed to access camera');
       return false;
     }
@@ -292,7 +290,7 @@ const Home = (props) => {
         showToast('info', 'No Token', 'Please press "Generate Token" to create a new token.');
       }
     } catch (error) {
-      console.error('Error processing QR code:', error.message, error.response?.data);
+
       showToast('error', 'Scan Failed', error.message || 'Could not process QR code');
       setIsScanning(false);
     } finally {
@@ -327,7 +325,6 @@ const Home = (props) => {
         return;
       }
 
-      // Fetch latest queue details to check limit
       const queueDetailsRes = await getQueueDetails(qrDetails.queueId);
       const queueData = queueDetailsRes?.data?.queue;
       const currentTokens = queueDetailsRes?.data?.tokens || [];
@@ -354,7 +351,7 @@ const Home = (props) => {
         showToast(
           'success',
           'Token Generated!',
-          `Your token number is ${res.data.tokenNumber} 🎉`
+          `Your token number is ${res.data.tokenNumber} ðŸŽ‰`
         );
         setQrDetails(null);
         clearInputs();
@@ -375,14 +372,12 @@ const Home = (props) => {
     return cat ? cat.text : 'Unknown';
   };
 
-  // Built-in Vision Camera QR Scanner (no external deps)
   const VisionQRScanner = () => {
     const device = useCameraDevice('back');
 
     const codeScanner = useCodeScanner({
       codeTypes: ['qr'],
       onCodeScanned: (codes) => {
-        // Scan once and close
         if (codes.length > 0 && codes[0]?.value) {
           onScanSuccess({ data: codes[0].value });
         }
@@ -407,7 +402,7 @@ const Home = (props) => {
           photo={false}
           video={false}
         />
-        {/* Scan Frame Overlay */}
+        { }
         <View style={styles.overlay}>
           <View style={styles.scanFrame} />
           <TextView
@@ -417,9 +412,9 @@ const Home = (props) => {
             style={styles.scanText}
           />
         </View>
-        {/* Close Button */}
+        { }
         <TouchableOpacity style={styles.closeBtn} onPress={() => setIsScanning(false)}>
-          <TextView text="✕ Close" color="white" type="body" />
+          <TextView text="âœ• Close" color="white" type="body" />
         </TouchableOpacity>
       </View>
     );
@@ -471,7 +466,7 @@ const Home = (props) => {
 
           {user?.role === 'merchant' && (
             <View style={s.dashboardContainer}>
-              {/* PREMIUM HEADER SECTION */}
+              { }
               <View style={s.merchantHeader}>
                 <View>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -540,7 +535,7 @@ const Home = (props) => {
               </View>
 
               <View style={s.statsGrid}>
-                {/* COMPLETED TOKENS CARD */}
+                { }
                 <View style={[s.statCard, s.completedCard]}>
                   <View style={s.cardIconContainer}>
                     <Icon name="check-circle" size={24} color={colors.success} />
@@ -551,7 +546,7 @@ const Home = (props) => {
                   </View>
                 </View>
 
-                {/* PENDING TOKENS CARD */}
+                { }
                 <View style={[s.statCard, s.pendingCard]}>
                   <View style={s.cardIconContainer}>
                     <Icon name="timer" size={24} color={colors.primary} />
@@ -562,7 +557,7 @@ const Home = (props) => {
                   </View>
                 </View>
 
-                {/* ACTIVE QUEUES CARD */}
+                { }
                 <View style={[s.statCard, s.queuesCard]}>
                   <View style={s.cardIconContainer}>
                     <Icon name="list" size={24} color="#3498db" />
@@ -573,7 +568,7 @@ const Home = (props) => {
                   </View>
                 </View>
 
-                {/* TOTAL DESKS CARD */}
+                { }
                 <View style={[s.statCard, s.desksCard]}>
                   <View style={s.cardIconContainer}>
                     <Icon name="desktop-windows" size={24} color="#f1c40f" />
@@ -584,7 +579,7 @@ const Home = (props) => {
                   </View>
                 </View>
 
-                {/* TOTAL BRANCHES CARD */}
+                { }
                 <View style={[s.statCard, s.branchesCard]}>
                   <View style={s.cardIconContainer}>
                     <Icon name="store" size={24} color="#9b59b6" />
@@ -595,7 +590,7 @@ const Home = (props) => {
                   </View>
                 </View>
 
-                {/* AVG WAIT TIME CARD */}
+                { }
                 <View style={[s.statCard, s.waitCard]}>
                   <View style={s.cardIconContainer}>
                     <Icon name="access-time" size={24} color="#e74c3c" />
@@ -607,7 +602,7 @@ const Home = (props) => {
                 </View>
               </View>
 
-              {/* WEEKLY PERFORMANCE CHART */}
+              { }
               {dashCounts.weeklyTrend && dashCounts.weeklyTrend.length > 0 && (
                 <View style={s.chartContainer}>
                   <TextView text="Weekly Performance (Tokens Served)" type="button-text" color={colors.white} style={s.chartTitle} />
@@ -666,7 +661,7 @@ const Home = (props) => {
                 </View>
               )}
 
-              {/* RECENT ACTIVITY SECTION */}
+              { }
               {dashCounts.recentHistory && dashCounts.recentHistory.length > 0 && (
                 <View style={s.activitySection}>
                   <View style={s.sectionHeader}>
@@ -717,7 +712,7 @@ const Home = (props) => {
                 </View>
               )}
 
-              {/* BROADCAST MODAL */}
+              { }
               <Modal
                 visible={broadcastModal}
                 transparent={true}
@@ -761,7 +756,7 @@ const Home = (props) => {
                 </View>
               </Modal>
 
-              {/* QUICK START GUIDE FOR MERCHANTS */}
+              { }
               <View style={s.sectionHeader}>
                 <TextView text="Quick Start Guide" type="body-head" color={colors.white} />
                 <TextView text="Setup your business in 4 easy steps" type="tiny" color={colors.lightWhite} />
@@ -813,7 +808,7 @@ const Home = (props) => {
             </View>
           )}
 
-          {/* Tab Content */}
+          { }
           {activeTab === 'private' && (
             <View style={s.inputWrapper}>
               <TextView text="Use Invite Code" type="body-head" color={colors.white} style={s.inputHeading} />
@@ -869,7 +864,7 @@ const Home = (props) => {
             />
           )}
 
-          {/* QR Details Card */}
+          { }
           {qrDetails && (
             <Card>
               <View style={s.qrDetails}>
@@ -920,7 +915,7 @@ const Home = (props) => {
             </Card>
           )}
 
-          {/* Bottom Content */}
+          { }
           {user?.role === 'customer' && (
             <>
               <Image style={s.mainImg} source={require('../../assets/images/home.png')} />
@@ -944,7 +939,7 @@ const Home = (props) => {
         </ScrollableAvoidKeyboard>
       </SafeAreaView>
 
-      {/* QR Scanner Modal */}
+      { }
       <Modal visible={isScanning} animationType="slide" onRequestClose={() => setIsScanning(false)}>
         <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
           <VisionQRScanner />
@@ -954,7 +949,6 @@ const Home = (props) => {
   );
 };
 
-// Scanner Styles
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,

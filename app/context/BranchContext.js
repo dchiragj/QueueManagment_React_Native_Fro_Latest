@@ -19,37 +19,28 @@ export const BranchProvider = ({ children }) => {
         });
     }, []);
 
-    // 2️⃣ Run whenever token changes
     useEffect(() => {
         if (!token) return;
-
         loadBranches();
     }, [token]);
 
     const loadBranches = async () => {
         try {
-            // Load saved branch from AsyncStorage
             const savedBranch = await AsyncStorage.getItem('qflow_selected_branch');
             if (savedBranch) {
                 setSelectedBranchId(savedBranch);
             }
-
-            // Fetch business list
             const response = await getBusinessList();
-
-            // Handle both { data: [...] } and [...] structures
             let list = [];
             if (Array.isArray(response)) {
                 list = response;
             } else if (response?.data && Array.isArray(response.data)) {
                 list = response.data;
-            } else if (Array.isArray(response?.list)) { // Fallback for other potential keys
+            } else if (Array.isArray(response?.list)) {
                 list = response.list;
             }
-
             setBusinesses(list);
         } catch (error) {
-            console.error('Failed to fetch businesses in context', error);
         } finally {
             setLoading(false);
         }

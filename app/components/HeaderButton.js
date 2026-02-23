@@ -5,7 +5,7 @@ import Icon from './Icon';
 import RoundButton from './RoundButton';
 
 const HeaderButton = ({
-  type, //here type 1=Button and type 2=View
+  type,
   color,
   iconName,
   style,

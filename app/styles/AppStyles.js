@@ -50,7 +50,6 @@ const AppStyles = StyleSheet.create({
     position: 'relative'
   },
 
-  // Membership Style
   bgColorWhite: {
     backgroundColor: colors.white
   },
@@ -72,8 +71,6 @@ const AppStyles = StyleSheet.create({
   },
   formContainer: {
     marginBottom: verticalScale(14)
-    // height: "auto",
-    // borderWidth: 0,
   },
   bottomOption: {
     flexDirection: 'row',
@@ -100,7 +97,6 @@ const AppStyles = StyleSheet.create({
     textAlign: 'center',
     justifyContent: 'center'
   },
-  // Header Style
   headerStyle: {
     backgroundColor: colors.white,
     borderBottomWidth: borderWidth,
@@ -181,7 +177,6 @@ const AppStyles = StyleSheet.create({
     paddingVertical: verticalScale(14)
   },
   headingStyle: {
-    // fontFamily: 'CircularStd-Bold',
     textAlign: 'center'
   },
   titleStyle: {
@@ -214,18 +209,10 @@ const AppStyles = StyleSheet.create({
     marginBottom: indent * 2 - 2
   },
   iconStyle: {
-    // marginTop: scaleVertical(40),
-    // marginBottom: scaleVertical(20),
   },
-  // --- Session Style
   modal: {
     backgroundColor: colors.transparent
   },
-  // modalWrapper: {
-  //   height: '60%',
-  //   borderTopLeftRadius: borderRadius + 25,
-  //   borderTopRightRadius: borderRadius + 25
-  // },
   modalBorder: {
     height: 5,
     width: 60,
@@ -264,7 +251,6 @@ const AppStyles = StyleSheet.create({
   countDownText: {
     alignContent: 'center',
     color: colors.black,
-    // fontFamily: 'CircularStd-Bold',
     ...Typography.header
   },
   modalBody: {

@@ -1,8 +1,7 @@
-// components/RoundButton.js  અથવા RoundButton.tsx
 
 import React from 'react';
 import { Platform, View, TouchableNativeFeedback, StyleSheet } from 'react-native';
-import PropTypes from 'prop-types';          // નવું
+import PropTypes from 'prop-types';
 import Icon from './Icon';
 import { colors } from '../styles';
 
@@ -43,7 +42,6 @@ const RoundButton = ({
     );
   }
 
-  // iOS માટે તમે પછી TouchableOpacity + shadow ઉમેરી શકો છો
   return null;
 };
 
@@ -60,7 +58,6 @@ const s = StyleSheet.create({
   },
 });
 
-// નવા PropTypes – 2025 માં ચાલે છે
 RoundButton.propTypes = {
   style: PropTypes.object,
   size: PropTypes.number,

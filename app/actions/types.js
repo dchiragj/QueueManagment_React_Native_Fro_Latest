@@ -1,8 +1,5 @@
-/**
- * @desc Reducers Action List
- */
 
-// Auth
+
 export const SET_AUTH_LOADER = 'SET_AUTH_LOADER';
 export const SET_CURRENT_USER = 'SET_CURRENT_USER';
 export const SET_USER_PROFILE = 'SET_USER_PROFILE';
@@ -11,7 +8,6 @@ export const SET_AUTH_RES_SUCCESS = 'SET_AUTH_RES_SUCCESS';
 export const CLEAR_AUTH_RES_MSG = 'CLEAR_AUTH_RES_MSG';
 export const CLEAR_AUTH_DATA = 'CLEAR_AUTH_DATA';
 
-//profie
 export const SET_PROFILE_LOADER = 'SET_PROFILE_LOADER';
 export const SET_PROFILE_INFO = 'SET_PROFILE_INFO';
 export const SET_PROFILE_RES_ERROR = 'SET_PROFILE_RES_ERROR';

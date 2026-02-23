@@ -120,7 +120,6 @@ const s = StyleSheet.create({
     flex: 1
   },
   headerWrapper: {
-    // backgroundColor: colors.red,
     paddingBottom: verticalScale(15)
   },
   modalHeder: {

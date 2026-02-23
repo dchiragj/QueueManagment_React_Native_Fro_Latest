@@ -21,7 +21,6 @@ const Servicing = (props) => {
   const { selectedBranchId } = useBranch();
   const role = auth.user?.role;
 
-  // Use params if available, otherwise fallback to user's assigned queue (for direct operator login)
   const queueId = route.params?.queueId || auth.user?.queue_id || auth.user?.assignedQueueId;
   const categoryid = route.params?.categoryid || auth.user?.category_id || auth.user?.categoryId;
 
@@ -50,13 +49,12 @@ const Servicing = (props) => {
       visibilityTime: 3000,
     });
   };
-  // Fetch Queue Data
   useEffect(() => {
     if (queueId && categoryid) {
       fetchQueueData(queueId, categoryid);
       fetchSkippedData(queueId, categoryid);
     } else {
-      console.error('Queue or category missing in params', { queueId, categoryid });
+      
       showToast('error', 'Error', 'Missing queue or category information.');
       setLoading(false);
     }
@@ -72,25 +70,21 @@ const Servicing = (props) => {
         }
 
       } catch (err) {
-        console.log("Current token fetch failed:", err);
+        
 
       }
     };
 
 
     fetchCurrentAndUpcoming();
-    // const interval = setInterval(fetchCurrentAndUpcoming, 8000);
 
-    // return () => clearInterval(interval);
   }, [queueId, categoryid, selectedBranchId]);
 
   useEffect(() => {
     if (!queueId || !categoryid) return;
 
-    // First time load
     fetchCompletedHistory();
 
-    // Auto refresh every 8 seconds
     const interval = setInterval(() => {
       fetchCompletedHistory();
     }, 8000);
@@ -105,7 +99,7 @@ const Servicing = (props) => {
         setCompletedHistory(res.data);
       }
     } catch (err) {
-      console.log('History load failed');
+      
     }
   };
   const handledcategorylist = async () => {
@@ -115,7 +109,7 @@ const Servicing = (props) => {
       setCategories(list);
       return list;
     } catch (err) {
-      console.error('Error fetching categories:', err);
+      
       setCategories([]);
       return [];
     }
@@ -190,7 +184,7 @@ const Servicing = (props) => {
         showToast('info', 'Empty Queue', servicingData.message || 'No tokens found');
       }
     } catch (error) {
-      console.error('Fetch queue data error:', error);
+      
       showToast('error', 'Error', error.message || 'Failed to load queue data');
     } finally {
       setLoading(false);
@@ -242,7 +236,6 @@ const Servicing = (props) => {
       const res = await completeToken(current.id);
       if (res.status !== 'ok') throw new Error(res.message);
 
-      // Add to Completed History
       setCompletedHistory(prev => [{
         id: current.id,
         tokenNumber: current.tokenNumber,
@@ -257,16 +250,14 @@ const Servicing = (props) => {
         const sorted = [...remaining].sort((a, b) => a.tokenNumber - b.tokenNumber);
         const next = sorted[0];
 
-        // Voice Announcement (in English)
         const announceText = `Token number ${next.tokenNumber}, please come to the counter.`;
 
         Speech.speak(announceText, {
-          language: 'en-US',  // English (you can also use 'en-IN' for Indian accent)
+          language: 'en-US',
           rate: 2.0,
           pitch: 0.5,
         });
 
-        // UI Update
         setNowServing(next.tokenNumber);
         setCustomers(sorted.map(c => ({
           ...c,
@@ -287,7 +278,7 @@ const Servicing = (props) => {
       }
 
     } catch (err) {
-      console.log(err);
+      
       showToast('error', 'Failed', err.message || 'Could not complete token');
     }
   };
@@ -304,7 +295,6 @@ const Servicing = (props) => {
 
       const tokens = Array.isArray(data.data) ? data.data : [data.data];
 
-      // Add to lastRecords (only SKIPPED)
       const skippedRecords = tokens.map(token => {
         const customer = customers.find(c => c.id === token.id);
         return {
@@ -316,11 +306,9 @@ const Servicing = (props) => {
 
       setLastRecords(prev => [...skippedRecords, ...prev].slice(-3));
 
-      // Remove from customers
       setCustomers(prev => prev.filter(c => !selected.includes(c.id)));
       setSelected([]);
 
-      // Update nowServing
       const remaining = customers.filter(c => !selected.includes(c.id));
       if (remaining.length > 0) {
         const sorted = remaining.sort((a, b) => a.tokenNumber - b.tokenNumber);
@@ -348,7 +336,7 @@ const Servicing = (props) => {
       fetchQueueData(queueId, categoryid);
       showToast('success', 'Recovered', `Token ${record.tokenNumber} recovered!`);
     } catch (error) {
-      console.error('Recover error:', error);
+      
       showToast('error', 'Recover Failed', error.message || 'Could not recover token');
     }
   };
@@ -461,7 +449,7 @@ const Servicing = (props) => {
               Completed History (Served Today) - {completedHistory.length}
             </Text>
 
-            {/* Always show the most recent (latest) served token */}
+            {}
             {completedHistory[0] && (
               <View style={styles.historyItem}>
                 <Text style={styles.historyToken}>
@@ -478,7 +466,7 @@ const Servicing = (props) => {
               </View>
             )}
 
-            {/* Expandable "More..." section */}
+            {}
             {completedHistory.length > 1 && (
               <View>
                 <TouchableOpacity
@@ -486,15 +474,15 @@ const Servicing = (props) => {
                   style={styles.moreButton}
                 >
                   <Text style={styles.moreText}>
-                    {showMore ? 'Hide' : 'More…'} ({completedHistory.length - 1} previous)
+                    {showMore ? 'Hide' : 'Moreâ€¦'} ({completedHistory.length - 1} previous)
                   </Text>
                 </TouchableOpacity>
 
-                {/* Show older tokens when expanded */}
+                {}
                 {showMore && (
                   <View style={styles.expandedHistory}>
                     <FlatList
-                      data={completedHistory.slice(1)} // All except the latest
+                      data={completedHistory.slice(1)}
                       keyExtractor={item => item.id.toString()}
                       scrollEnabled={false}
                       renderItem={({ item }) => (

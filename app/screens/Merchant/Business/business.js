@@ -27,7 +27,6 @@ const Business = () => {
       setBusinesses(list);
 
 
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -65,28 +64,24 @@ const Business = () => {
   };
 
 
-
   const handleStatusToggle = async (item) => {
     const currentIsActive = item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true;
     const newStatus = currentIsActive ? 0 : 1;
 
-    // Immediate local update
     setBusinesses(prev => prev.map(b => b.id === item.id ? { ...b, isActive: newStatus, status: newStatus } : b));
 
     try {
-      // Send only necessary data to avoid potential backend payload issues
       const updatePayload = {
         businessName: item.businessName,
         businessRegistrationNumber: item.businessRegistrationNumber || "BR12345",
         businessAddress: item.businessAddress,
         businessPhoneNumber: item.businessPhoneNumber,
         isActive: newStatus,
-        status: newStatus // Support both field names for backend compatibility
+        status: newStatus
       };
 
       await updateBusiness(item.id, updatePayload);
 
-      // Sync the app-wide branch dropdown
       await refreshBranches();
 
       Toast.show({
@@ -95,7 +90,6 @@ const Business = () => {
         text2: `Branch is now ${newStatus === 1 ? 'Active' : 'Inactive'}`,
       });
     } catch (err) {
-      // Revert if failed
       setBusinesses(prev => prev.map(b => b.id === item.id ? { ...b, isActive: item.isActive } : b));
       Toast.show({
         type: 'error',
@@ -227,10 +221,6 @@ const Business = () => {
 
   const ListHeader = () => (
     <></>
-    // <View style={styles.header}>
-    //   <Text style={styles.headerTitle}>My Businesses</Text>
-    //   <Text style={styles.headerSubtitle}>Manage your branches and shops</Text>
-    // </View>
   );
 
   return (
@@ -268,7 +258,7 @@ const Business = () => {
         )}
       </View>
 
-      {/* Floating Action Button */}
+      {}
       <TouchableOpacity style={styles.fab} onPress={handleAddBranch}>
         <Icon name="plus" type="feather" size={28} color={colors.white} />
       </TouchableOpacity>
@@ -315,7 +305,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   card: {
-    backgroundColor: colors.inputBackgroundColor, // Using a darker card bg
+    backgroundColor: colors.inputBackgroundColor,
     borderRadius: 16,
     padding: 8,
     marginBottom: 16,
@@ -331,7 +321,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: 'rgba(255, 106, 0, 0.15)', // Primary color with opacity
+    backgroundColor: 'rgba(255, 106, 0, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -360,7 +350,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   infoText: {
-    color: colors.lightWhite, // Use a lighter gray
+    color: colors.lightWhite,
     fontSize: 13,
   },
   cardFooter: {
@@ -381,7 +371,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 50, // Increased to avoid navigation bar overlap
+    bottom: 50,
     right: 24,
     width: 56,
     height: 56,
@@ -394,7 +384,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
-    zIndex: 999, // Ensure it sits on top of other content
+    zIndex: 999,
   },
 });
 

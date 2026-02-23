@@ -14,10 +14,10 @@ import { getCategories } from '../../services/apiService';
 
 const Categories = (props) => {
   const [categories, setCategories] = useState([]);
-  const [allCategories, setAllCategories] = useState([]); // Store all categories for filtering
+  const [allCategories, setAllCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(''); // State for search input
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchCategories();
@@ -28,16 +28,15 @@ const Categories = (props) => {
       const data = await getCategories();
 
       setCategories(data.data || []);
-      setAllCategories(data.data || []); // Store all categories initially
+      setAllCategories(data.data || []);
     } catch (err) {
       setError(err.message);
-      utility.ToastNotification(err.message); // Show error via toast
+      utility.ToastNotification(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle search input change
   const handleSearch = (text) => {
     setSearchQuery(text);
     if (text) {
@@ -46,7 +45,7 @@ const Categories = (props) => {
       );
       setCategories(filteredCategories);
     } else {
-      setCategories(allCategories); // Reset to all categories if search is empty
+      setCategories(allCategories);
     }
   };
 
@@ -91,7 +90,6 @@ const Categories = (props) => {
               <TouchableOpacity
                 key={category.id}
                 style={s.CategoriesOption}
-                // onPress={() => onPressCategories(category)}
               >
                 <TextView
                   text={category?.name || ''}

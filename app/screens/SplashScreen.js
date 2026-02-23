@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context'; // CORRECT IMPORT
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { connect } from 'react-redux';
 import { colors } from '../styles';
 import AppStyles from '../styles/AppStyles';
@@ -8,7 +8,7 @@ import { setupToken } from '../utils/authTokenHelpers';
 import { getAuthUser } from '../utils/localStorageHelpers';
 import { setCurrentUser } from './../actions/authActions';
 import { getDisplayName } from '../global/Helpers';
-import SvgIcon from 'react-native-svg'; // or your correct SVG component
+import SvgIcon from 'react-native-svg';
 import svgs from '../assets/svg';
 
 function SplashScreen({ navigation, setCurrentUser }) {
@@ -19,7 +19,7 @@ function SplashScreen({ navigation, setCurrentUser }) {
 const init = async () => {
   try {
     const token = await setupToken();
-    let targetScreen = 'Login'; // default
+    let targetScreen = 'Login';
 
     if (token) {
       const userDetails = await getAuthUser();
@@ -39,7 +39,6 @@ const init = async () => {
         } else if (userDetails.onboardingRequired) {
           targetScreen = 'Onboarding';
         } else {
-          // User is fully logged in → go to main app
           setTimeout(() => {
             navigation.reset({
               index: 0,
@@ -51,7 +50,6 @@ const init = async () => {
       }
     }
 
-    // For all auth-related screens: go through Auth navigator
     setTimeout(() => {
       navigation.reset({
         index: 0,

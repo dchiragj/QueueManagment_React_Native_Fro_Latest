@@ -70,37 +70,31 @@ const Login = (props) => {
         position: 'top',
       });
 
-      // Update token in BranchContext
       const user = await getAuthUser();
       if (user?.token) {
         setToken(user.token);
       }
 
 
-      // Get FCM Token and save it
       try {
-        // Step 1: Request notification permission (required on Android 13+)
         const authStatus = await messaging().requestPermission();
         const enabled =
           authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
           authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
         if (enabled) {
-          // Step 2: Now get the FCM token
           const fcmToken = await messaging().getToken();
 
           if (fcmToken) {
-            await saveFcmToken(fcmToken);  // Your API call to save token on server
+            await saveFcmToken(fcmToken);
           }
         } else {
-          console.log('User denied notification permission');
+          
         }
       } catch (error) {
-        console.warn('FCM Token error (not critical):', error.message || error);
-        // App will continue working even if token fails – user experience stays smooth
+        
       }
 
-      // Finally navigate to main app
       props.navigation.navigate("MainApp");
     }
   };
@@ -125,7 +119,7 @@ const Login = (props) => {
 
         <FormGroup style={[AppStyles.formContainer, s.fromGroup]}>
 
-          {/* Email Input with Icon */}
+          {}
           <Validation error={resError.username}>
             <View style={s.inputContainer}>
               <Ionicons name="mail" size={24} color={colors.primary} style={s.iconLeft} />
@@ -142,7 +136,7 @@ const Login = (props) => {
             </View>
           </Validation>
 
-          {/* Password Input with Icons */}
+          {}
           <Validation error={resError.password}>
             <View style={s.inputContainer}>
               <Ionicons name="lock-closed" size={24} color={colors.primary} style={s.iconLeft} />
@@ -188,7 +182,7 @@ const Login = (props) => {
         />
 
         <View style={s.footerMain}>
-          <TextView color={colors.white} text="Don’t have an Account? " type="body-one" />
+          <TextView color={colors.white} text="Donâ€™t have an Account? " type="body-one" />
           <TextView
             color={colors.primary}
             isClickableLink={true}

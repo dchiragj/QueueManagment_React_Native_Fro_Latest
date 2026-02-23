@@ -12,12 +12,7 @@ const BackgroundContainer = ({ children, isStatusBar = true, isBrandText = true,
     {isStatusBar && <StatusBar translucent backgroundColor={colors.transparent} barStyle='light-content' />}
     <ImageBackground style={s.imageStyle} source={images['splashBackground']}>
       <View style={s.backDrop}></View>
-      {/* {isBrandText && (
-        <Text style={s.brandText}>
-          <TextView text={'ki.co'} type={'body-head'} />
-          <TextView text={' MARKETING'} type={'caption'} />
-        </Text>
-      )} */}
+      {}
       {children}
     </ImageBackground>
   </SafeAreaView>

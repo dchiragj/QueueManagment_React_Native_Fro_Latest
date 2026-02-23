@@ -12,7 +12,7 @@ import { connect } from 'react-redux';
 import { DrawerItemList } from '@react-navigation/drawer';
 import screens from '../constants/screens';
 import { logout } from '../services/authService';
-import { useBranch } from '../context/BranchContext'; // Import useBranch
+import { useBranch } from '../context/BranchContext';
 import { colors } from '../styles';
 import { indent } from '../styles/dimensions';
 import { Touchable } from './Button';
@@ -31,12 +31,11 @@ function DrawerDesignComponent(props) {
   const deleteScaleAnim = useRef(new Animated.Value(0)).current;
 
   const role = props.auth.user?.role;
-  const { activeBranches, selectedBranchId, changeBranch, setToken } = useBranch(); // Consume context
+  const { activeBranches, selectedBranchId, changeBranch, setToken } = useBranch();
   const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
 
   const { state } = props;
 
-  // Fallback if state is not yet available
   if (!state || !state.routes) {
     return null;
   }
@@ -44,13 +43,12 @@ function DrawerDesignComponent(props) {
   const allowedRouteNames =
     role === 'customer'
       ? [screens.HomeRoot, screens.MyTokenRoot, screens.CompletedTokenRoot, screens.SettingsRoot]
-      : state.routes.map(r => r.name); // merchant = all
+      : state.routes.map(r => r.name);
 
   const filteredRoutes = state.routes.filter(route =>
     allowedRouteNames.includes(route.name)
   );
 
-  // Recalculate index for the filtered routes to avoid "key of undefined" crashes
   const focusedRoute = state.routes[state.index];
   const newIndex = filteredRoutes.findIndex(r => r.key === focusedRoute?.key);
 
@@ -126,7 +124,7 @@ function DrawerDesignComponent(props) {
       <SafeAreaView style={[AppStyles.root]}>
         <View style={s.bordertop} />
 
-        {/* BRANCH SELECTOR */}
+        {}
         <View style={s.branchSelectorContainer}>
           <Touchable
             style={s.branchSelectorHeader}
@@ -153,7 +151,7 @@ function DrawerDesignComponent(props) {
               <Icon
                 name={isBranchDropdownOpen ? 'chevron-up' : 'chevron-down'}
                 size={20}
-                color={colors.white} // White icon
+                color={colors.white}
               />
             )}
           </Touchable>
@@ -196,17 +194,17 @@ function DrawerDesignComponent(props) {
         </View>
 
         <ScrollView contentContainerStyle={s.container}>
-          {/* ROLE FILTERED DRAWER LIST */}
+          {}
           <DrawerItemList
             {...props}
             state={filteredState}
           />
         </ScrollView>
 
-        {/* BOTTOM BUTTONS CONTAINER */}
+        {}
         <View style={s.bottomButtonsContainer}>
           <View style={s.borderBottom} />
-          {/* SIGN OUT */}
+          {}
           <Touchable style={s.signOutMain} onPress={showLogoutModal}>
             <Icon name="log-out" color={colors.primary} size={22} />
             <TextView
@@ -217,7 +215,7 @@ function DrawerDesignComponent(props) {
             />
           </Touchable>
 
-          {/* DELETE ACCOUNT */}
+          {}
           <Touchable style={s.deleteAccountMain} onPress={showDeleteModal}>
             <Icon name="trash-2" color={colors.red} size={22} />
             <TextView
@@ -230,7 +228,7 @@ function DrawerDesignComponent(props) {
         </View>
       </SafeAreaView>
 
-      {/* LOGOUT MODAL */}
+      {}
       {logoutVisible && (
         <View style={s.overlay}>
           <Animated.View
@@ -257,7 +255,7 @@ function DrawerDesignComponent(props) {
         </View>
       )}
 
-      {/* DELETE ACCOUNT MODAL */}
+      {}
       {deleteVisible && (
         <View style={s.overlay}>
           <Animated.View
@@ -303,15 +301,15 @@ const s = StyleSheet.create({
     paddingHorizontal: scale(indent),
     paddingTop: verticalScale(indent),
     borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(255,255,255,0.1)', // Lighter border
+    borderBottomColor: 'rgba(255,255,255,0.1)',
     paddingBottom: verticalScale(10),
   },
   branchSelectorHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: verticalScale(10), // More padding
-    backgroundColor: 'rgba(255,255,255,0.05)', // Slight background
+    paddingVertical: verticalScale(10),
+    backgroundColor: 'rgba(255,255,255,0.05)',
     paddingHorizontal: scale(10),
     borderRadius: 8,
   },
@@ -323,11 +321,11 @@ const s = StyleSheet.create({
   branchName: {
     marginLeft: scale(10),
     fontWeight: '600',
-    color: colors.white, // Ensure white text
+    color: colors.white,
   },
   branchDropdown: {
     marginTop: verticalScale(5),
-    backgroundColor: '#1E2235', // Darker background for dropdown
+    backgroundColor: '#1E2235',
     borderRadius: 8,
     padding: scale(5),
     borderWidth: 1,
@@ -344,10 +342,10 @@ const s = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.05)',
   },
   selectedBranchItem: {
-    backgroundColor: 'rgba(255, 106, 0, 0.2)', // More visible selection
+    backgroundColor: 'rgba(255, 106, 0, 0.2)',
   },
   container: {
-    marginTop: verticalScale(10) // Reduced margin since we added specific Branch Selector section
+    marginTop: verticalScale(10)
   },
   signOutMain: {
     flexDirection: 'row',

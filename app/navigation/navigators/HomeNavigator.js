@@ -1,4 +1,3 @@
-// app/navigation/stacks/HomeStack.tsx
 
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';

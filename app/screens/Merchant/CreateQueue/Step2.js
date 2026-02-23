@@ -26,7 +26,7 @@ const Step2 = (props) => {
   return (
     <SafeAreaView style={[AppStyles.root]}>
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
-        <TextView text={'Desk’s Details'} type={'body-one'} isTextColorWhite={true} style={[AppStyles.titleStyle]} />
+        <TextView text={'Deskâ€™s Details'} type={'body-one'} isTextColorWhite={true} style={[AppStyles.titleStyle]} />
         <View style={s.inputBtnWrapper}>
           <View>
             <View style={s.Wrapper}>

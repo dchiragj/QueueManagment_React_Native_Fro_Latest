@@ -8,7 +8,7 @@ import colors from '../../../styles/colors';
 import Icon from '../../../components/Icon';
 import { getDeskList, deleteDesk, updateDesk } from '../../../services/apiService';
 import screens from '../../../constants/screens';
-import { useBranch } from '../../../context/BranchContext'; // Import context
+import { useBranch } from '../../../context/BranchContext';
 
 const DeskList = () => {
     const navigation = useNavigation();
@@ -16,7 +16,7 @@ const DeskList = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
-    const { selectedBranchId } = useBranch(); // Consume context
+    const { selectedBranchId } = useBranch();
 
     const fetchDesks = async () => {
         try {
@@ -38,7 +38,7 @@ const DeskList = () => {
     useFocusEffect(
         useCallback(() => {
             fetchDesks();
-        }, [selectedBranchId]) // Add dependency
+        }, [selectedBranchId])
     );
 
     const onRefresh = () => {
@@ -72,11 +72,9 @@ const DeskList = () => {
         const currentIsActive = item?.isActive == 1 || item?.status == 1 || item?.isActive === true || item?.status === true;
         const newStatus = currentIsActive ? 0 : 1;
 
-        // Immediate local update
         setDesks(prev => prev.map(d => d.id === item.id ? { ...d, isActive: newStatus, status: newStatus } : d));
 
         try {
-            // Send only required fields for update to avoid backend rejections
             const payload = {
                 id: item.id,
                 name: item.name,
@@ -87,9 +85,7 @@ const DeskList = () => {
             };
 
             await updateDesk(item.id, payload);
-            // fetchDesks(); // Sync with DB if needed
         } catch (err) {
-            // Revert
             setDesks(prev => prev.map(d => d.id === item.id ? { ...d, isActive: item.isActive } : d));
             Alert.alert("Error", err.message);
         }
@@ -279,7 +275,7 @@ const styles = StyleSheet.create({
     },
     fab: {
         position: 'absolute',
-        bottom: 50, // Increased to avoid navigation bar overlap
+        bottom: 50,
         right: 24,
         width: 56,
         height: 56,
@@ -292,7 +288,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 4.65,
-        zIndex: 999, // Ensure it sit
+        zIndex: 999,
     },
 });
 

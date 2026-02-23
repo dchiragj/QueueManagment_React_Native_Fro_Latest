@@ -54,7 +54,6 @@ const Button = ({
           type={'button-text'}
           text={ButtonText}
           isTextColorWhite={true}
-          // isUpperCaseText={true}
           style={[textStyle, disabled && s.disabledTextStyle]}
         />
         {isIconRight && (
@@ -74,11 +73,8 @@ const Button = ({
 
 const s = StyleSheet.create({
   fullWidthButton: {
-    // backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center'
-    //paddingVertical: indent,
-    // borderRadius: 12
   },
   animationButton: {
     width: '100%'

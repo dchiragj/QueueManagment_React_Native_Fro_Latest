@@ -15,7 +15,6 @@ import { logout } from '../../../services/authService';
 import Loading from '../../../components/Loading';
 import { Button } from '../../../components/Button';
 import { getBaseUrl } from '../../../global/Environment';
-// import Animated from 'react-native-reanimated';
 
 const Profile = (props) => {
   const { user } = props?.auth;
@@ -27,10 +26,6 @@ const Profile = (props) => {
       source: screens.Profile
     });
   };
-  // const onSignOut = async () => {
-  //   await props.logout();
-  //   props.navigation.navigate('Auth', { screen: screens.Login });
-  // };
   const onSignOut = () => {
     setLogoutVisible(true);
     Animated.spring(scaleAnim, {
@@ -85,14 +80,8 @@ const Profile = (props) => {
             style={[s.profileInfo]}
           />
         </View>
-        {/* <View style={[s.profileGenderWrapper]}>
-          <Icon name='transgender' color={colors.primary} isFeather={false} style={s.genderLogo} />
-          <TextView style={s.locationText} color={colors.white} text={user?.gander} type={'body'} />
-        </View> */}
-        {/* <View style={s.locationWrapper}>
-          <Icon style={s.genderLogo} name='md-location' color={colors.primary} isFeather={false} />
-          <TextView style={s.locationText} color={colors.white} text={user?.address} type={'body'} />
-        </View> */}
+        {}
+        {}
         <View style={s.mailWrapper}>
           <Icon color={colors.primary} name='transgender' isFeather={false} />
           <TextView
@@ -122,21 +111,14 @@ const Profile = (props) => {
             text={user.email}
             type={'body'}
           />
-          {/* <Icon color={colors.green} name='md-shield-checkmark-sharp' isFeather={false} /> */}
+          {}
         </View>
         <View style={s.mailWrapper}>
           <Icon name='call' color={colors.primary} isFeather={false} />
           <TextView style={s.mailTextStyle} color={colors.lightWhite} text={user.mobileNumber} type={'body'} />
           <TextView color={colors.green} text={'verify'} type={'body'} />
         </View>
-        {/* <TextView
-          isClickableLink={true}
-          color={colors.primary}
-          text={'Sign Out'}
-          type={'body-head'}
-          style={[s.signOut]}
-          onPress={onSignOut}
-        /> */}
+        {}
         <View style={s.buttonRow}>
           <Button
             onPress={onPressEdit}
@@ -252,7 +234,6 @@ const s = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: borderRadius,
     paddingVertical: verticalScale(14),
-    // width: 'auto',
     paddingHorizontal: scale(20),
   },
   editBtnText: {

@@ -46,7 +46,7 @@ const TextView = ({
       if (supported) {
         Linking.openURL(url);
       } else {
-        alert("Don't know how to open URI");
+        
       }
     });
   };
@@ -109,7 +109,6 @@ const s = StyleSheet.create({
   },
   buttonText: {
     ...Typography.body
-    // fontFamily: 'GothamBold'
   },
   numberText: {
     fontFamily: 'GothamBooks',

@@ -5,7 +5,6 @@ import AppStyles from '../../../styles/AppStyles';
 import { borderRadius, indent } from '../../../styles/dimensions'
 import { View, SafeAreaView, StyleSheet, ScrollView } from 'react-native';
 import { verticalScale, scale } from 'react-native-size-matters';
-// import SvgIcon from 'react-native-svg-icon/lib/components/SvgIcon';
 import svgs from '../../../assets/svg';
 import React, { useState } from 'react';
 import Modal from 'react-native-modalbox';
@@ -66,21 +65,21 @@ const GenerateToken = () => {
           <Touchable style={s.tokenOption}>
             <TextView style={s.tokenNumberText} text={'98'} type={'header'} color={colors.white} />
             <View style={s.tokenLogoMain}>
-              {/* <SvgIcon svgs={svgs} name={'bag-loss'} fill={colors.primary} width={20} height={22} style={s.tokenLogo} /> */}
+              {}
               <TextView color={colors.white} text={'Available Tokens'} type={'body-one'} style={s.tokenText} />
             </View>
           </Touchable>
           <Touchable style={s.tokenOption}>
             <TextView style={s.tokenNumberText} text={'150'} type={'header'} color={colors.white} />
             <View style={s.tokenLogoMain}>
-              {/* <SvgIcon svgs={svgs} name={'bag-logo'} fill={colors.primary} width={20} height={22} style={s.tokenLogo} /> */}
+              {}
               <TextView color={colors.white} text={'Total Token'} type={'body-one'} style={s.tokenText} />
             </View>
           </Touchable>
           <Touchable style={s.tokenOption}>
             <TextView style={s.tokenNumberText} text={'52'} type={'header'} color={colors.white} />
             <View style={s.tokenLogoMain}>
-              {/* <SvgIcon svgs={svgs} name={'bag-plus'} fill={colors.primary} width={20} height={22} style={s.tokenLogo} /> */}
+              {}
               <TextView color={colors.white} text={'Next Token'} type={'body-one'} style={s.tokenText} />
             </View>
           </Touchable>
@@ -178,7 +177,7 @@ const GenerateToken = () => {
           animationStyle={s.btn}
         />
       </ScrollableAvoidKeyboard>
-      {/* selectProblemModal */}
+      {}
       <Modal
         style={[AppStyles.modal, s.modal]}
         isOpen={isProblemModal}
@@ -192,7 +191,7 @@ const GenerateToken = () => {
         onClosed={closeSelectProblemModal}>
         <TokenProblemModal onClosed={closeSelectProblemModal} />
       </Modal>
-      {/* TokenSummaryModal */}
+      {}
       <Modal
         style={AppStyles.modal}
         isOpen={isTokenSummaryModal}

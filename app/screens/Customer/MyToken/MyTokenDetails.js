@@ -8,7 +8,6 @@ import TextView from '../../../components/TextView/TextView';
 import Icon from '../../../components/Icon';
 import { verticalScale, scale } from 'react-native-size-matters';
 import { borderRadius } from '../../../styles/dimensions';
-// import SvgIcon from 'react-native-svg-icon/lib/components/SvgIcon';
 import svgs from '../../../assets/svg';
 import Modal from 'react-native-modalbox';
 import React, { useState } from 'react';
@@ -56,14 +55,14 @@ const MyTokenDetails = () => {
           <Touchable style={s.tokenOption}>
             <TextView style={s.tokenNumberText} text={'52'} type={'header'} color={colors.white} />
             <View style={s.tokenLogoMain}>
-              {/* <SvgIcon svgs={svgs} name={'bag-plus'} fill={colors.primary} width={20} height={22} style={s.tokenLogo} /> */}
+              {}
               <TextView color={colors.lightWhite} text={'My Token'} type={'body-one'} style={s.tokenText} />
             </View>
           </Touchable>
           <Touchable style={s.tokenOption}>
             <TextView style={s.tokenNumberText} text={'19'} type={'header'} color={colors.white} />
             <View style={s.tokenLogoMain}>
-              {/* <SvgIcon svgs={svgs} name={'bag-true'} fill={colors.primary} width={20} height={22} style={s.tokenLogo} /> */}
+              {}
               <TextView color={colors.lightWhite} text={'Currently Serving'} type={'body-one'} style={s.tokenText} />
             </View>
           </Touchable>
@@ -71,7 +70,7 @@ const MyTokenDetails = () => {
         <Touchable style={s.timeWrapper} onPress={openTokenCompletedModal}>
           <TextView color={colors.primary} text={'17 : 30 : 56'} type={'header'} style={s.tokenText} />
           <View style={s.timeTextWrapper}>
-            {/* <SvgIcon svgs={svgs} name={'bag-handle'} fill={colors.primary} width={20} height={22} style={s.tokenLogo} /> */}
+            {}
             <TextView color={colors.lightWhite} text={'Expected Time'} type={'body-one'} />
           </View>
         </Touchable>
@@ -79,14 +78,14 @@ const MyTokenDetails = () => {
           <Touchable style={s.tokenOption}>
             <TextView style={s.tokenNumberText} text={'150'} type={'header'} color={colors.white} />
             <View style={s.tokenLogoMain}>
-              {/* <SvgIcon svgs={svgs} name={'bag-logo'} fill={colors.primary} width={20} height={22} style={s.tokenLogo} /> */}
+              {}
               <TextView color={colors.lightWhite} text={'Total Token'} type={'body-one'} style={s.tokenText} />
             </View>
           </Touchable>
           <Touchable style={s.tokenOption}>
             <TextView style={s.tokenNumberText} text={'98'} type={'header'} color={colors.white} />
             <View style={s.tokenLogoMain}>
-              {/* <SvgIcon svgs={svgs} name={'bag-loss'} fill={colors.primary} width={20} height={22} style={s.tokenLogo} /> */}
+              {}
               <TextView color={colors.lightWhite} text={'Available Tokens'} type={'body-one'} style={s.tokenText} />
             </View>
           </Touchable>

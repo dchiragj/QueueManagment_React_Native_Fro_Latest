@@ -1,7 +1,6 @@
 import Card from'../../../components/Card';
 import TextView from '../../../components/TextView/TextView';
 import  colors  from '../../../styles/colors';
-// import SvgIcon from 'react-native-svg-icon/lib/components/SvgIcon';
 import svgs from '../../../assets/svg';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -13,7 +12,7 @@ const CustomerQueueListItem = (props) => {
     <Card style={s.wrapper} onPress={props.onPress}>
       <View style={s.mainWrapper}>
         <View>
-          {/* <SvgIcon svgs={svgs} name={'card-logo'} fill={colors.primary} width={50} height={50} /> */}
+          {}
         </View>
         <View>
           <TextView color={colors.white} text={'Kiran Hospital'} type={'body-one '} />
@@ -21,7 +20,7 @@ const CustomerQueueListItem = (props) => {
           <TextView color={colors.lightWhite} text={'General Surgery'} type={'body-one '} />
         </View>
         <View>
-          {/* <SvgIcon svgs={svgs} name={'bag-qeuelist'} fill={colors.primary} width={24} height={26} /> */}
+          {}
           <TextView color={colors.white} text={'Join'} type={'body-one'} />
         </View>
       </View>

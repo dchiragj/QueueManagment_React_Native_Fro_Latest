@@ -1,9 +1,8 @@
-// components/CheckBox.js  અથવા CheckBox.tsx
 
 import React from 'react';
 import ReactCheckbox from 'react-native-check-box';
-import PropTypes from 'prop-types';           // આ નવું છે
-import { StyleProp, ViewStyle } from 'react-native';  // આ નવું છે
+import PropTypes from 'prop-types';
+import { StyleProp, ViewStyle } from 'react-native';
 import { colors } from '../styles';
 import Icon from './Icon';
 
@@ -29,7 +28,6 @@ const CheckBox = ({
   />
 );
 
-// નવા PropTypes – 2025 style
 CheckBox.propTypes = {
   onClick: PropTypes.func.isRequired,
   isChecked: PropTypes.bool.isRequired,
@@ -42,7 +40,6 @@ CheckBox.propTypes = {
   ]),
 };
 
-// TypeScript માટે (જો તમે .tsx કરો તો)
 CheckBox.defaultProps = {
   leftView: null,
   leftText: '',

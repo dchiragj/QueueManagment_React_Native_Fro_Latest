@@ -1,207 +1,3 @@
-// import React from 'react';
-// import { View, Text, SafeAreaView, StyleSheet, TextInput } from 'react-native';
-// import NavigationOptions from '../../../components/NavigationOptions';
-// import  colors  from '../../../styles/colors';
-// import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard' ;
-// import AppStyles from '../../../styles/AppStyles';
-// import TextView from '../../../components/TextView/TextView';
-// import FormGroup from '../../../components/FormGroup';
-// import Input from '../../../components/Input';
-// import { verticalScale, scale } from 'react-native-size-matters';
-// import Picker from '@app/app/components/Picker';
-// import { QueueCategory, Desks } from '@app/app/data/raw';
-// import DatePicker from '../../../components/DatePicker';
-// import { borderRadius } from '../../../styles/dimensions';
-// import { Button } from '../../../components/Button';
-// import screens from '../../constants/screens';
-// const Step1 = (props) => {
-//   const onPressStep2 = () => {
-//     props.navigation.navigate(screens.Step2);
-//   };
-//   return (
-//     <SafeAreaView style={AppStyles.root}>
-//       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
-//         <TextView text={'Queue Details'} type={'body-one'} isTextColorWhite={true} style={[AppStyles.titleStyle]} />
-//         <FormGroup style={[AppStyles.formContainer, s.firstFormWrapper]}>
-//           <Input returnKeyType={'next'} placeholder='Enter Queue Name' isIconLeft={true} leftIconName={'create'} />
-//         </FormGroup>
-//         <FormGroup>
-//           <Picker
-//             label={null}
-//             isPlaceholderItem={true}
-//             containerStyle={s.fullborderBox}
-//             data={QueueCategory}
-//             itemKeyField={'value'}
-//             itemValueField={'text'}
-//             isLeftIcon={true}
-//             leftIconName={'search'}
-//           />
-//         </FormGroup>
-//         <View style={s.topBorder} />
-//         <View style={s.dateWrapper}>
-//           <TextView
-//             style={s.dateTextHeader}
-//             text={'Queue Time Period Start To End'}
-//             type={'body-one'}
-//             isTextColorWhite={true}
-//           />
-//           <View style={s.DatePickerWrapper}>
-//             <DatePicker style={s.DatePicker} containerStyle={s.containerStyle} />
-//             <DatePicker style={s.DatePicker} containerStyle={s.containerStyle} />
-//           </View>
-//         </View>
-//         <View style={s.topBorder} />
-//         <View style={s.tokenWrapper}>
-//           <View style={s.tokenOption}>
-//             <TextView
-//               style={s.tokenNumberText}
-//               text={'Token starts with 01 to'}
-//               type={'body-one'}
-//               color={colors.white}
-//             />
-//             <Input returnKeyType={'next'} placeholder='50' wrapperStyle={s.wrapperStyle} style={s.inputPlaceholder} />
-//           </View>
-//           <View style={s.tokenOption}>
-//             <TextView style={s.tokenNumberText} text={'Choose No Of Desks'} type={'body-one'} color={colors.white} />
-//             <Picker
-//               label={null}
-//               isPlaceholderItem={true}
-//               containerStyle={s.secondPickerContainerStyle}
-//               data={Desks}
-//               itemKeyField={'value'}
-//               itemValueField={'text'}
-//             />
-//           </View>
-//         </View>
-//         <View style={s.topBorder} />
-//         <TextView style={s.locationHeader} text={'Add Queue Location'} type={'body-one'} isTextColorWhite={true} />
-//         <Input
-//           returnKeyType={'next'}
-//           placeholder='Enter Address'
-//           isIconLeft={true}
-//           leftIconName={'location'}
-//           isIconRight={true}
-//           rightIconName={'locate'}
-//           style={s.addressInput}
-//           wrapperStyle={s.addressInputWrapperStyle}
-//         />
-//         <View style={s.topBorder} />
-//         <Input
-//           returnKeyType={'done'}
-//           placeholder='Queue Description'
-//           isIconLeft={true}
-//           leftIconName={'create'}
-//           multiline={true}
-//           numberOfLines={5}
-//           style={s.queueInput}
-//           iconStyle={s.iconInput}
-//           wrapperStyle={[s.addressInputWrapperStyle]}
-//         />
-//         <Button
-//           ButtonText='Next'
-//           style={[s.btn, AppStyles.btnStyle]}
-//           animationStyle={[s.btn, AppStyles.btnStyle]}
-//           isIconRight={true}
-//           rightIconName={'arrow-forward'}
-//           onPress={onPressStep2}
-//         />
-//       </ScrollableAvoidKeyboard>
-//     </SafeAreaView>
-//   );
-// };
-// Step1.navigationOptions = ({ navigation }) => {
-//   return NavigationOptions({
-//     title: '',
-//     isBack: true,
-//     navigation: navigation,
-//     headerStyle: { elevation: 0 }
-//   });
-// };
-// const s = StyleSheet.create({
-//   firstFormWrapper: {
-//     marginTop: verticalScale(30)
-//   },
-//   topBorder: {
-//     borderWidth: 0.5,
-//     borderColor: colors.lightWhite,
-//     marginTop: scale(30),
-//     marginHorizontal: scale(15)
-//   },
-//   dateWrapper: {
-//     marginTop: verticalScale(30)
-//   },
-//   dateTextHeader: {
-//     textAlign: 'center'
-//   },
-//   DatePickerWrapper: {
-//     flexDirection: 'row',
-//     marginTop: verticalScale(15),
-//     justifyContent: 'space-around'
-//   },
-//   DatePicker: {
-//     marginRight: scale(120)
-//   },
-//   containerStyle: {
-//     marginLeft: scale(5)
-//   },
-//   tokenWrapper: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-around',
-//     marginTop: verticalScale(20),
-//     justifyContent: 'center',
-//     borderRadius: borderRadius
-//   },
-//   tokenOption: {
-//     width: '45%',
-//     paddingHorizontal: scale(20),
-//     marginTop: verticalScale(10),
-//     marginHorizontal: scale(5),
-//     borderWidth: 1,
-//     borderColor: colors.white,
-//     borderRadius: borderRadius
-//   },
-//   tokenNumberText: {
-//     marginTop: verticalScale(7),
-//     textAlign: 'center'
-//   },
-//   wrapperStyle: {
-//     marginTop: verticalScale(10),
-//     marginHorizontal: scale(25)
-//   },
-//   inputPlaceholder: {
-//     textAlign: 'center',
-//     color: colors.white
-//   },
-//   secondPickerContainerStyle: {
-//     marginTop: verticalScale(10),
-//     marginLeft: scale(-7)
-//   },
-//   locationHeader: {
-//     textAlign: 'center',
-//     marginTop: verticalScale(30)
-//   },
-//   addressInput: {
-//     color: colors.white
-//   },
-//   addressInputWrapperStyle: {
-//     marginVertical: verticalScale(30)
-//   },
-//   queueInput: {
-//     color: colors.white,
-//     textAlignVertical: 'top'
-//   },
-//   iconInput: {
-//     alignSelf: 'flex-start',
-//     paddingTop: 10
-//   },
-//   btn: {
-//     marginTop: verticalScale(50),
-//     marginBottom: verticalScale(40)
-//   }
-// });
-// export default Step1;
-// screens/Step1.js
-// screens/Step1.js
 import TextView from '../../../components/TextView/TextView';
 import colors from '../../../styles/colors';
 import React, { useEffect, useState } from 'react';
@@ -216,7 +12,6 @@ import {
   Text,
   ActivityIndicator,
 } from 'react-native';
-// import NavigationOptions from '../../../components/NavigationOptions';
 import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
 import AppStyles from '../../../styles/AppStyles';
 import FormGroup from '../../../components/FormGroup';
@@ -230,13 +25,13 @@ import { createQueue, getCategories, getQueueList, getDesksByCategory, getBusine
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Geolocation from 'react-native-geolocation-service';
 import Toast from 'react-native-toast-message';
-import { useBranch } from '../../../context/BranchContext'; // Import useBranch
+import { useBranch } from '../../../context/BranchContext';
 
 const Step1 = ({ navigation }) => {
-  const { selectedBranchId } = useBranch(); // Get selected branch
+  const { selectedBranchId } = useBranch();
   const [formData, setFormData] = useState({
     category: '',
-    businessId: selectedBranchId !== 'all' ? selectedBranchId : '', // Set initial businessId
+    businessId: selectedBranchId !== 'all' ? selectedBranchId : '',
     name: '',
     description: '',
     start_date: new Date(),
@@ -245,7 +40,7 @@ const Step1 = ({ navigation }) => {
     end_number: 50,
     address: '',
     deskDetails: [],
-    selectedDesks: [], // Array of selected desk IDs
+    selectedDesks: [],
     joinMethods: '',
     latitude: 0,
     longitude: 0,
@@ -261,7 +56,6 @@ const Step1 = ({ navigation }) => {
   const [errorMessages, setErrorMassages] = useState('')
   const [isDayQueue, setIsDayQueue] = useState(0);
 
-  // Update businessId if selectedBranchId changes
   useEffect(() => {
     if (selectedBranchId && selectedBranchId !== 'all') {
       setFormData(prev => ({ ...prev, businessId: selectedBranchId }));
@@ -302,7 +96,6 @@ const Step1 = ({ navigation }) => {
       return false;
     }
 
-    // businessId is now optional - removed validation
 
     if (!formData.description.trim()) {
       Toast.show({
@@ -374,16 +167,6 @@ const Step1 = ({ navigation }) => {
       return false;
     }
 
-    // desk selection is now optional for single merchant mode
-    // if (!formData.selectedDesks || formData.selectedDesks.length === 0) {
-    //   Toast.show({
-    //     type: 'error',
-    //     text1: 'Validation Error',
-    //     text2: 'Please select at least one desk',
-    //     position: 'top',
-    //   });
-    //   return false;
-    // }
 
     return true;
   };
@@ -404,7 +187,7 @@ const Step1 = ({ navigation }) => {
       );
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
-      console.warn(err);
+      
       return false;
     }
   };
@@ -431,7 +214,7 @@ const Step1 = ({ navigation }) => {
             resolve(true);
           },
           (error) => {
-            console.log('Location Error:', error);
+            
             setLocationError('Failed to get location');
             setLoading(false);
             resolve(false);
@@ -458,7 +241,7 @@ const Step1 = ({ navigation }) => {
       const payload = {
         ...formData,
         category: formData.category.toString(),
-        businessId: formData.businessId, // Added businessId
+        businessId: formData.businessId,
         start_date: formatDateForSQL(formData.start_date),
         end_date: formatDateForSQL(formData.end_date),
         isDayQueue: isDayQueue,
@@ -478,7 +261,7 @@ const Step1 = ({ navigation }) => {
       const queue = await getQueueList();
       navigation.navigate('MyQueue', { queues: queue.data ?? [] });
     } catch (error) {
-      console.error(error);
+      
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -498,7 +281,6 @@ const Step1 = ({ navigation }) => {
       }
       const res = await getDeskList(params);
       const desksData = res?.data?.data || res?.data || [];
-      // Only show active desks for queue creation
       const deskList = (Array.isArray(desksData) ? desksData : [])
         .filter(desk => desk.isActive == 1 || desk.status == 1 || desk.isActive === true || desk.status === true)
         .map((desk) => ({
@@ -508,7 +290,7 @@ const Step1 = ({ navigation }) => {
         }));
       setDesks(deskList);
     } catch (err) {
-      console.error('❌ Error fetching desks:', err);
+      
       setDesks([]);
     }
   };
@@ -541,10 +323,9 @@ const Step1 = ({ navigation }) => {
           }));
         setBusinesses(busList);
 
-        // Load all desks for the selected branch (or all branches)
         await fetchAllDesks();
       } catch (err) {
-        console.error(err);
+        
         setCategories([]);
         setBusinesses([]);
       } finally {
@@ -561,14 +342,13 @@ const Step1 = ({ navigation }) => {
         </View>
       )}
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        {/* <TextView text="Queue Details" type="body-one" isTextColorWhite style={ [ AppStyles.titleStyle ] } /> */}
+        {}
         <FormGroup style={[AppStyles.formContainer, s.firstFormWrapper]}>
           <Input
             placeholder="Enter Queue Name"
             isIconLeft leftIconName="create"
             value={formData.name}
             onChangeText={(text) => setFormData({ ...formData, name: text })}
-            // error={errors.name}
             editable={!loading}
           />
         </FormGroup>
@@ -590,7 +370,7 @@ const Step1 = ({ navigation }) => {
           />
         </FormGroup>
 
-        {/* Desk Selection Section */}
+        {}
         <FormGroup>
           <TextView
             text="Select Desks for this Queue"
@@ -667,7 +447,7 @@ const Step1 = ({ navigation }) => {
                 selectedDate={formData.start_date}
                 disabled={loading}
               />
-              {/* {errors.start_date && <Text style={s.errorText}>{errors.start_date}</Text>} */}
+              {}
             </View>
             <View style={s.containerStyle}>
               <DatePicker
@@ -679,7 +459,7 @@ const Step1 = ({ navigation }) => {
                 selectedDate={formData.end_date}
                 disabled={loading}
               />
-              {/* {errors.end_date && <Text style={s.errorText}>{errors.end_date}</Text>} */}
+              {}
             </View>
           </View>
         </View>
@@ -729,7 +509,6 @@ const Step1 = ({ navigation }) => {
               value={formData.end_number}
               onChangeText={(text) => setFormData({ ...formData, end_number: text })}
               keyboardType="numeric"
-              // error={errors.end_number}
               editable={!loading}
             />
           </View>
@@ -746,7 +525,6 @@ const Step1 = ({ navigation }) => {
           wrapperStyle={s.addressInputWrapperStyle}
           value={formData.address}
           onChangeText={(text) => setFormData({ ...formData, address: text })}
-          // error={errors.address}
           editable={!loading}
         />
 
@@ -759,7 +537,6 @@ const Step1 = ({ navigation }) => {
           wrapperStyle={s.addressInputWrapperStyle}
           value={formData.description}
           onChangeText={(text) => setFormData({ ...formData, description: text })}
-          // error={errors.description}
           editable={!loading}
         />
 
@@ -792,8 +569,7 @@ const Step1 = ({ navigation }) => {
               );
             })}
           </View>
-          {/* {errors.joinMethods && <Text style={s.errorText}>{errors.joinMethods}</Text>}
-          {locationError ? <Text style={s.errorText}>{locationError}</Text> : null} */}
+          {}
         </FormGroup>
 
         <Button

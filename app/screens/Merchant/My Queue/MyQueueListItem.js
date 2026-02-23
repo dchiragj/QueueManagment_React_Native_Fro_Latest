@@ -8,7 +8,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Alert, Modal, TouchableOpacity, Text } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import AwesomeAlert from 'react-native-awesome-alerts';
-// import SvgIcon from 'react-native-svg-icon/lib/components/SvgIcon';
 import svgs from '../../../assets/svg';
 import { getQueueDelete } from '../../../services/apiService';
 import screens from '../../../constants/screens';
@@ -25,7 +24,7 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
   const handleQueueDetails = () => {
     const queueId = item?.id || item?._id;
     if (!queueId) {
-      console.error('No queueId');
+      
       return;
     }
 
@@ -37,12 +36,12 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
 
 
   const handleDeleteQueue = async () => {
-    console.log('🗑️ Delete initiated for queue:', item.id || item._id);
+    
     try {
       setDeleting(true);
-      console.log('🔄 Calling delete API...');
+      
       const result = await getQueueDelete(item.id || item._id);
-      console.log('✅ Delete API response:', result);
+      
 
       Toast.show({
         type: 'success',
@@ -50,21 +49,19 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
         text2: 'Queue deleted successfully',
       });
 
-      // Close modal first
       setVisible(false);
-      console.log('✅ Modal closed');
+      
 
-      // Then refresh the list
       if (typeof onDeleteQueue === "function") {
-        console.log('🔄 Refreshing queue list...');
+        
         await onDeleteQueue();
-        console.log('✅ Queue list refreshed');
+        
       } else {
-        console.warn('⚠️ onDeleteQueue is not a function');
+        
       }
 
     } catch (err) {
-      console.error('❌ Delete error:', err);
+      
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -72,17 +69,14 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
       });
     } finally {
       setDeleting(false);
-      console.log('✅ Delete process completed');
+      
     }
   };
-
-
 
 
   const handleSignInDesk = () => {
     if (navigation && item) {
       const queueId = item.id || item._id;
-      // navigation.navigate('Service', { queueId, categoryid });
       navigation.navigate(screens.MyQueueRoot, {
         screen: screens.Service,
         params: { queueId, categoryid },

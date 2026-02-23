@@ -8,14 +8,12 @@ import {
   clearProfileResponseMsg
 } from '../actions/profileActions';
 import { getUserProfileme, profileUpdate } from './apiService';
-// import formDataEntries from 'form-data-entries';
 const baseUrl = `${getBaseUrl()}/api`
 
 export const updateUserProfile = (obj) => async (dispatch) => {
   try {
     dispatch(clearProfileResponseMsg());
 
-    // If it's FormData, convert to object for validation
     let dataForValidation = obj;
     if (obj instanceof FormData) {
       dataForValidation = {};
@@ -41,7 +39,7 @@ export const updateUserProfile = (obj) => async (dispatch) => {
     }
 
     dispatch(setProfileLoader(true));
-    const response = await profileUpdate(obj); // <- send FormData here
+    const response = await profileUpdate(obj);
     const { data } = response;
     dispatch(setProfile(data));
     return true;
@@ -57,8 +55,8 @@ export const getUserProfile = () => async (dispatch) => {
   try {
     dispatch(clearProfileResponseMsg());
     dispatch(setProfileLoader(true));
-    const response = await getUserProfileme(); // Use api service
-    const { data } = response; // Adjust based on actual response structure
+    const response = await getUserProfileme();
+    const { data } = response;
     dispatch(setProfile(data));
     return true;
   } catch (e) {

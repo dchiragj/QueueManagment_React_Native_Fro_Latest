@@ -1,6 +1,5 @@
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
-// import { FadeIn } from 'react-native-reanimated'; // Reanimated v3
 import Animated, { FadeIn, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import Spinner from './Spinner';
 import styles from './SpinnerButtonStyle';

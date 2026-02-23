@@ -102,7 +102,6 @@ const Onboarding = (props) => {
 
       if (result) {
         setSelectedImage(null);
-        // Update local storage
         const userDetails = await getAuthUser();
         delete userDetails.onboardingRequired;
         Toast.show({
@@ -112,15 +111,13 @@ const Onboarding = (props) => {
         });
         await saveUserDetails(userDetails);
 
-        // Check where we came from
         const source = props.route.params?.source;
 
         if (source === screens.Profile) {
-          // If came from Profile → go back to Settings (inside Drawer/Tab)
           props.navigation.dispatch(
             CommonActions.reset({
               index: 0,
-              routes: [{ name: 'MainApp' }], // or your main app stack name
+              routes: [{ name: 'MainApp' }],
             })
           );
           props.navigation.navigate('MainApp', {
@@ -128,7 +125,6 @@ const Onboarding = (props) => {
             params: { screen: screens.Settings },
           });
         } else {
-          // Normal flow: Onboarding → Home
           props.navigation.dispatch(
             CommonActions.reset({
               index: 0,
@@ -177,7 +173,7 @@ const Onboarding = (props) => {
 
   const requestCameraPermission = async () => {
     if (Platform.OS === 'ios') {
-      return true; // iOS handles via Info.plist
+      return true;
     }
     try {
       const granted = await PermissionsAndroid.request(
@@ -191,13 +187,13 @@ const Onboarding = (props) => {
       );
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
-      console.warn('Camera permission error:', err);
+      
       return false;
     }
   };
   const handleImagePick = async () => {
     if (!launchCamera || !launchImageLibrary) {
-      console.error('ImagePicker functions are undefined. Verify library installation.');
+      
       Alert.alert('Error', 'Image picker module not found. Please restart the app or contact support.');
       return;
     }
@@ -236,11 +232,11 @@ const Onboarding = (props) => {
 
 
           setSelectedImage(imageData);
-          handleFormChange('ProfileUrl', uri); // preview માટે
+          handleFormChange('ProfileUrl', uri);
         }
 
       } catch (error) {
-        console.error('Image pick error:', error);
+        
         Alert.alert('Error', 'Failed to select image');
       }
     };
@@ -277,8 +273,8 @@ const Onboarding = (props) => {
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
         <Touchable onPress={handleImagePick}>
           <View style={s.profileImgMain}>
-            {/* <Image source={selectedImage ? { uri: selectedImage.uri } : user?.ProfileUrl ? { uri: user.ProfileUrl } : require('../../../assets/images/profile.png')} style={s.ProfileUrl} /> */}
-            {/* <Image source={ require('../../../assets/images/profile.png')} style={s.ProfileUrl} /> */}
+            {}
+            {}
             <Image
               source={
                 user?.ProfileUrl
@@ -374,7 +370,6 @@ const Onboarding = (props) => {
         <Button
           ButtonText='Submit'
           style={s.btn}
-          // animationStyle={s.btn}
           onPress={onSubmit}
           isLoading={loading}
         />

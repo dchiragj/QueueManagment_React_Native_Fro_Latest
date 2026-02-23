@@ -17,9 +17,9 @@ const Welcome = ({ navigation })=> {
   return (
     <>
       <SafeAreaView style={AppStyles.root}>
-        {/* <Image style={s.mainImg} source={require('../assets/images/qustartimg.png')} /> */}
+        {}
         <Image style={s.mainImg} source={require('../assets/images/qustartimg.png')} />
-        {/* <SvgIcon style={s.logo} svgs={svgs} name={'splash-logo'} fill={colors.primary} width={230} height={70} /> */}
+        {}
         <Button
           onPress={onPressGetStarted}
           ButtonText='Get Started'

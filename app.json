@@ -1,4 +1,10 @@
 {
   "name": "QueueFlow",
-  "displayName": "QueueFlow"
+  "displayName": "QueueFlow",
+  "extra": {
+    "eas": {
+      "projectId": "5ccddee4-f100-434b-857c-5633ee7f2439"
+    }
+  },
+  "owner": "queueflow"
 }

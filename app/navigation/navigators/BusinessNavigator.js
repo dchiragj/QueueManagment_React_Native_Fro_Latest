@@ -1,11 +1,9 @@
-// import { createStackNavigator } from 'react-navigation-stack';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import screens from '../../constants/screens';
 import Business from '../../screens/Merchant/Business/business';
 import Icon from '../../components/Icon';
 import { TouchableOpacity } from 'react-native';
 import AddBranch from '../../screens/Merchant/Business/AddBranch';
-
 
 
 const Stack = createNativeStackNavigator();

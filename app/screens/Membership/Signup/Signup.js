@@ -19,7 +19,6 @@ import { halfindent } from '../../../styles/dimensions';
 import { borderRadius } from '../../../styles/dimensions';
 import messaging from '@react-native-firebase/messaging';
 
-// Import Toast
 import Toast from 'react-native-toast-message';
 import { saveFcmToken } from '../../../services/apiService';
 
@@ -35,7 +34,6 @@ function Signup(props) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
-  // New Business Fields
   const [businessName, setBusinessName] = useState('');
   const [businessAddress, setBusinessAddress] = useState('');
   const [businessRegistrationNumber, setBusinessRegistrationNumber] = useState('');
@@ -49,7 +47,6 @@ function Signup(props) {
     };
   }, []);
 
-  // Show toast whenever resError changes
   useEffect(() => {
     if (resError && Object.keys(resError).length > 0) {
       const errorMsg =
@@ -94,7 +91,6 @@ function Signup(props) {
       return;
     }
 
-    // Validate business fields if merchant is selected
     if (selectRole.merchant) {
       if (!businessName.trim()) {
         Toast.show({
@@ -122,7 +118,6 @@ function Signup(props) {
       password: password,
       confirmPassword: confirmPassword,
       role,
-      // Conditionally include business details
       ...(selectRole.merchant && {
         businessName: businessName.trim(),
         businessAddress: businessAddress.trim(),
@@ -140,9 +135,7 @@ function Signup(props) {
         text2: 'Please verify your email',
         position: 'top',
       });
-      // Get FCM Token and save it
       try {
-        // Step 1: Request notification permission (required on Android 13+)
         const authStatus = await messaging().requestPermission();
         const enabled =
           authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -150,20 +143,18 @@ function Signup(props) {
 
         if (enabled) {
 
-          // Step 2: Now get the FCM token
           const fcmToken = await messaging().getToken();
 
           if (fcmToken) {
-            await saveFcmToken(fcmToken);  // Your API call to save token on server
+            await saveFcmToken(fcmToken);
           } else {
-            console.log('FCM Token is empty');
+            
           }
         } else {
-          console.log('User denied notification permission');
+          
         }
       } catch (error) {
-        console.warn('FCM Token error (not critical):', error.message || error);
-        // App will continue working even if token fails – user experience stays smooth
+        
       }
       props.navigation.navigate(screens.VerifyEmail);
     }
@@ -173,12 +164,6 @@ function Signup(props) {
     props.navigation.navigate(screens.Login);
   };
 
-  // const setUserRole = (name) => {
-  //   setSelectedRole((prev) => ({
-  //     ...prev,
-  //     [name]: !prev[name],
-  //   }));
-  // };
   const setUserRole = (name) => {
     if (name === 'customer') {
       setSelectedRole({
@@ -213,7 +198,7 @@ function Signup(props) {
             style={[AppStyles.titleStyle, AppStyles.subtitle]}
           />
 
-          {/* Role Selection */}
+          {}
           <Validation error={resError.role}>
             <View style={s.customerMain}>
               <Touchable
@@ -240,7 +225,7 @@ function Signup(props) {
             </View>
           </Validation>
 
-          {/* Form Fields */}
+          {}
           <FormGroup style={s.fromGroup}>
             <Validation error={resError.firstname}>
               <Input
@@ -334,7 +319,7 @@ function Signup(props) {
                 value={confirmPassword}
               />
             </Validation>
-            {/* Business Details - Show only if Merchant is selected */}
+            {}
             {selectRole.merchant && (
               <>
                 <View style={s.sectionHeader}>
@@ -403,7 +388,7 @@ function Signup(props) {
             )}
           </FormGroup>
 
-          {/* Sign Up Button */}
+          {}
           <Button
             onPress={onPressSignup}
             isLoading={loading}
@@ -412,7 +397,7 @@ function Signup(props) {
             animationStyle={s.signBtn}
           />
 
-          {/* Footer */}
+          {}
           <View style={s.footerMain}>
             <TextView color={colors.white} text={'Already have an account? '} type={'body-one'} />
             <TextView

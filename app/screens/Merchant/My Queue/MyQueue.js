@@ -8,12 +8,11 @@ import screens from '../../../constants/screens';
 import { verticalScale } from 'react-native-size-matters';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useBranch } from '../../../context/BranchContext'; // Import context
+import { useBranch } from '../../../context/BranchContext';
 
 const MyQueue = ({ navigation, route }) => {
-  // const params = navigation.state?.params || {};
   const params = route.params || {};
-  const { selectedBranchId } = useBranch(); // Consume context
+  const { selectedBranchId } = useBranch();
   const [queues, setQueues] = useState(params.queues || []);
   const [filteredQueues, setFilteredQueues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +41,7 @@ const MyQueue = ({ navigation, route }) => {
       const list = res?.data?.map((c) => ({ text: c.name, value: c.id }));
       setCategories(list);
     } catch (err) {
-      console.error('Error fetching categories:', err);
+      
       setCategories([]);
     }
   };
@@ -54,13 +53,12 @@ const MyQueue = ({ navigation, route }) => {
       const fetchParams = {};
       if (params.businessId) {
         fetchParams.businessId = params.businessId;
-      } else if (selectedBranchId !== 'all') { // Use selectedBranchId
+      } else if (selectedBranchId !== 'all') {
         fetchParams.businessId = selectedBranchId;
       }
       const queueRes = await getQueueList(fetchParams);
       let queueData = queueRes.data || [];
 
-      // Filter token counts by branch if selected
       const tokenCountsParams = selectedBranchId !== 'all' ? selectedBranchId : null;
       const tokenData = await getTokenCounts(tokenCountsParams);
 
@@ -85,10 +83,9 @@ const MyQueue = ({ navigation, route }) => {
       }));
 
       setQueues(updatedQueues);
-      // filterQueues(activeTab);
 
     } catch (e) {
-      console.error('Queue list fetch error:', e);
+      
       setError(e.message || 'Unable to fetch queue list');
     } finally {
       setLoading(false);
@@ -118,7 +115,7 @@ const MyQueue = ({ navigation, route }) => {
   useEffect(() => {
     fetchCategories();
     fetchQueueList();
-  }, [params.queues, params.businessId, selectedBranchId]); // Add dependency
+  }, [params.queues, params.businessId, selectedBranchId]);
 
   useEffect(() => {
     filterQueues(activeTab);
@@ -150,7 +147,7 @@ const MyQueue = ({ navigation, route }) => {
         navigation={navigation}
         item={item}
         status={statusLabel}
-        onDeleteQueue={fetchQueueList} // Pass the refresh function
+        onDeleteQueue={fetchQueueList}
       />
     );
   };
@@ -176,11 +173,7 @@ const MyQueue = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={[AppStyles.root]}>
-      {/* <View style={ styles.tabContainer }>
-        { renderTab( 'all', 'All' ) }
-        { renderTab( 'running', 'Running' ) }
-        { renderTab( 'cancel', 'Cancel' ) }
-      </View> */}
+      {}
 
 
       <FlatList
@@ -229,7 +222,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: colors.inputBackgroundColor,
     elevation: 3,
-    // shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 3,

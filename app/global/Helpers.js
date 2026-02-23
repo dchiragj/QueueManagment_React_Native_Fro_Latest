@@ -3,10 +3,7 @@ import moment from 'moment';
 import { ToastAndroid, Platform } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 
-/**
- * @desc Checks for valid email
- * @param {*} value // Accepts string
- */
+
 export function isEmail(value) {
   var myRegEx =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -14,10 +11,7 @@ export function isEmail(value) {
   return isValid ? true : false;
 }
 
-/**
- * @desc Checks for Empty string
- * @param {*} value // Accepts string, object
- */
+
 export function isEmpty(value) {
   if (
     value === undefined ||
@@ -31,9 +25,7 @@ export function isEmpty(value) {
   }
 }
 
-/**
- * @desc: Check valid date
- */
+
 export function isValidDate(d) {
   return d instanceof Date;
 }
@@ -45,10 +37,7 @@ export function getDate(date) {
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 }
 
-/**
- * @desc Change Display Format based on date
- * @param {*} date
- */
+
 export function __displayDate(date) {
   if (!date) return date;
 
@@ -70,14 +59,14 @@ export function __displayDate(date) {
 export function formatCurrency(num) {
   try {
     if (num) return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-  } catch (e) {}
+  } catch (e) { }
   return num;
 }
 export function mathRound(number, digit = 2) {
   try {
     if (Number(number) < 1) digit = 3;
     if (number) return Number(number).toFixed(digit);
-  } catch (e) {}
+  } catch (e) { }
   return Number(0).toFixed(2);
 }
 
@@ -93,7 +82,7 @@ export function currencyWithDecimal(num) {
     } else {
       returnValue = Number(0).toFixed(digit);
     }
-  } catch (e) {}
+  } catch (e) { }
   return returnValue;
 }
 
@@ -136,7 +125,6 @@ export function toastNotification(message, isShowInIOS = true) {
   }
 }
 
-//Get file Name
 export const getFileName = (path) => {
   let split = path.split('/');
   if (split && split.length > 0) {

@@ -21,7 +21,6 @@ class Picker extends Component {
     const { selectedValue, data = [], itemKeyField, itemValueField } = this.props;
     if (Platform.OS == 'ios') {
       if (selectedValue && data) {
-        //Get object by id to show its details
         let item = data.find((x) => x[itemKeyField] == selectedValue);
         if (item) this.setPickerLabelIOS(item[itemValueField]);
         else this.setPickerLabelIOS();
@@ -116,9 +115,7 @@ class Picker extends Component {
                       padding: 0
                     }}
                     onPress={() => {
-                      //show selected value in label
                       if (this.props.selectedValue && this.props.data) {
-                        //Get object by id to show its details
                         let item = this.props.data.find((x) => x[this.props.itemKeyField] == this.props.selectedValue);
                         if (item) this.setPickerLabelIOS(item[this.props.itemValueField]);
                         else this.setPickerLabelIOS();

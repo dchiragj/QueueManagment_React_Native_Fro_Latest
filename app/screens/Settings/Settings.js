@@ -8,7 +8,6 @@ import { scale, verticalScale } from 'react-native-size-matters';
 import { View, SafeAreaView, StyleSheet, Image, Linking, Platform, Alert } from 'react-native';
 import { borderRadius, height } from '../../styles/dimensions';
 import screens from '../../constants/screens';
-// import NavigationOptions from '../../../components/NavigationOptions';
 import HeaderButton from '../../components/HeaderButton';
 import Icon from '../../components/Icon';
 import { connect } from 'react-redux';
@@ -35,15 +34,13 @@ const Settings = (props) => {
 
   const onRate = () => {
     const GOOGLE_PACKAGE_NAME = 'com.QueueFlow';
-    const APPLE_ID = 'YOUR_APPLE_ID'; // Replace with actual Apple ID when available
+    const APPLE_ID = 'YOUR_APPLE_ID';
 
     if (Platform.OS === 'android') {
       Linking.openURL(`market://details?id=${GOOGLE_PACKAGE_NAME}`).catch(() => {
         Linking.openURL(`https://play.google.com/store/apps/details?id=${GOOGLE_PACKAGE_NAME}`);
       });
     } else {
-      // For iOS
-      // Linking.openURL(`itms-apps://itunes.apple.com/app/viewContentsUserReviews/id${APPLE_ID}?action=write-review`);
       Alert.alert('Coming Soon', 'Rating functionality for iOS will be available once the app is on the App Store.');
     }
   };
@@ -100,7 +97,7 @@ const Settings = (props) => {
             <TextView color={colors.lightWhite} text={'Help'} type={'body-one'} style={s.profileText} />
           </Touchable>
         </View>
-        {/* <Button onPress={onPressSignOut} ButtonText='Sign Out' style={s.btn} animationStyle={s.btn} /> */}
+        {}
       </ScrollableAvoidKeyboard>
     </SafeAreaView>
   );
