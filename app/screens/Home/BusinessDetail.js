@@ -13,6 +13,9 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { verticalScale, moderateScale, scale } from 'react-native-size-matters';
 import Toast from 'react-native-toast-message';
+import Geolocation from 'react-native-geolocation-service';
+import { PermissionsAndroid, Platform } from 'react-native';
+import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 import TextView from '../../components/TextView/TextView';
 import AppStyles from '../../styles/AppStyles';
@@ -53,10 +56,50 @@ const BusinessDetail = ({ route, navigation }) => {
         fetchQueues();
     };
 
+    const requestLocationPermission = async () => {
+        try {
+            if (Platform.OS === 'ios') {
+                const status = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+                return status === RESULTS.GRANTED;
+            } else {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                    {
+                        title: 'Location Permission',
+                        message: 'We need your location to join this queue.',
+                        buttonPositive: 'OK',
+                        buttonNegative: 'Cancel',
+                    }
+                );
+                return granted === PermissionsAndroid.RESULTS.GRANTED;
+            }
+        } catch (err) {
+            return false;
+        }
+    };
+
     const handleQueuePress = async (queue) => {
         setIsLoading(true);
         try {
-            const payload = { joinMethods: queue.joinMethods, queueId: queue.id, categoryId: queue.category };
+            let payload = { joinMethods: queue.joinMethods, queueId: queue.id, categoryId: queue.category };
+
+            if (queue.joinMethods === 'location') {
+                const hasPermission = await requestLocationPermission();
+                if (hasPermission) {
+                    const position = await new Promise((resolve, reject) => {
+                        Geolocation.getCurrentPosition(resolve, reject, {
+                            enableHighAccuracy: true,
+                            timeout: 15000,
+                            maximumAge: 10000,
+                        });
+                    });
+                    payload.lat = position.coords.latitude;
+                    payload.long = position.coords.longitude;
+                } else {
+                    throw new Error('Location permission is required for this queue.');
+                }
+            }
+
             const tokenCheckResponse = await checkToken(payload);
 
             if (

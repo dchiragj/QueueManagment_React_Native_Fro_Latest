@@ -50,7 +50,7 @@ const AddDesk = () => {
                     }));
                 setBusinesses(businessList);
             } catch (err) {
-                
+
                 setBusinesses([]);
             } finally {
                 setLoading(false);
@@ -64,11 +64,32 @@ const AddDesk = () => {
     };
 
     const handleSave = async () => {
-        if (!formData.name.trim()) {
+        const { name, email, password } = formData;
+
+        if (!name.trim()) {
             Toast.show({
                 type: 'error',
-                text1: 'Validation Error',
+                text1: 'Required',
                 text2: 'Desk name is required.',
+            });
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email.trim() && !emailRegex.test(email.trim())) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Email',
+                text2: 'Please enter a valid operator email address.',
+            });
+            return;
+        }
+
+        if (!deskToEdit && !password.trim()) {
+            Toast.show({
+                type: 'error',
+                text1: 'Required',
+                text2: 'Password is required for new desks.',
             });
             return;
         }

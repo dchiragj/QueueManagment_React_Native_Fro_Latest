@@ -80,8 +80,8 @@ const Profile = (props) => {
             style={[s.profileInfo]}
           />
         </View>
-        {}
-        {}
+        { }
+        { }
         <View style={s.mailWrapper}>
           <Icon color={colors.primary} name='transgender' isFeather={false} />
           <TextView
@@ -111,14 +111,14 @@ const Profile = (props) => {
             text={user.email}
             type={'body'}
           />
-          {}
+          { }
         </View>
         <View style={s.mailWrapper}>
           <Icon name='call' color={colors.primary} isFeather={false} />
           <TextView style={s.mailTextStyle} color={colors.lightWhite} text={user.mobileNumber} type={'body'} />
           <TextView color={colors.green} text={'verify'} type={'body'} />
         </View>
-        {}
+        { }
         <View style={s.buttonRow}>
           <Button
             onPress={onPressEdit}

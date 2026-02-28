@@ -41,7 +41,7 @@ const MyQueue = ({ navigation, route }) => {
       const list = res?.data?.map((c) => ({ text: c.name, value: c.id }));
       setCategories(list);
     } catch (err) {
-      
+
       setCategories([]);
     }
   };
@@ -57,6 +57,7 @@ const MyQueue = ({ navigation, route }) => {
         fetchParams.businessId = selectedBranchId;
       }
       const queueRes = await getQueueList(fetchParams);
+
       let queueData = queueRes.data || [];
 
       const tokenCountsParams = selectedBranchId !== 'all' ? selectedBranchId : null;
@@ -85,7 +86,7 @@ const MyQueue = ({ navigation, route }) => {
       setQueues(updatedQueues);
 
     } catch (e) {
-      
+
       setError(e.message || 'Unable to fetch queue list');
     } finally {
       setLoading(false);
@@ -173,7 +174,7 @@ const MyQueue = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={[AppStyles.root]}>
-      {}
+      { }
 
 
       <FlatList

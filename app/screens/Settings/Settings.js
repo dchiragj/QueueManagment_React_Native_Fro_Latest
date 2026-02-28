@@ -81,9 +81,15 @@ const Settings = (props) => {
             <TextView color={colors.lightWhite} text={user.email} type={'body-one'} style={s.profileText} />
           </View>
         </Touchable>
-        <Touchable style={[s.scanMain, s.same]} onPress={() => props.navigation.navigate('QRScanner')}>
+        {/* <Touchable style={[s.scanMain, s.same]} onPress={() => props.navigation.navigate('QRScanner')}>
           <Icon name='scan-circle' color={colors.lightWhite} isFeather={false} />
           <TextView color={colors.lightWhite} text={'Scan QR For Generate Token'} type={'body'} />
+          <Icon name='chevron-forward' color={colors.lightWhite} isFeather={false} />
+        </Touchable> */}
+
+        <Touchable style={[s.scanMain, s.same]} onPress={() => props.navigation.navigate(screens.HomeRoot, { screen: screens.Home, params: { startTour: true } })}>
+          <Icon name='play-circle' color={colors.lightWhite} isFeather={false} />
+          <TextView color={colors.lightWhite} text={'Application Tour'} type={'body'} />
           <Icon name='chevron-forward' color={colors.lightWhite} isFeather={false} />
         </Touchable>
 
@@ -97,7 +103,7 @@ const Settings = (props) => {
             <TextView color={colors.lightWhite} text={'Help'} type={'body-one'} style={s.profileText} />
           </Touchable>
         </View>
-        {}
+        { }
       </ScrollableAvoidKeyboard>
     </SafeAreaView>
   );

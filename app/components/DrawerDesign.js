@@ -124,7 +124,7 @@ function DrawerDesignComponent(props) {
       <SafeAreaView style={[AppStyles.root]}>
         <View style={s.bordertop} />
 
-        {}
+        { }
         <View style={s.branchSelectorContainer}>
           <Touchable
             style={s.branchSelectorHeader}
@@ -194,17 +194,17 @@ function DrawerDesignComponent(props) {
         </View>
 
         <ScrollView contentContainerStyle={s.container}>
-          {}
+          { }
           <DrawerItemList
             {...props}
             state={filteredState}
           />
         </ScrollView>
 
-        {}
+        { }
         <View style={s.bottomButtonsContainer}>
           <View style={s.borderBottom} />
-          {}
+          { }
           <Touchable style={s.signOutMain} onPress={showLogoutModal}>
             <Icon name="log-out" color={colors.primary} size={22} />
             <TextView
@@ -215,7 +215,7 @@ function DrawerDesignComponent(props) {
             />
           </Touchable>
 
-          {}
+          { }
           <Touchable style={s.deleteAccountMain} onPress={showDeleteModal}>
             <Icon name="trash-2" color={colors.red} size={22} />
             <TextView
@@ -228,7 +228,7 @@ function DrawerDesignComponent(props) {
         </View>
       </SafeAreaView>
 
-      {}
+      { }
       {logoutVisible && (
         <View style={s.overlay}>
           <Animated.View
@@ -255,7 +255,7 @@ function DrawerDesignComponent(props) {
         </View>
       )}
 
-      {}
+      { }
       {deleteVisible && (
         <View style={s.overlay}>
           <Animated.View

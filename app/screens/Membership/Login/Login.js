@@ -53,13 +53,30 @@ const Login = (props) => {
   }, [resError]);
 
   const onLogin = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email.trim()) {
+      Toast.show({ type: 'error', text1: 'Required', text2: 'Email is required' });
+      return;
+    } else if (!emailRegex.test(email.trim())) {
+      Toast.show({ type: 'error', text1: 'Invalid Email', text2: 'Please enter a valid email address' });
+      return;
+    }
+
+    if (!password.trim()) {
+      Toast.show({ type: 'error', text1: 'Required', text2: 'Password is required' });
+      return;
+    }
+
     const loginObj = {
-      username: String(email),
-      password: String(password),
+      username: email.trim(),
+      password: password.trim(),
       role: 'merchant'
     };
 
     const result = await props.login(loginObj);
+    console.log(result, "result");
+
 
     if (result) {
 
@@ -89,10 +106,10 @@ const Login = (props) => {
             await saveFcmToken(fcmToken);
           }
         } else {
-          
+
         }
       } catch (error) {
-        
+
       }
 
       props.navigation.navigate("MainApp");
@@ -117,61 +134,57 @@ const Login = (props) => {
         <TextView text="Welcome Back!" type="title" isTextColorWhite={true} style={[AppStyles.titleStyle, AppStyles.title]} />
         <TextView color={colors.lightWhite} text="Please sign in to your account" type="body-head" style={[AppStyles.titleStyle, AppStyles.subtitle]} />
 
-        <FormGroup style={[AppStyles.formContainer, s.fromGroup]}>
+        <FormGroup style={[AppStyles.formContainer, s.formGroup]}>
 
-          {}
-          <Validation error={resError.username}>
-            <View style={s.inputContainer}>
-              <Ionicons name="mail" size={24} color={colors.primary} style={s.iconLeft} />
-              <TextInput
-                style={s.textInput}
-                placeholder="example@gmail.com"
-                placeholderTextColor="#888"
-                keyboardType="email-address"
-                value={email}
-                onChangeText={setEmail}
-                editable={!loading}
-                autoCapitalize="none"
-              />
-            </View>
-          </Validation>
-
-          {}
-          <Validation error={resError.password}>
-            <View style={s.inputContainer}>
-              <Ionicons name="lock-closed" size={24} color={colors.primary} style={s.iconLeft} />
-              <TextInput
-                style={s.textInput}
-                placeholder="Password"
-                placeholderTextColor="#888"
-                secureTextEntry={!isPasswordVisible}
-                value={password}
-                onChangeText={setPassword}
-                editable={!loading}
-                onSubmitEditing={onLogin}
-              />
-              <TouchableOpacity onPress={onTogglePassword}>
-                <Ionicons
-                  name={isPasswordVisible ? "eye-off" : "eye"}
-                  size={24}
-                  color={colors.primary}
-                  style={s.iconRight}
-                />
-              </TouchableOpacity>
-            </View>
-          </Validation>
-
-          <Validation>
-            <TextView
-              color={colors.lightWhite}
-              isClickableLink={true}
-              text="Forgot Password?"
-              onPress={onPressForgotPassword}
-              type="body-one"
-              style={s.forgotPasswordLink}
-              disabled={loading}
+          { }
+          { }
+          <View style={s.inputContainer}>
+            <Ionicons name="mail" size={24} color={colors.primary} style={s.iconLeft} />
+            <TextInput
+              style={s.textInput}
+              placeholder="example@gmail.com"
+              placeholderTextColor="#888"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+              editable={!loading}
+              autoCapitalize="none"
             />
-          </Validation>
+          </View>
+
+          { }
+          { }
+          <View style={s.inputContainer}>
+            <Ionicons name="lock-closed" size={24} color={colors.primary} style={s.iconLeft} />
+            <TextInput
+              style={s.textInput}
+              placeholder="Password"
+              placeholderTextColor="#888"
+              secureTextEntry={!isPasswordVisible}
+              value={password}
+              onChangeText={setPassword}
+              editable={!loading}
+              onSubmitEditing={onLogin}
+            />
+            <TouchableOpacity onPress={onTogglePassword}>
+              <Ionicons
+                name={isPasswordVisible ? "eye-off" : "eye"}
+                size={24}
+                color={colors.primary}
+                style={s.iconRight}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TextView
+            color={colors.lightWhite}
+            isClickableLink={true}
+            text="Forgot Password?"
+            onPress={onPressForgotPassword}
+            type="body-one"
+            style={s.forgotPasswordLink}
+            disabled={loading}
+          />
         </FormGroup>
 
         <Button
@@ -182,7 +195,7 @@ const Login = (props) => {
         />
 
         <View style={s.footerMain}>
-          <TextView color={colors.white} text="Donâ€™t have an Account? " type="body-one" />
+          <TextView color={colors.white} text="Don't have an Account? " type="body-one" />
           <TextView
             color={colors.primary}
             isClickableLink={true}
@@ -198,7 +211,7 @@ const Login = (props) => {
 };
 
 const s = StyleSheet.create({
-  fromGroup: {
+  formGroup: {
     marginTop: verticalScale(45),
     paddingTop: verticalScale(10),
     paddingBottom: verticalScale(40),

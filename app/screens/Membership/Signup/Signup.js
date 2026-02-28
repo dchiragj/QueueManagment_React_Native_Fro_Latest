@@ -95,19 +95,77 @@ function Signup(props) {
       if (!businessName.trim()) {
         Toast.show({
           type: 'error',
-          text1: 'Business Name Required',
-          text2: 'Please enter your business name',
+          text1: 'Required',
+          text2: 'Business Name is required',
         });
         return;
       }
       if (!businessAddress.trim()) {
         Toast.show({
           type: 'error',
-          text1: 'Business Address Required',
-          text2: 'Please enter your business address',
+          text1: 'Required',
+          text2: 'Business Address is required',
         });
         return;
       }
+      if (!businessPhone.trim()) {
+        Toast.show({
+          type: 'error',
+          text1: 'Required',
+          text2: 'Business Phone is required',
+        });
+        return;
+      }
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(businessPhone.trim())) {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Phone',
+          text2: 'Please enter a valid 10-digit business phone number',
+        });
+        return;
+      }
+    }
+
+    // Basic Field Validations
+    if (!fname.trim()) {
+      Toast.show({ type: 'error', text1: 'Required', text2: 'First Name is required' });
+      return;
+    }
+    if (!lname.trim()) {
+      Toast.show({ type: 'error', text1: 'Required', text2: 'Last Name is required' });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      Toast.show({ type: 'error', text1: 'Required', text2: 'Email is required' });
+      return;
+    } else if (!emailRegex.test(email.trim())) {
+      Toast.show({ type: 'error', text1: 'Invalid Email', text2: 'Please enter a valid email address' });
+      return;
+    }
+
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phone.trim()) {
+      Toast.show({ type: 'error', text1: 'Required', text2: 'Phone Number is required' });
+      return;
+    } else if (!phoneRegex.test(phone.trim())) {
+      Toast.show({ type: 'error', text1: 'Invalid Phone', text2: 'Please enter a valid 10-digit phone number' });
+      return;
+    }
+
+    if (!password) {
+      Toast.show({ type: 'error', text1: 'Required', text2: 'Password is required' });
+      return;
+    }
+
+    if (!confirmPassword) {
+      Toast.show({ type: 'error', text1: 'Required', text2: 'Confirm Password is required' });
+      return;
+    } else if (password !== confirmPassword) {
+      Toast.show({ type: 'error', text1: 'Mismatch', text2: 'Passwords do not match' });
+      return;
     }
 
     const signupObj = {
@@ -148,13 +206,13 @@ function Signup(props) {
           if (fcmToken) {
             await saveFcmToken(fcmToken);
           } else {
-            
+
           }
         } else {
-          
+
         }
       } catch (error) {
-        
+
       }
       props.navigation.navigate(screens.VerifyEmail);
     }
@@ -198,128 +256,115 @@ function Signup(props) {
             style={[AppStyles.titleStyle, AppStyles.subtitle]}
           />
 
-          {}
-          <Validation error={resError.role}>
-            <View style={s.customerMain}>
-              <Touchable
-                style={[
-                  s.customermarbtn,
-                  selectRole.customer && s.selectedBtn,
-                ]}
-                onPress={() => setUserRole('customer')}
-              >
-                <TextView color={colors.white} text={'Customer'} type={'body-one'} style={s.customermarText} />
-                <Image source={require('../../../assets/images/customer.png')} />
-              </Touchable>
+          { }
+          { }
+          <View style={s.customerMain}>
+            <Touchable
+              style={[
+                s.customermarbtn,
+                selectRole.customer && s.selectedBtn,
+              ]}
+              onPress={() => setUserRole('customer')}
+            >
+              <TextView color={colors.white} text={'Customer'} type={'body-one'} style={s.customermarText} />
+              <Image source={require('../../../assets/images/customer.png')} />
+            </Touchable>
 
-              <Touchable
-                style={[
-                  s.customermarbtn,
-                  selectRole.merchant && s.selectedBtn,
-                ]}
-                onPress={() => setUserRole('merchant')}
-              >
-                <TextView color={colors.white} text={'Merchant'} type={'body-one'} style={s.customermarText} />
-                <Image source={require('../../../assets/images/merchant.png')} />
-              </Touchable>
-            </View>
-          </Validation>
+            <Touchable
+              style={[
+                s.customermarbtn,
+                selectRole.merchant && s.selectedBtn,
+              ]}
+              onPress={() => setUserRole('merchant')}
+            >
+              <TextView color={colors.white} text={'Merchant'} type={'body-one'} style={s.customermarText} />
+              <Image source={require('../../../assets/images/merchant.png')} />
+            </Touchable>
+          </View>
 
-          {}
-          <FormGroup style={s.fromGroup}>
-            <Validation error={resError.firstname}>
-              <Input
-                onChangeText={setFname}
-                style={s.inputText}
-                returnKeyType={'next'}
-                placeholder='First Name'
-                isIconLeft={true}
-                leftIconName={'create'}
-                editable={!loading}
-                value={fname}
-              />
-            </Validation>
+          { }
+          <FormGroup style={s.formGroup}>
+            <Input
+              onChangeText={setFname}
+              style={s.inputText}
+              returnKeyType={'next'}
+              placeholder='First Name'
+              isIconLeft={true}
+              leftIconName={'create'}
+              editable={!loading}
+              value={fname}
+            />
 
-            <Validation error={resError.lastname}>
-              <Input
-                onChangeText={setLname}
-                style={s.inputText}
-                returnKeyType={'next'}
-                placeholder='Last Name'
-                isIconLeft={true}
-                leftIconName={'create'}
-                editable={!loading}
-                value={lname}
-              />
-            </Validation>
+            <Input
+              onChangeText={setLname}
+              style={s.inputText}
+              returnKeyType={'next'}
+              placeholder='Last Name'
+              isIconLeft={true}
+              leftIconName={'create'}
+              editable={!loading}
+              value={lname}
+            />
 
-            <Validation error={resError.email}>
-              <Input
-                onChangeText={setEmail}
-                style={s.inputText}
-                returnKeyType={'next'}
-                placeholder='Email Address'
-                keyboardType="email-address"
-                isIconLeft={true}
-                leftIconName={'mail'}
-                editable={!loading}
-                value={email}
-              />
-            </Validation>
+            <Input
+              onChangeText={setEmail}
+              style={s.inputText}
+              returnKeyType={'next'}
+              placeholder='Email Address'
+              keyboardType="email-address"
+              isIconLeft={true}
+              leftIconName={'mail'}
+              editable={!loading}
+              value={email}
+            />
 
-            <Validation error={resError.mobileNumber}>
-              <Input
-                onChangeText={setPhone}
-                style={s.inputText}
-                returnKeyType={'next'}
-                keyboardType={'numeric'}
-                placeholder='Phone Number'
-                isIconLeft={true}
-                leftIconName={'call'}
-                editable={!loading}
-                value={phone}
-              />
-            </Validation>
+            <Input
+              onChangeText={setPhone}
+              style={s.inputText}
+              returnKeyType={'next'}
+              keyboardType={'numeric'}
+              placeholder='Phone Number'
+              isIconLeft={true}
+              leftIconName={'call'}
+              editable={!loading}
+              value={phone}
+            />
 
-            <Validation error={resError.password}>
-              <Input
-                onPressIcon={onTogglePassword}
-                style={s.inputText}
-                returnKeyType={'next'}
-                autoCapitalize='none'
-                placeholder='Password'
-                secureTextEntry={!isPasswordVisible}
-                isIconLeft={true}
-                isIconRight={true}
-                leftIconName={'lock-closed'}
-                rightIconName={!isPasswordVisible ? 'eye' : 'eye-off'}
-                iconColor={colors.dustRodeo}
-                onChangeText={setPassword}
-                editable={!loading}
-                value={password}
-              />
-            </Validation>
+            <Input
+              onPressIcon={onTogglePassword}
+              style={s.inputText}
+              returnKeyType={'next'}
+              autoCapitalize='none'
+              placeholder='Password'
+              secureTextEntry={!isPasswordVisible}
+              isIconLeft={true}
+              isIconRight={true}
+              leftIconName={'lock-closed'}
+              rightIconName={!isPasswordVisible ? 'eye' : 'eye-off'}
+              iconColor={colors.dustRodeo}
+              onChangeText={setPassword}
+              editable={!loading}
+              value={password}
+            />
 
-            <Validation error={resError.confirmPassword || resError.error}>
-              <Input
-                onPressIcon={onTogglePassword}
-                style={s.inputText}
-                returnKeyType={'done'}
-                onSubmitEditing={onPressSignup}
-                autoCapitalize='none'
-                placeholder='Confirm Password'
-                secureTextEntry={!isPasswordVisible}
-                isIconLeft={true}
-                isIconRight={true}
-                leftIconName={'lock-closed'}
-                rightIconName={!isPasswordVisible ? 'eye' : 'eye-off'}
-                iconColor={colors.dustRodeo}
-                onChangeText={setConfirmPassword}
-                editable={!loading}
-                value={confirmPassword}
-              />
-            </Validation>
-            {}
+            <Input
+              onPressIcon={onTogglePassword}
+              style={s.inputText}
+              returnKeyType={'done'}
+              onSubmitEditing={onPressSignup}
+              autoCapitalize='none'
+              placeholder='Confirm Password'
+              secureTextEntry={!isPasswordVisible}
+              isIconLeft={true}
+              isIconRight={true}
+              leftIconName={'lock-closed'}
+              rightIconName={!isPasswordVisible ? 'eye' : 'eye-off'}
+              iconColor={colors.dustRodeo}
+              onChangeText={setConfirmPassword}
+              editable={!loading}
+              value={confirmPassword}
+            />
+            { }
             {selectRole.merchant && (
               <>
                 <View style={s.sectionHeader}>
@@ -331,64 +376,56 @@ function Signup(props) {
                   />
                 </View>
 
-                <Validation error={resError.businessName}>
-                  <Input
-                    onChangeText={setBusinessName}
-                    style={s.inputText}
-                    returnKeyType={'next'}
-                    placeholder='Business Name'
-                    isIconLeft={true}
-                    leftIconName={'business'}
-                    editable={!loading}
-                    value={businessName}
-                  />
-                </Validation>
+                <Input
+                  onChangeText={setBusinessName}
+                  style={s.inputText}
+                  returnKeyType={'next'}
+                  placeholder='Business Name'
+                  isIconLeft={true}
+                  leftIconName={'business'}
+                  editable={!loading}
+                  value={businessName}
+                />
 
-                <Validation error={resError.businessAddress}>
-                  <Input
-                    onChangeText={setBusinessAddress}
-                    style={s.inputText}
-                    returnKeyType={'next'}
-                    placeholder='Business Address'
-                    isIconLeft={true}
-                    leftIconName={'location'}
-                    editable={!loading}
-                    value={businessAddress}
-                  />
-                </Validation>
+                <Input
+                  onChangeText={setBusinessAddress}
+                  style={s.inputText}
+                  returnKeyType={'next'}
+                  placeholder='Business Address'
+                  isIconLeft={true}
+                  leftIconName={'location'}
+                  editable={!loading}
+                  value={businessAddress}
+                />
 
-                <Validation error={resError.businessRegistrationNumber}>
-                  <Input
-                    onChangeText={setBusinessRegistrationNumber}
-                    style={s.inputText}
-                    returnKeyType={'next'}
-                    placeholder='Business Registration Number'
-                    isIconLeft={true}
-                    leftIconName={'document-text'}
-                    editable={!loading}
-                    value={businessRegistrationNumber}
-                  />
-                </Validation>
+                <Input
+                  onChangeText={setBusinessRegistrationNumber}
+                  style={s.inputText}
+                  returnKeyType={'next'}
+                  placeholder='Business Registration Number'
+                  isIconLeft={true}
+                  leftIconName={'document-text'}
+                  editable={!loading}
+                  value={businessRegistrationNumber}
+                />
 
-                <Validation error={resError.businessPhone}>
-                  <Input
-                    onChangeText={setBusinessPhone}
-                    style={s.inputText}
-                    returnKeyType={'done'}
-                    onSubmitEditing={onPressSignup}
-                    keyboardType="phone-pad"
-                    placeholder='Business Phone'
-                    isIconLeft={true}
-                    leftIconName={'call'}
-                    editable={!loading}
-                    value={businessPhone}
-                  />
-                </Validation>
+                <Input
+                  onChangeText={setBusinessPhone}
+                  style={s.inputText}
+                  returnKeyType={'done'}
+                  onSubmitEditing={onPressSignup}
+                  keyboardType="phone-pad"
+                  placeholder='Business Phone'
+                  isIconLeft={true}
+                  leftIconName={'call'}
+                  editable={!loading}
+                  value={businessPhone}
+                />
               </>
             )}
           </FormGroup>
 
-          {}
+          { }
           <Button
             onPress={onPressSignup}
             isLoading={loading}
@@ -397,7 +434,7 @@ function Signup(props) {
             animationStyle={s.signBtn}
           />
 
-          {}
+          { }
           <View style={s.footerMain}>
             <TextView color={colors.white} text={'Already have an account? '} type={'body-one'} />
             <TextView
@@ -440,7 +477,7 @@ const s = StyleSheet.create({
     letterSpacing: 0.5,
     marginBottom: scale(8),
   },
-  fromGroup: {
+  formGroup: {
     flex: 1,
   },
   inputText: {

@@ -24,7 +24,6 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
   const handleQueueDetails = () => {
     const queueId = item?.id || item?._id;
     if (!queueId) {
-      
       return;
     }
 
@@ -36,12 +35,12 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
 
 
   const handleDeleteQueue = async () => {
-    
+
     try {
       setDeleting(true);
-      
+
       const result = await getQueueDelete(item.id || item._id);
-      
+
 
       Toast.show({
         type: 'success',
@@ -50,18 +49,18 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
       });
 
       setVisible(false);
-      
+
 
       if (typeof onDeleteQueue === "function") {
-        
+
         await onDeleteQueue();
-        
+
       } else {
-        
+
       }
 
     } catch (err) {
-      
+
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -69,7 +68,7 @@ const MyQueueListItem = ({ name, category, date, desks, people, navigation, item
       });
     } finally {
       setDeleting(false);
-      
+
     }
   };
 

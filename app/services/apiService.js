@@ -103,12 +103,12 @@ export const verifyEmailApi = async (code) => {
   }
 };
 
-export const verificationcode = async (code) => {
+export const verificationcode = async () => {
   try {
-    const response = await apiService.post('/auth/verification-code', { code });
+    const response = await apiService.post('/auth/verification-code');
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Failed to verify email');
+    throw new Error(error.response?.data?.message || 'Failed to resend verification code');
   }
 };
 

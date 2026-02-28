@@ -30,7 +30,7 @@ const ForgotPassword = ({ navigation }) => {
     }
   }, [step]);
 
-  
+
   const showToast = (type, title, message) => {
     Toast.show({
       type,
@@ -41,10 +41,15 @@ const ForgotPassword = ({ navigation }) => {
     });
   };
 
-  
+
   const handleSendOtp = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!email?.trim()) {
       showToast('error', 'Error', 'Please enter your email');
+      return;
+    } else if (!emailRegex.test(email.trim())) {
+      showToast('error', 'Invalid Email', 'Please enter a valid email address');
       return;
     }
 
@@ -64,7 +69,7 @@ const ForgotPassword = ({ navigation }) => {
     }
   };
 
-  
+
   const handleVerifyOtp = async () => {
     if (!otp?.trim()) {
       showToast('error', 'Error', 'Please enter the OTP');
@@ -88,7 +93,7 @@ const ForgotPassword = ({ navigation }) => {
     }
   };
 
-  
+
   const handleResetPassword = async () => {
     if (!password || !confirmPassword) {
       showToast('error', 'Error', 'Please fill both password fields');
@@ -115,7 +120,7 @@ const ForgotPassword = ({ navigation }) => {
     }
   };
 
-  
+
   return (
     <ScrollableAvoidKeyboard style={styles.container}>
       <TextView
@@ -126,7 +131,7 @@ const ForgotPassword = ({ navigation }) => {
       />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {}
+        { }
         {step === 1 && (
           <Validation>
             <Input
@@ -146,7 +151,7 @@ const ForgotPassword = ({ navigation }) => {
             />
           </Validation>
         )}
-        {}
+        { }
         {step === 2 && (
           <Validation>
             <Input
@@ -171,7 +176,7 @@ const ForgotPassword = ({ navigation }) => {
             />
           </Validation>
         )}
-        {}
+        { }
         {step === 3 && (
           <Validation>
             <Input

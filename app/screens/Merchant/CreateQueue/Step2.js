@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, SafeAreaView, StyleSheet } from 'react-native';
 import NavigationOptions from '../../../components/NavigationOptions';
-import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard' ;
+import ScrollableAvoidKeyboard from '../../../components/ScrollableAvoidKeyboard/ScrollableAvoidKeyboard';
 import AppStyles from '../../../styles/AppStyles';
 import { Button, Touchable } from '../../../components/Button';
 import TextView from '../../../components/TextView/TextView';
 import Icon from '../../../components/Icon';
-import  colors  from '../../../styles/colors';
+import colors from '../../../styles/colors';
 import { borderRadius } from '../../../styles/dimensions';
 import { verticalScale, scale } from 'react-native-size-matters';
 import FormGroup from '../../../components/FormGroup';
@@ -26,7 +26,7 @@ const Step2 = (props) => {
   return (
     <SafeAreaView style={[AppStyles.root]}>
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
-        <TextView text={'Deskâ€™s Details'} type={'body-one'} isTextColorWhite={true} style={[AppStyles.titleStyle]} />
+        <TextView text={"Desk's Details"} type={'body-one'} isTextColorWhite={true} style={[AppStyles.titleStyle]} />
         <View style={s.inputBtnWrapper}>
           <View>
             <View style={s.Wrapper}>
@@ -231,7 +231,7 @@ const s = StyleSheet.create({
     marginRight: scale(50),
     marginLeft: scale(5)
   },
-  fromGroup: {
+  formGroup: {
     marginTop: verticalScale(10)
   },
   inputWrapperStyle: {

@@ -48,6 +48,7 @@ export const login = (obj) => async (dispatch) => {
     dispatch(setLoginToken(data));
     return true;
   } catch (e) {
+    console.log("error");
     console.log(e, "errorrrrr");
     dispatchAuthError('error', getAPIResponseError(e) || 'Unable to login please try again', dispatch);
     return false;
@@ -172,11 +173,10 @@ export const verificationCode = () => async (dispatch) => {
   try {
     dispatch(clearAuthResponseMsg());
     dispatch(setAuthLoader(true));
-    // const response = await axios.post(`${baseUrl}/auth/verification-code`);
-    const response = await verificationcode(code);
+    const response = await verificationcode();
     return true;
   } catch (e) {
-    dispatchAuthError('error', getAPIResponseError(e) || 'Unable to signup, please try again', dispatch);
+    dispatchAuthError('error', getAPIResponseError(e) || 'Unable to resend code, please try again', dispatch);
     return false;
   } finally {
     dispatch(setAuthLoader(false));

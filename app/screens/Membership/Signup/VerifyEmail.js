@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import Input from '../../../components/Input';
 import screens from '../../../constants/screens';
 import { borderRadius } from '../../../styles/dimensions';
@@ -16,17 +16,34 @@ import Validation from './../../../components/Validation/Validation';
 import { logout } from '../../../services/authService';
 import { getAuthUser, saveAuthUser } from '../../../utils/localStorageHelpers';
 import { clearAuthResponseMsg, setCurrentUser } from '../../../actions/authActions';
+import Toast from 'react-native-toast-message';
 
 const VerifyEmail = (props) => {
   const [code, setCode] = useState('');
-  const [isResendButtonEnable, setButtonEnableDisable] = useState(false);
+  const [timer, setTimer] = useState(30);
+  const [isResending, setIsResending] = useState(false);
+  const timerRef = useRef(null);
 
   const { loading, resError = {}, user } = props.auth;
+
+  const startTimer = () => {
+    setTimer(30);
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   useEffect(() => {
-    setTimeout(() => {
-      setButtonEnableDisable(true);
-    }, 15000);
+    startTimer();
     return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
       props.clearAuthResponseMsg();
     };
   }, []);
@@ -49,7 +66,20 @@ const VerifyEmail = (props) => {
   };
 
   const onPressResendCodeHandler = async () => {
-    await props.verificationCode();
+    if (timer > 0 || isResending) return;
+
+    setIsResending(true);
+    const result = await props.verificationCode();
+    setIsResending(false);
+
+    if (result) {
+      Toast.show({
+        type: 'success',
+        text1: 'Code Sent',
+        text2: 'A new verification code has been sent to your email.',
+      });
+      startTimer();
+    }
   };
 
   const onPressChangeEmail = async () => {
@@ -89,15 +119,24 @@ const VerifyEmail = (props) => {
             />
           </Validation>
         </View>
-        {isResendButtonEnable && (
-          <TextView
-            color={colors.primary}
-            text={'Resend Code'}
-            type={'body-head'}
-            style={[AppStyles.titleStyle, s.resetOtp]}
-            onPress={onPressResendCodeHandler}
-          />
-        )}
+        <View style={s.resendContainer}>
+          {timer > 0 ? (
+            <TextView
+              color={colors.lightWhite}
+              text={`Resend Code in ${timer}s`}
+              type={'body-head'}
+              style={[AppStyles.titleStyle, s.resetOtp]}
+            />
+          ) : (
+            <TextView
+              color={isResending ? colors.lightWhite : colors.primary}
+              text={isResending ? 'Sending...' : 'Resend Code'}
+              type={'body-head'}
+              style={[AppStyles.titleStyle, s.resetOtp]}
+              onPress={onPressResendCodeHandler}
+            />
+          )}
+        </View>
         <Button
           onPress={onPressVerifyEmail}
           ButtonText='Verify & Continue'

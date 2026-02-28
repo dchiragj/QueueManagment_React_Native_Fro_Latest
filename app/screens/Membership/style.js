@@ -4,12 +4,12 @@ import { colors, fontWeights } from '../../styles';
 import { halfindent, indent } from '../../styles/dimensions';
 
 export default StyleSheet.create({
-  fromGroup: {
+  formGroup: {
     marginTop: verticalScale(45),
     paddingTop: verticalScale(10),
     paddingBottom: verticalScale(40)
   },
-  inputplaceholderText: {
+  inputPlaceholderText: {
     marginLeft: scale(halfindent),
     color: 'white'
   },

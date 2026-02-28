@@ -37,12 +37,48 @@ const AddBranch = () => {
    };
 
    const handleSave = async () => {
-      const { businessName, businessAddress, businessPhoneNumber } = formData;
-      if (!businessName || !businessAddress || !businessPhoneNumber) {
+      const { businessName, businessAddress, businessPhoneNumber, businessRegistrationNumber } = formData;
+
+      if (!businessName.trim()) {
          Toast.show({
             type: 'error',
-            text1: 'Validation Error',
-            text2: 'Please fill in all required fields.',
+            text1: 'Required',
+            text2: 'Business Name is required.',
+         });
+         return;
+      }
+
+      if (!businessRegistrationNumber.trim()) {
+         Toast.show({
+            type: 'error',
+            text1: 'Required',
+            text2: 'Business Registration Number is required.',
+         });
+         return;
+      }
+
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!businessPhoneNumber.trim()) {
+         Toast.show({
+            type: 'error',
+            text1: 'Required',
+            text2: 'Phone number is required.',
+         });
+         return;
+      } else if (!phoneRegex.test(businessPhoneNumber.trim())) {
+         Toast.show({
+            type: 'error',
+            text1: 'Invalid Phone',
+            text2: 'Please enter a valid 10-digit phone number.',
+         });
+         return;
+      }
+
+      if (!businessAddress.trim()) {
+         Toast.show({
+            type: 'error',
+            text1: 'Required',
+            text2: 'Address is required.',
          });
          return;
       }
@@ -85,7 +121,7 @@ const AddBranch = () => {
             keyboardShouldPersistTaps={'handled'}
             contentContainerStyle={{ paddingBottom: 40 }}
          >
-            {}
+            { }
             <Input
                placeholder="Enter business name"
                value={formData.businessName}

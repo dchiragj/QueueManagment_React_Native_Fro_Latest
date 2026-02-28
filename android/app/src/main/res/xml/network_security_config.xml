@@ -11,6 +11,6 @@
         <!-- <domain includeSubdomains="true">10.0.2.2</domain>
         <domain includeSubdomains="true">127.0.0.1</domain> -->
         <!-- Add your computer's IP address -->
-        <domain includeSubdomains="true">192.168.2.11</domain>
+        <domain includeSubdomains="true">192.168.2.50</domain>
     </domain-config>
 </network-security-config>

@@ -53,7 +53,7 @@ const Step1 = ({ navigation }) => {
   const [desks, setDesks] = useState([]);
   const [locationError, setLocationError] = useState('');
   const [userLocation, setUserLocation] = useState({ lat: 0, long: 0 });
-  const [errorMessages, setErrorMassages] = useState('')
+  const [errorMessages, setErrorMessages] = useState('')
   const [isDayQueue, setIsDayQueue] = useState(0);
 
   useEffect(() => {
@@ -180,28 +180,65 @@ const Step1 = ({ navigation }) => {
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
           title: 'Location Permission',
-          message: 'We need your location to create a location-based queue',
+          message: 'We need your location to create a location-based queue. Please allow "While using the app".',
           buttonPositive: 'OK',
           buttonNegative: 'Cancel',
         }
       );
+
+      if (granted === PermissionsAndroid.RESULTS.DENIED) {
+        Toast.show({
+          type: 'error',
+          text1: 'Permission Denied',
+          text2: 'Location is required for this join method.',
+          position: 'top',
+        });
+      } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+        Alert.alert(
+          'Permission Blocked',
+          'You have previously denied location permissions. Please go to Phone Settings > Apps > QueueFlow > Permissions and enable Location manually.'
+        );
+      }
+
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
-      
+      console.error('Permission Request Error:', err);
       return false;
     }
   };
 
-  const captureLocation = async () => {
+  const captureLocation = async (retryWithLowAccuracy = false) => {
     setLoading(true);
     setLocationError('');
+    if (!retryWithLowAccuracy) {
+      Toast.show({
+        type: 'info',
+        text1: 'Location',
+        text2: 'Fetching your current GPS coordinates...',
+        position: 'top',
+      });
+    }
 
     try {
       const hasPermission = await requestLocationPermission();
       if (!hasPermission) {
-        setLocationError('Permission denied');
         setLoading(false);
+        setLocationError('Permission denied');
+        Alert.alert(
+          'Permission Denied',
+          'Please enable Location permissions in your phone settings and REBUILD the app to apply changes.'
+        );
         return false;
+      }
+
+      // Explicit check for Android permissions status
+      if (Platform.OS === 'android') {
+        const checkPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+        if (!checkPermission) {
+          setLoading(false);
+          Alert.alert('Permission Error', 'The app does not have ACCESS_FINE_LOCATION permission. Please rebuild the app.');
+          return false;
+        }
       }
 
       return new Promise((resolve) => {
@@ -211,22 +248,43 @@ const Step1 = ({ navigation }) => {
             setFormData(prev => ({ ...prev, latitude, longitude }));
             setUserLocation({ lat: latitude, long: longitude });
             setLoading(false);
+            Toast.show({
+              type: 'success',
+              text1: 'Location Captured',
+              text2: `Coordinates: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+              position: 'top',
+            });
             resolve(true);
           },
-          (error) => {
-            
-            setLocationError('Failed to get location');
+          async (error) => {
+            console.error('Location Error:', error);
+
+            if (!retryWithLowAccuracy) {
+              setLoading(false);
+              const success = await captureLocation(true);
+              resolve(success);
+              return;
+            }
+
             setLoading(false);
+            setLocationError(`Error: ${error.message} (Code: ${error.code})`);
+            Alert.alert(
+              'Location Error',
+              `Detailed Error: ${error.message}\nCode: ${error.code}\n\nTips:\n1. Ensure GPS is ON\n2. Move near a window or outdoors\n3. Restart the app if it persists.`
+            );
             resolve(false);
           },
           {
-            enableHighAccuracy: true,
-            timeout: 15000,
+            enableHighAccuracy: !retryWithLowAccuracy,
+            timeout: retryWithLowAccuracy ? 20000 : 15000,
             maximumAge: 10000,
+            showLocationDialog: true,
+            forceRequestLocation: true,
           }
         );
       });
     } catch (err) {
+      console.error('Capture Location Catch Error:', err);
       setLocationError('Permission error');
       setLoading(false);
       return false;
@@ -261,14 +319,14 @@ const Step1 = ({ navigation }) => {
       const queue = await getQueueList();
       navigation.navigate('MyQueue', { queues: queue.data ?? [] });
     } catch (error) {
-      
+
       Toast.show({
         type: 'error',
         text1: 'Error',
         text2: error.message || 'Failed to create queue',
       });
     } finally {
-      setErrorMassages('')
+      setErrorMessages('')
       setLoading(false);
     }
   };
@@ -290,7 +348,7 @@ const Step1 = ({ navigation }) => {
         }));
       setDesks(deskList);
     } catch (err) {
-      
+
       setDesks([]);
     }
   };
@@ -325,7 +383,7 @@ const Step1 = ({ navigation }) => {
 
         await fetchAllDesks();
       } catch (err) {
-        
+
         setCategories([]);
         setBusinesses([]);
       } finally {
@@ -342,7 +400,7 @@ const Step1 = ({ navigation }) => {
         </View>
       )}
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        {}
+        { }
         <FormGroup style={[AppStyles.formContainer, s.firstFormWrapper]}>
           <Input
             placeholder="Enter Queue Name"
@@ -370,7 +428,7 @@ const Step1 = ({ navigation }) => {
           />
         </FormGroup>
 
-        {}
+        { }
         <FormGroup>
           <TextView
             text="Select Desks for this Queue"
@@ -447,7 +505,7 @@ const Step1 = ({ navigation }) => {
                 selectedDate={formData.start_date}
                 disabled={loading}
               />
-              {}
+              { }
             </View>
             <View style={s.containerStyle}>
               <DatePicker
@@ -459,12 +517,12 @@ const Step1 = ({ navigation }) => {
                 selectedDate={formData.end_date}
                 disabled={loading}
               />
-              {}
+              { }
             </View>
           </View>
         </View>
 
-        <View style={s.dayaWrapper}>
+        <View style={s.dayWrapper}>
           <TextView
             style={s.dateTextHeader}
             text="Is this a day-based queue?"
@@ -521,6 +579,8 @@ const Step1 = ({ navigation }) => {
           placeholder="Enter Address"
           isIconLeft leftIconName="location"
           isIconRight rightIconName="locate"
+          onPressIcon={captureLocation}
+          loading={loading}
           style={s.addressInput}
           wrapperStyle={s.addressInputWrapperStyle}
           value={formData.address}
@@ -550,11 +610,13 @@ const Step1 = ({ navigation }) => {
                   key={key}
                   style={s.radio}
                   onPress={async () => {
+                    const prevMethod = formData.joinMethods;
                     setFormData({ ...formData, joinMethods: key });
                     if (key === 'location') {
                       const success = await captureLocation();
                       if (!success) {
-                        setFormData((prev) => ({ ...prev, joinMethods: '' }));
+                        setFormData((prev) => ({ ...prev, joinMethods: prevMethod }));
+                        // Removed generic toast to avoid overlapping with detailed Alert
                       }
                     } else {
                       setFormData((prev) => ({ ...prev, latitude: 0, longitude: 0 }));
@@ -569,7 +631,7 @@ const Step1 = ({ navigation }) => {
               );
             })}
           </View>
-          {}
+          { }
         </FormGroup>
 
         <Button
@@ -588,7 +650,7 @@ const s = StyleSheet.create({
   firstFormWrapper: { marginTop: verticalScale(30) },
   topBorder: { borderWidth: 0.5, borderColor: colors.lightWhite, marginTop: scale(30), marginHorizontal: scale(15) },
   dateWrapper: { marginTop: verticalScale(30) },
-  dayaWrapper: { marginTop: verticalScale(0) },
+  dayWrapper: { marginTop: verticalScale(0) },
   dateTextHeader: { textAlign: 'center' },
   DatePickerWrapper: { flexDirection: 'row', marginTop: verticalScale(15), justifyContent: 'space-around' },
   DaybasedQueue: { flexDirection: 'row', marginTop: verticalScale(15), justifyContent: 'center' },

@@ -187,13 +187,13 @@ const Onboarding = (props) => {
       );
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
-      
+
       return false;
     }
   };
   const handleImagePick = async () => {
     if (!launchCamera || !launchImageLibrary) {
-      
+
       Alert.alert('Error', 'Image picker module not found. Please restart the app or contact support.');
       return;
     }
@@ -236,7 +236,7 @@ const Onboarding = (props) => {
         }
 
       } catch (error) {
-        
+
         Alert.alert('Error', 'Failed to select image');
       }
     };
@@ -273,8 +273,8 @@ const Onboarding = (props) => {
       <ScrollableAvoidKeyboard showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
         <Touchable onPress={handleImagePick}>
           <View style={s.profileImgMain}>
-            {}
-            {}
+            { }
+            { }
             <Image
               source={
                 user?.ProfileUrl
@@ -294,7 +294,7 @@ const Onboarding = (props) => {
             <TextView color={colors.primary} text={'Upload Photo'} type={'body-head'} style={[s.uploadPhotoText]} />
           </View>
         </Touchable>
-        <FormGroup style={[s.fromGroup]}>
+        <FormGroup style={[s.formGroup]}>
           <Validation error={resError.firstname}>
             <Input
               returnKeyType={'next'}
@@ -415,7 +415,7 @@ const s = StyleSheet.create({
   uploadPhotoText: {
     marginTop: verticalScale(15),
   },
-  fromGroup: {
+  formGroup: {
     marginTop: verticalScale(25),
   },
   genderWrapper: {

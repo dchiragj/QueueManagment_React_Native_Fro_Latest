@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { connect } from 'react-redux';
 import TextView from '../../components/TextView/TextView';
 import AppStyles from '../../styles/AppStyles';
@@ -38,6 +39,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RefreshControl, Dimensions } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import moment from 'moment';
+import Geolocation from 'react-native-geolocation-service';
+import { PermissionsAndroid } from 'react-native';
 
 import {
   Camera,
@@ -45,6 +48,7 @@ import {
   useCodeScanner,
 } from 'react-native-vision-camera';
 import Loading from '../../components/Loading';
+import { getHasSeenTour, setHasSeenTour } from '../../utils/localStorageHelpers';
 
 const Home = (props) => {
   let { user } = props.auth;
@@ -75,6 +79,8 @@ const Home = (props) => {
     weeklyTrend: [],
     recentHistory: [],
   });
+  const [showTourModal, setShowTourModal] = useState(false);
+  const [currentTourStep, setCurrentTourStep] = useState(1);
 
 
   const fetchDashCounts = async () => {
@@ -165,8 +171,6 @@ const Home = (props) => {
 
 
   useEffect(() => {
-    props.navigation.setParams({ openDrawer: _openDrawer });
-
     const fetchCategories = async () => {
       setIsLoadingCategories(true);
       try {
@@ -184,6 +188,31 @@ const Home = (props) => {
     };
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    props.navigation.setParams({ openDrawer: _openDrawer });
+  }, []);
+
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    const checkTourStatus = async () => {
+      if (user?.role === 'merchant' && isFocused) {
+        const hasSeen = await getHasSeenTour();
+        const startTourParam = props.route?.params?.startTour;
+
+        if (startTourParam) {
+          if (!showTourModal) setShowTourModal(true);
+          props.navigation.setParams({ startTour: false });
+          return;
+        }
+
+        if (!hasSeen && !showTourModal) {
+          setShowTourModal(true);
+        }
+      }
+    };
+    checkTourStatus();
+  }, [isFocused, props.route?.params?.startTour, showTourModal]);
 
   const _openDrawer = () => {
     props.navigation.openDrawer();
@@ -203,6 +232,29 @@ const Home = (props) => {
       visibilityTime: 3000,
       topOffset: 60,
     });
+  };
+
+  const requestLocationPermission = async () => {
+    try {
+      if (Platform.OS === 'ios') {
+        const status = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+        return status === RESULTS.GRANTED;
+      } else {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Permission',
+            message: 'We need your location to find nearby queues.',
+            buttonPositive: 'OK',
+            buttonNegative: 'Cancel',
+          }
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      }
+    } catch (err) {
+      showToast('error', 'Permission Error', 'Failed to access location');
+      return false;
+    }
   };
 
   const requestCameraPermission = async () => {
@@ -235,6 +287,23 @@ const Home = (props) => {
       const granted = await requestCameraPermission();
       if (granted) {
         setIsScanning(true);
+      }
+    } else if (tab === 'location') {
+      const granted = await requestLocationPermission();
+      if (granted) {
+        setIsLoading(true);
+        Geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setLocation(`${latitude},${longitude}`);
+            setIsLoading(false);
+          },
+          (error) => {
+            setIsLoading(false);
+            showToast('error', 'Location Error', 'Failed to get current location');
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
       }
     }
   };
@@ -351,7 +420,7 @@ const Home = (props) => {
         showToast(
           'success',
           'Token Generated!',
-          `Your token number is ${res.data.tokenNumber} ðŸŽ‰`
+          `Your token number is ${res.data.tokenNumber} 🎉`
         );
         setQrDetails(null);
         clearInputs();
@@ -414,15 +483,155 @@ const Home = (props) => {
         </View>
         { }
         <TouchableOpacity style={styles.closeBtn} onPress={() => setIsScanning(false)}>
-          <TextView text="âœ• Close" color="white" type="body" />
+          <TextView text="✖ Close" color="white" type="body" />
         </TouchableOpacity>
       </View>
+    );
+  };
+
+  const tourSteps = [
+    {
+      title: "1. Setup Your Business",
+      description: "Add your branches and locations in 'Branch Service' menu.",
+      icon: "business",
+      color: colors.success
+    },
+    {
+      title: "2. Configure Desks",
+      description: "Assign service counters to each branch in 'Desk Management'.",
+      icon: "desktop-windows",
+      color: "#3498db"
+    },
+    {
+      title: "3. Create a Queue",
+      description: "Start a new queue and map it to your desks in 'My Queue'.",
+      icon: "queue",
+      color: "#f1c40f"
+    },
+    {
+      title: "4. Serve Customers",
+      description: "Share your QR. Customers join and you serve them via Desk.",
+      icon: "people",
+      color: colors.primary
+    }
+  ];
+
+  const handleNextTour = async () => {
+    if (currentTourStep < 4) {
+      setCurrentTourStep(currentTourStep + 1);
+    } else {
+      await setHasSeenTour(true);
+      setShowTourModal(false);
+      setCurrentTourStep(1);
+    }
+  };
+
+  const handleSkipTour = async () => {
+    await setHasSeenTour(true);
+    setShowTourModal(false);
+    setCurrentTourStep(1);
+  };
+
+  const renderTourModal = () => {
+    const step = tourSteps[currentTourStep - 1];
+    return (
+      <Modal
+        visible={showTourModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={handleSkipTour}
+      >
+        <View style={s.modalOverlay}>
+          <View style={[s.broadcastContainer, {
+            padding: scale(25),
+            backgroundColor: '#1A1A1A',
+            borderRadius: 24,
+            borderWidth: 1,
+            borderColor: 'rgba(255, 107, 0, 0.2)',
+            shadowColor: colors.primary,
+            shadowOffset: { width: 0, height: 10 },
+            shadowOpacity: 0.3,
+            shadowRadius: 20,
+            elevation: 10
+          }]}>
+            <View style={{ alignItems: 'center', marginBottom: verticalScale(20) }}>
+              <View style={[s.stepNumber, {
+                backgroundColor: 'rgba(255, 107, 0, 0.1)',
+                width: scale(80),
+                height: scale(80),
+                borderRadius: scale(40),
+                marginBottom: verticalScale(20),
+                borderWidth: 2,
+                borderColor: step.color,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }]}>
+                <Icon name={step.icon} size={40} color={step.color} />
+              </View>
+              <TextView
+                text={step.title}
+                type="body-head"
+                color={colors.white}
+                style={{ fontSize: moderateScale(22), textAlign: 'center', fontWeight: 'bold' }}
+              />
+              <TextView
+                text={step.description}
+                type="body"
+                color={colors.lightWhite}
+                style={{ textAlign: 'center', marginTop: verticalScale(12), lineHeight: verticalScale(22), fontSize: moderateScale(15) }}
+              />
+            </View>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: verticalScale(30) }}>
+              {[1, 2, 3, 4].map((i) => (
+                <View
+                  key={i}
+                  style={{
+                    width: i === currentTourStep ? scale(24) : scale(8),
+                    height: scale(8),
+                    borderRadius: scale(4),
+                    backgroundColor: i === currentTourStep ? colors.primary : 'rgba(255,255,255,0.2)',
+                    marginHorizontal: scale(4)
+                  }}
+                />
+              ))}
+            </View>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <TouchableOpacity onPress={handleSkipTour} style={{ paddingVertical: verticalScale(10), paddingHorizontal: scale(10) }}>
+                <TextView text="Skip Tour" color={colors.lightWhite} type="body" style={{ opacity: 0.7 }} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleNextTour}
+                style={{
+                  backgroundColor: colors.primary,
+                  paddingVertical: verticalScale(12),
+                  paddingHorizontal: scale(40),
+                  borderRadius: 15,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  elevation: 5,
+                  shadowColor: colors.primary,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 8
+                }}
+              >
+                <TextView text={currentTourStep === 4 ? "Let's Start" : "Next"} color={colors.white} type="body-head" style={{ fontWeight: 'bold' }} />
+                <Icon name="chevron-right" size={20} color="white" style={{ marginLeft: 5 }} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     );
   };
 
   return (
     <>
       {isLoading && <Loading isTransparent={true} />}
+      {renderTourModal()}
       <SafeAreaView style={[AppStyles.root]}>
         <StatusBar barStyle="light-content" backgroundColor="#000" />
         <ScrollableAvoidKeyboard
@@ -437,7 +646,12 @@ const Home = (props) => {
           }
         >
           {user?.role === 'customer' && (
-            <Input placeholder="Search Shop Here" isIconLeft leftIconName="search" color={colors.white} />
+            <Image
+              source={require('../../assets/images/upcoming events.png')}
+              style={{ textAlign: 'center', alignSelf: 'center' }}  // size compulsory che
+              resizeMode="contain"
+            />
+            // <Input placeholder="Search Shop Here" isIconLeft leftIconName="search" color={colors.white} />
           )}
           {tabs.length > 0 && (
             <View style={s.tabContainer}>
@@ -756,55 +970,6 @@ const Home = (props) => {
                 </View>
               </Modal>
 
-              { }
-              <View style={s.sectionHeader}>
-                <TextView text="Quick Start Guide" type="body-head" color={colors.white} />
-                <TextView text="Setup your business in 4 easy steps" type="tiny" color={colors.lightWhite} />
-              </View>
-
-              <View style={s.guideContainer}>
-                <View style={s.timelineLine} />
-
-                <View style={s.stepItem}>
-                  <View style={[s.stepNumber, { backgroundColor: colors.success }]}>
-                    <Icon name="business" size={16} color="white" />
-                  </View>
-                  <View style={s.stepContent}>
-                    <TextView text="1. Setup Your Business" type="body-head" color={colors.white} />
-                    <TextView text="Add your branches and locations in 'Branch Service' menu." type="caption" color={colors.lightWhite} />
-                  </View>
-                </View>
-
-                <View style={s.stepItem}>
-                  <View style={[s.stepNumber, { backgroundColor: "#3498db" }]}>
-                    <Icon name="desktop-windows" size={16} color="white" />
-                  </View>
-                  <View style={s.stepContent}>
-                    <TextView text="2. Configure Desks" type="body-head" color={colors.white} />
-                    <TextView text="Assign service counters to each branch in 'Desk Management'." type="caption" color={colors.lightWhite} />
-                  </View>
-                </View>
-
-                <View style={s.stepItem}>
-                  <View style={[s.stepNumber, { backgroundColor: "#f1c40f" }]}>
-                    <Icon name="queue" size={16} color="white" />
-                  </View>
-                  <View style={s.stepContent}>
-                    <TextView text="3. Create a Queue" type="body-head" color={colors.white} />
-                    <TextView text="Start a new queue and map it to your desks in 'My Queue'." type="caption" color={colors.lightWhite} />
-                  </View>
-                </View>
-
-                <View style={s.stepItem}>
-                  <View style={[s.stepNumber, { backgroundColor: colors.primary }]}>
-                    <Icon name="people" size={16} color="white" />
-                  </View>
-                  <View style={s.stepContent}>
-                    <TextView text="4. Serve Customers" type="body-head" color={colors.white} />
-                    <TextView text="Share your QR. Customers join and you serve them via Desk." type="caption" color={colors.lightWhite} />
-                  </View>
-                </View>
-              </View>
             </View>
           )}
 
@@ -875,7 +1040,7 @@ const Home = (props) => {
                   style={s.profileText}
                 />
                 <TextView
-                  text={`Category: ${isLoadingCategories ? 'Loading...' : getCategoryName(qrDetails.category)}`}
+                  text={`Category: ${qrDetails.categoryName || (isLoadingCategories ? 'Loading...' : getCategoryName(qrDetails.category))}`}
                   color={colors.white}
                   type="body"
                   style={s.profileText}
@@ -937,14 +1102,14 @@ const Home = (props) => {
             </>
           )}
         </ScrollableAvoidKeyboard>
-      </SafeAreaView>
+      </SafeAreaView >
 
       { }
-      <Modal visible={isScanning} animationType="slide" onRequestClose={() => setIsScanning(false)}>
+      < Modal visible={isScanning} animationType="slide" onRequestClose={() => setIsScanning(false)}>
         <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
           <VisionQRScanner />
         </SafeAreaView>
-      </Modal>
+      </Modal >
     </>
   );
 };
